@@ -31,6 +31,17 @@ public class c_airPlane : MonoBehaviour
 
     private void Update()
     {
+        // 엔진 출력 제어
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            m_power += Time.deltaTime * 5.0f;
+        }
+        else if (Input.GetKey(KeyCode.LeftControl))
+        {
+            m_power -= Time.deltaTime * 5.0f;
+        }
+
+        m_state[(int)m_currentState].update();
         m_material.SetFloat("_DissolveAmount", m_stealth);
     }
 
