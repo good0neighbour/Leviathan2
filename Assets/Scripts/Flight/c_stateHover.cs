@@ -9,15 +9,18 @@ public class c_stateHover : c_airPlaneStateBase
         m_transform = t_transform;
     }
 
+
     public override void changeState()
     {
         throw new System.NotImplementedException();
     }
 
+
     public override void execute()
     {
         throw new System.NotImplementedException();
     }
+
 
     public override void fixedUpdate()
     {
@@ -32,6 +35,7 @@ public class c_stateHover : c_airPlaneStateBase
         // 위치 이동
         m_transform.position += m_velocity * Time.deltaTime;
     }
+
 
     public override void update()
     {
