@@ -19,6 +19,28 @@ public class C_AirPlane : MonoBehaviour
 
     /* ========== Public Methods ========== */
 
+    /// <summary>
+    /// 상태 변경
+    /// </summary>
+    public void SetState(E_FlightStates t_state)
+    {
+        // 상태 변경
+        m_currentState = t_state;
+    }
+
+
+    /// <summary>
+    /// 상태 클래스 반환
+    /// </summary>
+    public C_AirPlaneStateBase GetState(E_FlightStates t_state)
+    {
+        return m_state[(int)t_state];
+    }
+
+
+
+    /* ========== Private Methods ========== */
+
     private void Awake()
     {
         // 항공기 설정 가져오기
@@ -28,8 +50,8 @@ public class C_AirPlane : MonoBehaviour
 
         // 상태 클래스 생성
         m_state = new C_AirPlaneStateBase[(int)E_FlightStates.end];
-        m_state[(int)E_FlightStates.eHover] = new C_StateHover(transform, t_settings);
-        m_state[(int)E_FlightStates.eFlight] = new C_StateFlight(transform, t_settings);
+        m_state[(int)E_FlightStates.eHover] = new C_StateHover(this, t_settings);
+        m_state[(int)E_FlightStates.eFlight] = new C_StateFlight(this, t_settings);
 
         // 항공기 메타리얼 복사
         m_material = new Material(m_renderer.material);
@@ -44,43 +66,27 @@ public class C_AirPlane : MonoBehaviour
         {
             m_power += Time.deltaTime * 5.0f;
         }
-        else if (Input.GetKey(KeyCode.LeftControl))
+        else if (Input.GetKey(KeyCode.LeftControl) && m_minEnginePower < m_power)
         {
             m_power -= Time.deltaTime * 5.0f;
         }
 
-        // 비행 상태 변경 (임시)
-        if (Input.GetKeyDown(KeyCode.F) && m_minEnginePower < m_power)
-        {
-            switch (m_currentState)
-            {
-                case E_FlightStates.eHover:
-                    m_currentState = E_FlightStates.eFlight;
-                    break;
-                case E_FlightStates.eFlight:
-                    m_currentState = E_FlightStates.eHover;
-                    break;
-            }
-            m_currentPower = m_power;
-            m_state[(int)m_currentState].power = m_power;
-        }
-
         // 은폐 (임시)
-        if (Input.GetKeyDown(KeyCode.C) && 0 == (m_stealthActive & 0b010))
+        if (Input.GetKeyDown(KeyCode.C) && 0 == (m_stealthActive & 0b10))
         {
             if (1 <= (1 & m_stealthActive))
             {
-                m_stealthActive -= 0b001;
+                m_stealthActive -= 0b01;
             }
             else
             {
-                m_stealthActive += 0b001;
+                m_stealthActive += 0b01;
             }
 
-            m_stealthActive += 0b010;
+            m_stealthActive += 0b10;
         }
 
-        if (1 <= (m_stealthActive & 0b010))
+        if (1 <= (m_stealthActive & 0b10))
         {
             if (1 <= (1 & m_stealthActive))
             {
@@ -88,7 +94,7 @@ public class C_AirPlane : MonoBehaviour
                 if (1.0f < m_stealth)
                 {
                     m_stealth = 1.0f;
-                    m_stealthActive -= 0b010;
+                    m_stealthActive -= 0b10;
                 }
             }
             else
@@ -97,7 +103,7 @@ public class C_AirPlane : MonoBehaviour
                 if (0.0f > m_stealth)
                 {
                     m_stealth = 0.0f;
-                    m_stealthActive -= 0b010;
+                    m_stealthActive -= 0b10;
                 }
             }
 

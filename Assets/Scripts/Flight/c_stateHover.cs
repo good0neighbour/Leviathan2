@@ -16,9 +16,10 @@ public class C_StateHover : C_AirPlaneStateBase
 
     /* ========== Public Methods ========== */
 
-    public C_StateHover(Transform t_transform, C_AirplaneSettings t_settings)
+    public C_StateHover(C_AirPlane t_machine, C_AirplaneSettings t_settings)
     {
-        m_transform = t_transform;
+        m_machine = t_machine;
+        m_transform = t_machine.transform;
         m_rotateSpeedmult = t_settings.m_hoverRotateSpeedmult;
         m_rotatePower = t_settings.m_hoverRotatePower;
         m_rotateRestorePower = t_settings.m_hoverRotateRestorePower;
@@ -29,35 +30,29 @@ public class C_StateHover : C_AirPlaneStateBase
 
     public override void ChangeState()
     {
-        
+        C_AirPlaneStateBase t_state = m_machine.GetState(E_FlightStates.eFlight);
+        t_state.power = power;
+        t_state.velocity = velocity;
+        t_state.Execute();
     }
 
 
     public override void Execute()
     {
-        
+        m_machine.SetState(E_FlightStates.eHover);
     }
 
 
     public override void FixedUpdate()
     {
         // 기체의 위 방향으로 가속
-        Vector3 t_acellation = new Vector3(0.0f, power, 0.0f);
-
-        // 공기저항과 양력
-        t_acellation += AirResistAndLiftPower();
-
-        // 중력 가속도 및 가속 방향
-        t_acellation = m_transform.localRotation * t_acellation + new Vector3(0, -9.8f, 0);
-
-        // 속력 결정
-        m_velocity += t_acellation * Time.deltaTime;
+        Vector3 t_acceleration = new Vector3(0.0f, power, 0.0f);
 
         // 위치 이동
-        m_transform.localPosition += m_velocity * Time.deltaTime;
+        m_transform.localPosition += SetVelocity(t_acceleration) * Time.fixedDeltaTime;
 
         // 기체 회전
-        m_transform.localRotation *= Quaternion.Euler(new Vector3(m_rotationFront, m_rotationY, m_rotationSide) * Time.deltaTime * m_rotatePower);
+        m_transform.localRotation *= Quaternion.Euler(new Vector3(m_rotationFront, m_rotationY, m_rotationSide) * Time.fixedDeltaTime * m_rotatePower);
 
         // 기체 회전 회복
         float t_rotationX = m_transform.localRotation.eulerAngles.x;
@@ -71,21 +66,22 @@ public class C_StateHover : C_AirPlaneStateBase
             t_rotationZ -= 360.0f;
         }
         m_transform.localRotation *= Quaternion.Euler(
-            (-t_rotationX) * Time.deltaTime * m_rotateRestorePower,
+            (-t_rotationX) * Time.fixedDeltaTime * m_rotateRestorePower,
             0.0f,
-            (-t_rotationZ) * Time.deltaTime * m_rotateRestorePower
+            (-t_rotationZ) * Time.fixedDeltaTime * m_rotateRestorePower
         );
     }
 
 
     public override void Update()
     {
+        #region 조작
         // 전, 후 기울기
         if (Input.GetKey(KeyCode.W))
         {
-            if (1 < m_rotationFront)
+            if (1.0f < m_rotationFront)
             {
-                m_rotationFront = 1;
+                m_rotationFront = 1.0f;
             }
             else
             {
@@ -94,24 +90,26 @@ public class C_StateHover : C_AirPlaneStateBase
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            if (-1 > m_rotationFront)
+            if (-1.0f > m_rotationFront)
             {
-                m_rotationFront = -1;
+                m_rotationFront = -1.0f;
             }
             else
             {
                 m_rotationFront -= Time.deltaTime * m_rotateSpeedmult;
             }
         }
-
-        // 전, 후 기울기 속도 감소
-        if (0 < m_rotationFront)
+        else
         {
-            m_rotationFront -= Time.deltaTime * m_reverseRotateSpeedmult;
-        }
-        else if (0 > m_rotationFront)
-        {
-            m_rotationFront += Time.deltaTime * m_reverseRotateSpeedmult;
+            // 전, 후 기울기 속도 감소
+            if (0.0f < m_rotationFront)
+            {
+                m_rotationFront -= Time.deltaTime * m_reverseRotateSpeedmult;
+            }
+            else if (0.0f > m_rotationFront)
+            {
+                m_rotationFront += Time.deltaTime * m_reverseRotateSpeedmult;
+            }
         }
 
         // 좌, 우 기울기
@@ -119,7 +117,7 @@ public class C_StateHover : C_AirPlaneStateBase
         {
             if (1 < m_rotationSide)
             {
-                m_rotationSide = 1;
+                m_rotationSide = 1.0f;
             }
             else
             {
@@ -128,32 +126,34 @@ public class C_StateHover : C_AirPlaneStateBase
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            if (-1 > m_rotationSide)
+            if (-1.0f > m_rotationSide)
             {
-                m_rotationSide = -1;
+                m_rotationSide = -1.0f;
             }
             else
             {
                 m_rotationSide -= Time.deltaTime * m_rotateSpeedmult;
             }
         }
-
-        // 좌, 우 기울기 속도 김소
-        if (0 < m_rotationSide)
+        else
         {
-            m_rotationSide -= Time.deltaTime * m_reverseRotateSpeedmult;
-        }
-        else if (0 > m_rotationSide)
-        {
-            m_rotationSide += Time.deltaTime * m_reverseRotateSpeedmult;
+            // 좌, 우 기울기 속도 감소
+            if (0.0f < m_rotationSide)
+            {
+                m_rotationSide -= Time.deltaTime * m_reverseRotateSpeedmult;
+            }
+            else if (0.0f > m_rotationSide)
+            {
+                m_rotationSide += Time.deltaTime * m_reverseRotateSpeedmult;
+            }
         }
 
         // 기체 회전 속도
         if (Input.GetKey(KeyCode.E))
         {
-            if (1 < m_rotationY)
+            if (1.0f < m_rotationY)
             {
-                m_rotationY = 1;
+                m_rotationY = 1.0f;
             }
             else
             {
@@ -162,9 +162,9 @@ public class C_StateHover : C_AirPlaneStateBase
         }
         else if (Input.GetKey(KeyCode.Q))
         {
-            if (-1 > m_rotationY)
+            if (-1.0f > m_rotationY)
             {
-                m_rotationY = -1;
+                m_rotationY = -1.0f;
             }
             else
             {
@@ -174,14 +174,21 @@ public class C_StateHover : C_AirPlaneStateBase
         else
         {
             // 기체 회전 속도 감소
-            if (0 < m_rotationY)
+            if (0.0f < m_rotationY)
             {
                 m_rotationY -= Time.deltaTime * m_reverseRotateSpeedmult;
             }
-            else if (0 > m_rotationY)
+            else if (0.0f > m_rotationY)
             {
                 m_rotationY += Time.deltaTime * m_reverseRotateSpeedmult;
             }
+        }
+        #endregion
+
+        // 비행 상태 변경
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            ChangeState();
         }
     }
 }

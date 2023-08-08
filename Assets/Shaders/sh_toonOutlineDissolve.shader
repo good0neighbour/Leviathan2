@@ -3,7 +3,7 @@ Shader "Leviathan/sh_toonOutline"
     Properties
     {
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _DeepShadowColour ("ShadowColour", Color) = (0.5,0.5,0.5,1)
+        _Color ("ShadowColour", Color) = (0.5,0.5,0.5,1)
         [Space(16)]
         _RimLightColour ("RimLightColour", Color) = (1,1,1,1)
         _RimLightWidth ("RimLightWidth", Range(0,1)) = 0.9
@@ -21,6 +21,8 @@ Shader "Leviathan/sh_toonOutline"
         [Space(16)]
         _StealthTexture ("StealthTexture", 2D) = "white" {}
         _StealthWidth ("StealthWidth", Range(1,20)) = 5
+        [Space(16)]
+        _Cutoff ("Cutoff", Range(0, 1)) = 0.5
     }
     SubShader
     {
@@ -116,7 +118,7 @@ Shader "Leviathan/sh_toonOutline"
             fixed2 uv_MainTex;
         };
 
-        fixed4 _DeepShadowColour;
+        fixed4 _Color;
         fixed4 _RimLightColour;
         fixed _RimLightWidth;
         fixed _RimLightAppearing;
@@ -154,7 +156,7 @@ Shader "Leviathan/sh_toonOutline"
 
             // Ä«Å÷ ·»´õ¸µ
             tTemp.x = step(0.2, dot(tLightDir, tOutput.Normal));
-            tResult.rgb = tOutput.Albedo * (tTemp.x + _DeepShadowColour * (1 - tTemp.x));
+            tResult.rgb = tOutput.Albedo * (tTemp.x + _Color * (1 - tTemp.x));
             
             // ¸²¶óÀÌÆ® Ä«Å÷ ·»´õ¸µ ¹öÀü
             tTemp.x = 1 - dot(tViewDir, tOutput.Normal);
@@ -170,5 +172,5 @@ Shader "Leviathan/sh_toonOutline"
         }
         ENDCG
     }
-    FallBack "Diffuse"
+    FallBack "Legacy Shaders/Transparent/Cutout/VertexLit"
 }
