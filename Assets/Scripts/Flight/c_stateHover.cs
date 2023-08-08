@@ -16,10 +16,9 @@ public class C_StateHover : C_AirPlaneStateBase
 
     /* ========== Public Methods ========== */
 
-    public C_StateHover(Transform t_transform)
+    public C_StateHover(Transform t_transform, C_AirplaneSettings t_settings)
     {
         m_transform = t_transform;
-        C_AirplaneSettings t_settings = Resources.Load<C_AirplaneSettings>("AirplaneSettings");
         m_rotateSpeedmult = t_settings.m_hoverRotateSpeedmult;
         m_rotatePower = t_settings.m_hoverRotatePower;
         m_rotateRestorePower = t_settings.m_hoverRotateRestorePower;
@@ -46,7 +45,7 @@ public class C_StateHover : C_AirPlaneStateBase
         Vector3 t_acellation = new Vector3(0.0f, power, 0.0f);
 
         // 공기저항과 양력
-        t_acellation -= AirResistAndLiftPower();
+        t_acellation += AirResistAndLiftPower();
 
         // 중력 가속도 및 가속 방향
         t_acellation = m_transform.localRotation * t_acellation + new Vector3(0, -9.8f, 0);

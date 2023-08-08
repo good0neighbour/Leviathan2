@@ -4,10 +4,9 @@ public class C_StateFlight : C_AirPlaneStateBase
 {
     /* ========== Public Methods ========== */
 
-    public C_StateFlight(Transform t_transform)
+    public C_StateFlight(Transform t_transform, C_AirplaneSettings t_settings)
     {
         m_transform = t_transform;
-        C_AirplaneSettings t_settings = Resources.Load<C_AirplaneSettings>("AirplaneSettings");
         m_airResist = t_settings.m_airResist;
         m_liftPower = t_settings.m_liftPower;
     }
@@ -46,6 +45,21 @@ public class C_StateFlight : C_AirPlaneStateBase
 
     public override void Update()
     {
-        
+        if (Input.GetKey(KeyCode.S))
+        {
+            m_transform.localRotation *= Quaternion.Euler(-50.0f * Time.deltaTime, 0.0f, 0.0f);
+        }
+        else if (Input.GetKey(KeyCode.W))
+        {
+            m_transform.localRotation *= Quaternion.Euler(50.0f * Time.deltaTime, 0.0f, 0.0f);
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            m_transform.localRotation *= Quaternion.Euler(0.0f, 0.0f, 50.0f * Time.deltaTime);
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            m_transform.localRotation *= Quaternion.Euler(0.0f, 0.0f, -50.0f * Time.deltaTime);
+        }
     }
 }

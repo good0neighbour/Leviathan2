@@ -6,7 +6,7 @@ public abstract class C_AirPlaneStateBase : C_StateBase
 
     protected Transform m_transform = null;
     protected Vector3 m_velocity = Vector3.zero;
-    protected float m_airResist = 0.0f;
+    protected Vector3 m_airResist = Vector3.zero;
     protected float m_liftPower = 0.0f;
 
 
@@ -30,10 +30,16 @@ public abstract class C_AirPlaneStateBase : C_StateBase
         // ·ÎÄ® ÁÂÇ¥°è ±âÁØ ¼Ó·Â
         Vector3 t_velocity = Quaternion.Inverse(m_transform.localRotation) * m_velocity;
 
+        Debug.Log(Mathf.Abs(t_velocity.y) * t_velocity.y * m_airResist.y);
+
         // ¾ç·Â
         return new Vector3(0.0f, -m_velocity.y * Mathf.Abs(m_velocity.z) * m_liftPower, 0.0f)
 
             // °ø±âÀúÇ× »¬¼À
-            - new Vector3(Mathf.Abs(t_velocity.x) * t_velocity.x, Mathf.Abs(t_velocity.y) * t_velocity.y, Mathf.Abs(t_velocity.z) * t_velocity.z) * m_airResist;
+             - new Vector3(
+                 Mathf.Abs(t_velocity.x) * t_velocity.x * m_airResist.x,
+                 Mathf.Abs(t_velocity.y) * t_velocity.y * m_airResist.y,
+                 0.0f
+               );
     }
 }

@@ -12,7 +12,7 @@ Shader "Leviathan/sh_toonOutline"
         [Space(16)]
         _OutlineColour ("OutlineColour", Color) = (0,0,0,1)
         _OutlineWidth ("OustlineWidth", Range(0,0.1)) = 0.05
-        _OutlineMaxWidth ("OutlineMaxWidth", Range(0,0.1)) = 0.05
+        _OutlineMaxWidth ("OutlineMaxWidth", Range(0,0.5)) = 0.05
         [Space(16)]
         _DissolveTexture ("DissolveTexture", 2D) = "white" {}
         _DissolveAmount ("DissolveAmount", Range(0,1)) = 0
@@ -27,7 +27,10 @@ Shader "Leviathan/sh_toonOutline"
         Tags { "RenderType"="Opaque" "Queue"="Transparent" }
         LOD 200
 
-        // ¿Ü°û¼± ·»´õ¸µ
+
+
+        // 1 pass ¿Ü°û¼± ·»´õ¸µ
+
         cull front
         CGPROGRAM
         #pragma surface surf NoLight noshadow noambient noforwardadd nolightmap novertexlight vertex:vert alpha:fade
@@ -69,8 +72,12 @@ Shader "Leviathan/sh_toonOutline"
         }
         ENDCG
 
-        // ±íÀÌ°ª ±â·Ï¿ë
+
+
+        // 2 pass ±íÀÌ°ª ±â·Ï¿ë
+
         zwrite on
+        cull back
         colormask 0
         CGPROGRAM
         #pragma surface surf NoCaculation noshadow noambient noforwardadd nolightmap novertexlight
@@ -91,9 +98,11 @@ Shader "Leviathan/sh_toonOutline"
         }
         ENDCG
 
-        // º»Ã¼ ·»´õ¸µ
+
+
+        // 3 pass º»Ã¼ ·»´õ¸µ
+
         zwrite off
-        cull back
         CGPROGRAM
         #pragma surface surf ToonShade noambient noforwardadd nolightmap novertexlight alpha:fade
         #pragma target 3.0
