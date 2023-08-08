@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8cc0e4aa1f15954eb36a02049a7b636, type: 3}
   m_Name: AirplaneSettings
   m_EditorClassIdentifier: 
-  m_hoverRotateSpeedmult: 25
-  m_hoverRotateRestoreSpeedmult: 10
-  m_hiverMaxRotation: 30
+  m_hoverRotateSpeedmult: 4
+  m_hoverRotatePower: 25
+  m_hoverRotateRestorePower: 0.5
+  m_airResist: 0.01
+  m_liftPower: 0.1

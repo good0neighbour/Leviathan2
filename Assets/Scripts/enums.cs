@@ -1,4 +1,4 @@
-public enum e_flightStates
+public enum E_FlightStates
 {
     eHover,
     eFlight,

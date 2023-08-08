@@ -1,51 +1,51 @@
 using UnityEngine;
 
-public class c_stateFlight : c_airPlaneStateBase
+public class C_StateFlight : C_AirPlaneStateBase
 {
     /* ========== Public Methods ========== */
 
-    public c_stateFlight(Transform t_transform)
+    public C_StateFlight(Transform t_transform)
     {
         m_transform = t_transform;
+        C_AirplaneSettings t_settings = Resources.Load<C_AirplaneSettings>("AirplaneSettings");
+        m_airResist = t_settings.m_airResist;
+        m_liftPower = t_settings.m_liftPower;
     }
 
 
-    public override void changeState()
+    public override void ChangeState()
     {
-        throw new System.NotImplementedException();
+        
     }
 
 
-    public override void execute()
+    public override void Execute()
     {
-        throw new System.NotImplementedException();
+        
     }
 
 
-    public override void fixedUpdate()
+    public override void FixedUpdate()
     {
-        Vector3 t_accelation;
+        // 전방으로 가속
+        Vector3 t_accelation = new Vector3(0.0f, 0.0f, power);
 
-        switch (m_velocity.z)
-        {
-            case 0.0f:
-                t_accelation = new Vector3(0.0f, -9.8f, 0.0f);
-                break;
-            default:
-                t_accelation = new Vector3(0.0f, -Mathf.Abs(9.8f / m_velocity.z), 0.0f);
-                break;
-        }
+        // 공기저항과 양력
+        t_accelation += AirResistAndLiftPower();
 
-        t_accelation += m_transform.localRotation * new Vector3(0.0f, 0.0f, power);
+        // 중력가속도 및 가속 방향
+        t_accelation += m_transform.localRotation * t_accelation + new Vector3(0, -9.8f, 0);
 
+        // 속력 결정
         m_velocity += t_accelation * Time.deltaTime;
 
+        // 위치 이동
         m_transform.localPosition += m_velocity * Time.deltaTime;
     }
 
 
-    public override void update()
+    public override void Update()
     {
-        throw new System.NotImplementedException();
+        
     }
 }
