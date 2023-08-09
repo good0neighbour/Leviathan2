@@ -13,6 +13,7 @@ public class C_AirPlane : MonoBehaviour
     [SerializeField] private RectTransform m_directionImage = null;
     [SerializeField] private RectTransform m_powerImage = null;
     [SerializeField] private TMP_Text m_velocityText = null;
+    [SerializeField] private TMP_Text m_altitudeText = null;
     private C_AirPlaneStateBase[] m_state = null;
     private Material m_material = null;
     private E_FlightStates m_currentState = E_FlightStates.eHover;
@@ -20,6 +21,8 @@ public class C_AirPlane : MonoBehaviour
     private byte m_stealthActive = 0;
     private float m_maxEnginePower = 0.0f;
     private float m_minEnginePower = 0.0f;
+    private float m_powerMovement = 0.0f;
+    private float m_powerImageLength = 0.0f;
 
 
 
@@ -64,8 +67,8 @@ public class C_AirPlane : MonoBehaviour
         C_AirplaneSettings t_settings = Resources.Load<C_AirplaneSettings>("AirplaneSettings");
         m_maxEnginePower = t_settings.m_maxEnginePower;
         m_minEnginePower = t_settings.m_minEnginePower;
-        m_HUDUpDown.offsetMax = new Vector2(t_settings.m_HUDUpDownWidth * 0.5f, t_settings.m_HUDUpDownHeight * 0.5f);
-        m_HUDUpDown.offsetMin = new Vector2(-t_settings.m_HUDUpDownWidth * 0.5f, -t_settings.m_HUDUpDownHeight * 0.5f);
+        m_powerMovement = t_settings.m_powerMovement;
+        m_powerImageLength = t_settings.m_powerImageLength * Screen.height;
 
         // 상태 클래스 생성
         m_state = new C_AirPlaneStateBase[(int)E_FlightStates.end];
@@ -83,11 +86,17 @@ public class C_AirPlane : MonoBehaviour
         // 엔진 출력 제어
         if (Input.GetKey(KeyCode.LeftShift) && m_maxEnginePower > m_power)
         {
-            m_power += Time.deltaTime * 5.0f;
+            m_power += Time.deltaTime * m_powerMovement;
+
+            // 엔진 출력 표시
+            m_powerImage.localPosition = new Vector3(m_powerImage.localPosition.x, m_power / m_maxEnginePower * m_powerImageLength - m_powerImageLength * 0.5f, 0.0f);
         }
         else if (Input.GetKey(KeyCode.LeftControl) && m_minEnginePower < m_power)
         {
-            m_power -= Time.deltaTime * 5.0f;
+            m_power -= Time.deltaTime * m_powerMovement;
+
+            // 엔진 출력 표시
+            m_powerImage.localPosition = new Vector3(m_powerImage.localPosition.x, m_power / m_maxEnginePower * m_powerImageLength - m_powerImageLength * 0.5f, 0.0f);
         }
 
         // 은폐 (임시)
@@ -132,8 +141,8 @@ public class C_AirPlane : MonoBehaviour
         // 다형성
         m_state[(int)m_currentState].Update();
 
-        // 엔진 출력 표시
-        m_powerImage.localPosition = new Vector3(m_powerImage.localPosition.x, m_power / m_maxEnginePower * 800.0f - 400.0f, 0.0f);
+        // 고도 표시
+        m_altitudeText.text = Mathf.RoundToInt(transform.localPosition.y).ToString();
     }
 
 
@@ -155,16 +164,4 @@ public class C_AirPlane : MonoBehaviour
             transform.localPosition = new Vector3(transform.localPosition.x, 0.0f, transform.localPosition.z);
         }
     }
-
-
-#if UNITY_EDITOR
-    private void OnDrawGizmos()
-    {
-        if (null != m_state)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(transform.position, transform.position + m_state[(int)m_currentState].velocity * 100.0f);
-        }
-    }
-#endif
 }

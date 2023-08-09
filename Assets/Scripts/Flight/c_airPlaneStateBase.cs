@@ -8,11 +8,11 @@ public abstract class C_AirPlaneStateBase : C_StateBase
     protected C_AirPlane m_machine = null;
     protected Transform m_transform = null;
     protected Vector3 m_airResist = Vector3.zero;
-    protected float m_liftPower = 0.0f;
     protected float m_HUDUpDownMoveAmount = 0.0f;
     private RectTransform m_HUDUpDown = null;
     private RectTransform m_directionImage = null;
     private TMP_Text m_velocityText = null;
+    private int m_currentScreenHeight = 0;
 
 
 
@@ -40,8 +40,9 @@ public abstract class C_AirPlaneStateBase : C_StateBase
         t_machine.GetHUDs(out m_HUDUpDown, out m_velocityText, out m_directionImage);
 
         m_airResist = t_settings.m_airResist;
-        m_liftPower = t_settings.m_liftPower;
-        m_HUDUpDownMoveAmount = t_settings.m_HUDUpDownMoveAmount;
+
+        m_currentScreenHeight = Screen.height;
+        m_HUDUpDownMoveAmount = m_currentScreenHeight / Camera.main.fieldOfView;
     }
 
 
@@ -53,9 +54,6 @@ public abstract class C_AirPlaneStateBase : C_StateBase
     /// </summary>
     protected Vector3 SetVelocity(Vector3 t_acceleration)
     {
-        // 양력
-        //t_acceleration += new Vector3(0.0f, -velocity.y * Mathf.Abs(velocity.z) * m_liftPower, 0.0f);
-
         // 로칼 좌표계 기준 속력
         Vector3 t_velocity = Quaternion.Inverse(m_transform.localRotation) * velocity
         
@@ -85,9 +83,6 @@ public abstract class C_AirPlaneStateBase : C_StateBase
     /// </summary>
     protected Vector3 SetVelocity(Vector3 t_acceleration, out float t_localVelocityZ)
     {
-        // 양력
-        //t_acceleration += new Vector3(0.0f, -velocity.y * Mathf.Abs(velocity.z) * m_liftPower, 0.0f);
-
         // 로칼 좌표계 기준 속력
         Vector3 t_velocity = Quaternion.Inverse(m_transform.localRotation) * velocity
 
@@ -120,6 +115,24 @@ public abstract class C_AirPlaneStateBase : C_StateBase
     /// </summary>
     protected void HUDUpdate()
     {
+#if PLATFORM_STANDALONE_WIN
+        // 화면 크기 바뀐 경우 HUD 크기 변경
+        if (m_currentScreenHeight != Screen.height)
+        {
+            m_currentScreenHeight = Screen.height;
+            m_HUDUpDownMoveAmount = m_currentScreenHeight / Camera.main.fieldOfView;
+
+            m_HUDUpDown.offsetMax = new Vector2(
+                m_HUDUpDown.offsetMax.x,
+                m_currentScreenHeight / Camera.main.fieldOfView * 90.0f
+            );
+            m_HUDUpDown.offsetMin = new Vector2(
+                m_HUDUpDown.offsetMin.x,
+                -m_currentScreenHeight / Camera.main.fieldOfView * 90.0f
+            );
+        }
+#endif
+
         // 기체 각도
         Vector3 t_rotation = m_transform.localRotation.eulerAngles;
         if (180.0f < t_rotation.x)
@@ -143,25 +156,25 @@ public abstract class C_AirPlaneStateBase : C_StateBase
         m_velocityText.text = Mathf.RoundToInt(t_velocity).ToString();
 
         // 계산량 절약
-        float t_r2d = 180.0f / Mathf.PI;
-        float t_radianZ = t_rotation.z * Mathf.PI / 180.0f;
+        float t_radianZ = t_rotation.z * Mathf.Deg2Rad;
         float t_cosZ = Mathf.Cos(t_radianZ);
         float t_sinZ = Mathf.Sin(t_radianZ);
 
+        // 방향 표시 이미지 위치
+        m_directionImage.localPosition = new Vector3(
+            Mathf.Atan(t_direction.x) * Mathf.Rad2Deg * m_HUDUpDownMoveAmount,
+            Mathf.Atan(t_direction.y) * Mathf.Rad2Deg * m_HUDUpDownMoveAmount,
+            0.0f
+        );
+
         // 위, 아래 각도 HUD 위치
         m_HUDUpDown.localPosition = new Vector3(
-            (t_rotation.x * t_sinZ + Mathf.Atan(t_direction.x) * t_cosZ * t_r2d) * m_HUDUpDownMoveAmount,
-            (t_rotation.x * t_cosZ + Mathf.Atan(t_direction.y) * Mathf.Abs(t_sinZ) * t_r2d) * m_HUDUpDownMoveAmount,
+            (t_rotation.x * t_sinZ + Mathf.Atan(t_direction.x) * t_cosZ * Mathf.Rad2Deg) * m_HUDUpDownMoveAmount,
+            (t_rotation.x * t_cosZ + Mathf.Atan(t_direction.y) * Mathf.Abs(t_sinZ) * Mathf.Rad2Deg) * m_HUDUpDownMoveAmount,
             0.0f
         );
 
         // 위, 아래 각도 HUD 회전
         m_HUDUpDown.localRotation = Quaternion.Euler(0.0f, 0.0f, -t_rotation.z);
-
-        // 방향 표시 이미지 위치
-        m_directionImage.localPosition = new Vector3(
-            Mathf.Atan(t_direction.x) * t_r2d * m_HUDUpDownMoveAmount,
-            Mathf.Atan(t_direction.y) * t_r2d * m_HUDUpDownMoveAmount,
-            0.0f);
     }
 }
