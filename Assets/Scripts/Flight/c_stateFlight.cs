@@ -8,20 +8,18 @@ public class C_StateFlight : C_AirPlaneStateBase
     private float m_rotationLeftRight = 0.0f;
     private float m_rotationY = 0.0f;
     private float m_rotateSpeedmult = 0.0f;
+    private float m_flightPowerMultiply = 0.0f;
     private Vector3 m_rotatePower = Vector3.zero;
 
 
 
     /* ========== Public Methods ========== */
 
-    public C_StateFlight(C_AirPlane t_machine, C_AirplaneSettings t_settings)
+    public C_StateFlight(C_AirPlane t_machine, C_AirplaneSettings t_settings) : base(t_machine, t_settings)
     {
-        m_machine = t_machine;
-        m_transform = t_machine.transform;
-        m_airResist = t_settings.m_airResist;
-        m_liftPower = t_settings.m_liftPower;
         m_rotateSpeedmult = t_settings.m_flightRotateSpeedmult;
         m_rotatePower = t_settings.m_flightRotatePower;
+        m_flightPowerMultiply = t_settings.m_flightPowerMultiply;
     }
 
 
@@ -43,7 +41,7 @@ public class C_StateFlight : C_AirPlaneStateBase
     public override void FixedUpdate()
     {
         // 전방으로 가속
-        Vector3 t_acceleration = new Vector3(0.0f, 0.0f, power);
+        Vector3 t_acceleration = new Vector3(0.0f, 0.0f, power * m_flightPowerMultiply);
 
         // 로칼 좌표계 기준 전방 방향 속력
         float t_velocityZ;
@@ -179,5 +177,7 @@ public class C_StateFlight : C_AirPlaneStateBase
         {
             ChangeState();
         }
+
+        HUDUpdate();
     }
 }

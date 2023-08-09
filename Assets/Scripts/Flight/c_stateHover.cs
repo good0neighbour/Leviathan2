@@ -16,14 +16,11 @@ public class C_StateHover : C_AirPlaneStateBase
 
     /* ========== Public Methods ========== */
 
-    public C_StateHover(C_AirPlane t_machine, C_AirplaneSettings t_settings)
+    public C_StateHover(C_AirPlane t_machine, C_AirplaneSettings t_settings) : base(t_machine, t_settings)
     {
-        m_machine = t_machine;
-        m_transform = t_machine.transform;
         m_rotateSpeedmult = t_settings.m_hoverRotateSpeedmult;
         m_rotatePower = t_settings.m_hoverRotatePower;
         m_rotateRestorePower = t_settings.m_hoverRotateRestorePower;
-        m_airResist = t_settings.m_airResist;
         m_reverseRotateSpeedmult = m_rotateSpeedmult * 0.5f;
     }
 
@@ -190,5 +187,7 @@ public class C_StateHover : C_AirPlaneStateBase
         {
             ChangeState();
         }
+
+        HUDUpdate();
     }
 }

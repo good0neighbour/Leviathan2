@@ -15,9 +15,13 @@ MonoBehaviour:
   m_hoverRotateSpeedmult: 4
   m_hoverRotatePower: 15
   m_hoverRotateRestorePower: 0.5
+  m_flightPowerMultiply: 1.5
   m_flightRotateSpeedmult: 2
-  m_flightRotatePower: {x: 0.05, y: 0.05, z: 0.2}
-  m_airResist: {x: 0.0005, y: 0.001, z: 0.00001}
+  m_flightRotatePower: {x: 0.07, y: 0.05, z: 0.2}
+  m_airResist: {x: 0.0003, y: 0.0005, z: 0.00001}
   m_liftPower: 0.1
   m_maxEnginePower: 100
   m_minEnginePower: 0
+  m_HUDUpDownWidth: 960
+  m_HUDUpDownHeight: 3300
+  m_HUDUpDownMoveAmount: 19.5

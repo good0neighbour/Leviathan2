@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class C_AirPlane : MonoBehaviour
 {
@@ -7,6 +8,11 @@ public class C_AirPlane : MonoBehaviour
     [SerializeField][Range(0.0f, 100.0f)] private float m_power = 9.8f;
     [SerializeField][Range(0.0f, 1.0f)] private float m_stealth = 0.0f;
     [SerializeField] private MeshRenderer m_renderer = null;
+    [Header("HUD")]
+    [SerializeField] private RectTransform m_HUDUpDown = null;
+    [SerializeField] private RectTransform m_directionImage = null;
+    [SerializeField] private RectTransform m_powerImage = null;
+    [SerializeField] private TMP_Text m_velocityText = null;
     private C_AirPlaneStateBase[] m_state = null;
     private Material m_material = null;
     private E_FlightStates m_currentState = E_FlightStates.eHover;
@@ -38,6 +44,17 @@ public class C_AirPlane : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// 헤드업디스플레이 가져오기
+    /// </summary>
+    public void GetHUDs(out RectTransform t_HUDUpDown, out TMP_Text t_velocityText, out RectTransform t_directionImage)
+    {
+        t_HUDUpDown = m_HUDUpDown;
+        t_velocityText = m_velocityText;
+        t_directionImage = m_directionImage;
+    }
+
+
 
     /* ========== Private Methods ========== */
 
@@ -47,6 +64,8 @@ public class C_AirPlane : MonoBehaviour
         C_AirplaneSettings t_settings = Resources.Load<C_AirplaneSettings>("AirplaneSettings");
         m_maxEnginePower = t_settings.m_maxEnginePower;
         m_minEnginePower = t_settings.m_minEnginePower;
+        m_HUDUpDown.offsetMax = new Vector2(t_settings.m_HUDUpDownWidth * 0.5f, t_settings.m_HUDUpDownHeight * 0.5f);
+        m_HUDUpDown.offsetMin = new Vector2(-t_settings.m_HUDUpDownWidth * 0.5f, -t_settings.m_HUDUpDownHeight * 0.5f);
 
         // 상태 클래스 생성
         m_state = new C_AirPlaneStateBase[(int)E_FlightStates.end];
@@ -112,6 +131,9 @@ public class C_AirPlane : MonoBehaviour
 
         // 다형성
         m_state[(int)m_currentState].Update();
+
+        // 엔진 출력 표시
+        m_powerImage.localPosition = new Vector3(m_powerImage.localPosition.x, m_power / m_maxEnginePower * 800.0f - 400.0f, 0.0f);
     }
 
 
@@ -133,4 +155,16 @@ public class C_AirPlane : MonoBehaviour
             transform.localPosition = new Vector3(transform.localPosition.x, 0.0f, transform.localPosition.z);
         }
     }
+
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (null != m_state)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, transform.position + m_state[(int)m_currentState].velocity * 100.0f);
+        }
+    }
+#endif
 }
