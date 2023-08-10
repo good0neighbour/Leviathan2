@@ -41,6 +41,7 @@ public abstract class C_AirPlaneStateBase : C_StateBase
 
         m_airResist = t_settings.m_airResist;
 
+        // 화면 크기 가져온다.
         m_currentScreenHeight = Screen.height;
         m_HUDUpDownMoveAmount = m_currentScreenHeight / Camera.main.fieldOfView;
     }

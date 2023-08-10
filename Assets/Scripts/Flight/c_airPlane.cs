@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class C_AirPlane : MonoBehaviour
@@ -61,6 +62,97 @@ public class C_AirPlane : MonoBehaviour
 
     /* ========== Private Methods ========== */
 
+    private void CreateHUD(Color32 t_HUDColour, float t_HUDColourDarkMultiply, float t_HUDLineWidth, float t_HUDHorizonWidthMultiply)
+    {
+        for (byte t_i = 0; t_i <= 36; ++t_i)
+        {
+            float t_height = 1.0f / 36.0f * t_i;
+
+            #region 위, 아래 각도 표시용 HUD 선분
+            // 좌측
+            GameObject t_gameObject = new GameObject("HUDUpDownLineImageLeft", typeof(CanvasRenderer), typeof(Image));
+            t_gameObject.transform.SetParent(m_HUDUpDown);
+
+            RectTransform t_rectTransform = t_gameObject.GetComponent<RectTransform>();
+            t_rectTransform.offsetMax = Vector2.zero;
+            t_rectTransform.offsetMin = Vector2.zero;
+            t_rectTransform.anchorMax = new Vector2(0.45f, t_height + t_HUDLineWidth);
+            t_rectTransform.anchorMin = new Vector2(0.1f, t_height - t_HUDLineWidth);
+
+            Image t_image = t_gameObject.GetComponent<Image>();
+
+            if (18 > t_i)
+            {
+                t_image.color = new Color32(
+                    (byte)(t_HUDColour.r * t_HUDColourDarkMultiply),
+                    (byte)(t_HUDColour.g * t_HUDColourDarkMultiply),
+                    (byte)(t_HUDColour.b * t_HUDColourDarkMultiply),
+                    t_HUDColour.a);
+            }
+            else
+            {
+                t_image.color = t_HUDColour;
+                switch (t_i)
+                {
+                    case 18:
+                        t_rectTransform.anchorMax = new Vector2(0.45f, 1.0f / 36.0f * t_i + t_HUDLineWidth * t_HUDHorizonWidthMultiply);
+                        t_rectTransform.anchorMin = new Vector2(0.0f, 1.0f / 36.0f * t_i - t_HUDLineWidth * t_HUDHorizonWidthMultiply);
+                        break;
+                }
+            }
+
+            // 우측
+            t_gameObject = new GameObject("HUDUpDownLineImageRight", typeof(CanvasRenderer), typeof(Image));
+            t_gameObject.transform.SetParent(m_HUDUpDown);
+
+            t_rectTransform = t_gameObject.GetComponent<RectTransform>();
+            t_rectTransform.offsetMax = Vector2.zero;
+            t_rectTransform.offsetMin = Vector2.zero;
+            t_rectTransform.anchorMax = new Vector2(0.9f, t_height + t_HUDLineWidth);
+            t_rectTransform.anchorMin = new Vector2(0.55f, t_height - t_HUDLineWidth);
+
+            t_image = t_gameObject.GetComponent<Image>();
+
+            if (18 > t_i)
+            {
+                t_image.color = new Color32(
+                    (byte)(t_HUDColour.r * t_HUDColourDarkMultiply),
+                    (byte)(t_HUDColour.g * t_HUDColourDarkMultiply),
+                    (byte)(t_HUDColour.b * t_HUDColourDarkMultiply),
+                    t_HUDColour.a
+                );
+            }
+            else
+            {
+                t_image.color = t_HUDColour;
+                switch (t_i)
+                {
+                    case 18:
+                        t_rectTransform.anchorMax = new Vector2(1.0f, 1.0f / 36.0f * t_i + t_HUDLineWidth * t_HUDHorizonWidthMultiply);
+                        t_rectTransform.anchorMin = new Vector2(0.5f, 1.0f / 36.0f * t_i - t_HUDLineWidth * t_HUDHorizonWidthMultiply);
+                        break;
+                }
+            }
+            #endregion
+
+            #region 각도 숫자 표시
+            // 좌측
+            t_gameObject = new GameObject("HUDUpDownTextLeft", typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            t_gameObject.transform.SetParent(m_HUDUpDown);
+
+            t_rectTransform = t_gameObject.GetComponent<RectTransform>();
+            t_rectTransform.offsetMax = Vector2.zero;
+            t_rectTransform.offsetMin = Vector2.zero;
+            t_rectTransform.anchorMax = new Vector2(0.45f, t_height + 0.001f);
+            t_rectTransform.anchorMin = new Vector2(0.1f, t_height - 0.001f);
+
+            TextMeshProUGUI t_text = t_gameObject.GetComponent<TextMeshProUGUI>();
+            t_text.text = ((t_i - 18) * 5).ToString();
+            #endregion
+        }
+    }
+
+
     private void Awake()
     {
         // 항공기 설정 가져오기
@@ -78,6 +170,23 @@ public class C_AirPlane : MonoBehaviour
         // 항공기 메타리얼 복사
         m_material = new Material(m_renderer.material);
         m_renderer.material = m_material;
+
+        // HUD 크기 화면에 맞춤
+        m_HUDUpDown.offsetMax = new Vector2(
+            m_HUDUpDown.offsetMax.x,
+            Screen.height / Camera.main.fieldOfView * 90.0f
+        );
+        m_HUDUpDown.offsetMin = new Vector2(
+            m_HUDUpDown.offsetMin.x,
+            -Screen.height / Camera.main.fieldOfView * 90.0f
+        );
+
+        CreateHUD(
+            t_settings.m_HUDColour,
+            t_settings.m_HUDColourDarkMultiply,
+            t_settings.m_HUDLineWidth,
+            t_settings.m_HUDHorizonWidthMultiply
+        );
     }
 
 
