@@ -15,13 +15,20 @@ MonoBehaviour:
   m_hoverRotateSpeedmult: 4
   m_hoverRotatePower: 15
   m_hoverRotateRestorePower: 0.5
+  m_flightRotatePower: {x: 0.07, y: 0.05, z: 0.2}
   m_flightPowerMultiply: 1.5
   m_flightRotateSpeedmult: 2
-  m_flightRotatePower: {x: 0.07, y: 0.05, z: 0.2}
+  m_flightFalldownForce: 10
+  m_liftPower: 0.01
   m_airResist: {x: 0.0003, y: 0.0005, z: 0.00001}
-  m_liftPower: 0.1
   m_maxEnginePower: 100
   m_minEnginePower: 0
-  m_HUDUpDownWidth: 960
-  m_HUDUpDownHeight: 3300
-  m_HUDUpDownMoveAmount: 19.5
+  m_powerMovement: 20
+  m_HUDColour:
+    serializedVersion: 2
+    rgba: 4294967040
+  m_HUDColourDarkMultiply: 0.5
+  m_HUDLineWidth: 0.0004
+  m_HUDTextSize: 0.005
+  m_HUDHorizonWidthMultiply: 1.5
+  m_powerImageLength: 0.8

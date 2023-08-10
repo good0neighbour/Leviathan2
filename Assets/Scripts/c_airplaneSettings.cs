@@ -25,6 +25,7 @@ public class C_AirplaneSettings : ScriptableObject
     public Color32 m_HUDColour = new Color32(0, 255, 255, 255);
     [Range(0.0f, 1.0f)] public float m_HUDColourDarkMultiply = 0.5f;
     public float m_HUDLineWidth = 0.0004f;
+    public float m_HUDTextSize = 0.005f;
     public float m_HUDHorizonWidthMultiply = 1.5f;
     public float m_powerImageLength = 0.8f;
 }
