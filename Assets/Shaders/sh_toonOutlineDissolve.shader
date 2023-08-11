@@ -1,4 +1,4 @@
-Shader "Leviathan/sh_toonOutline"
+Shader "Leviathan/sh_toonOutlineDissolve"
 {
     Properties
     {
@@ -12,7 +12,7 @@ Shader "Leviathan/sh_toonOutline"
         [Space(16)]
         _OutlineColour ("OutlineColour", Color) = (0,0,0,1)
         _OutlineWidth ("OustlineWidth", Range(0,0.1)) = 0.05
-        _OutlineMaxWidth ("OutlineMaxWidth", Range(0,0.5)) = 0.05
+        _OutlineMaxWidth ("OutlineMaxWidth", Range(0,1)) = 0.05
         [Space(16)]
         _DissolveTexture ("DissolveTexture", 2D) = "white" {}
         _DissolveAmount ("DissolveAmount", Range(0,1)) = 0

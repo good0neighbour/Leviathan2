@@ -8,7 +8,7 @@ public class C_AirPlane : MonoBehaviour
 
     [SerializeField][Range(0.0f, 100.0f)] private float m_power = 9.8f;
     [SerializeField][Range(0.0f, 1.0f)] private float m_stealth = 0.0f;
-    [SerializeField] private MeshRenderer m_renderer = null;
+    [SerializeField] private MeshRenderer[] m_renderers = null;
     [Header("HUD 참조")]
     [SerializeField] private RectTransform m_HUDUpDown = null;
     [SerializeField] private RectTransform m_directionImage = null;
@@ -244,8 +244,11 @@ public class C_AirPlane : MonoBehaviour
         m_state[(int)E_FlightStates.eFlight] = new C_StateFlight(this, t_settings);
 
         // 항공기 메타리얼 복사
-        m_material = new Material(m_renderer.material);
-        m_renderer.material = m_material;
+        m_material = new Material(m_renderers[0].material);
+        for (byte t_i = 0; t_i < m_renderers.Length; ++t_i)
+        {
+            m_renderers[t_i].material = m_material;
+        }
 
         // HUD 크기 화면에 맞춤
         float t_FOV = 1.0f / Camera.main.fieldOfView;

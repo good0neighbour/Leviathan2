@@ -7,14 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SfTest1
+  m_Name: mtl_airPlaneBody
   m_Shader: {fileID: 4800000, guid: 13ed1b510e47dcb48b0f7efc146d4e28, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
-  m_InvalidKeywords:
-  - _EMISSION
-  m_LightmapFlags: 1
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -49,7 +48,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: d5a734e49adf60d4097dc29152e2cc1f, type: 3}
+        m_Texture: {fileID: 2800000, guid: 5c777c660d9bffe4baf15cd4de721e42, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -64,13 +63,17 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _StealthTexture:
+        m_Texture: {fileID: 2800000, guid: 815e49afbd8939249b6ee3f05dced9de, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DissolveAmount: 0
-    - _DissolveOutlineWidth: 0
+    - _DissolveOutlineWidth: 0.05
     - _DstBlend: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
@@ -78,8 +81,8 @@ Material:
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _OutlineMaxWidth: 0.05
-    - _OutlineWidth: 0.05
+    - _OutlineMaxWidth: 0.5
+    - _OutlineWidth: 0.005
     - _Parallax: 0.02
     - _RimLightAppearing: 1
     - _RimLightStrength: 1
@@ -87,11 +90,12 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
+    - _StealthWidth: 20
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.5882353, g: 0.5882353, b: 0.5882353, a: 1}
-    - _DeepShadowColour: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _Color: {r: 0.6886792, g: 0.6886792, b: 0.6886792, a: 1}
+    - _DissolveOutlineColour: {r: 0, g: 9.211473, b: 47.93726, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _OutlineColour: {r: 0, g: 0, b: 0, a: 1}
     - _RimLightColour: {r: 1, g: 1, b: 1, a: 1}
