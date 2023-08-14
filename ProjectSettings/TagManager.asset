@@ -3,12 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - tag_airplane
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - layer_cleanAlpha
   - Water
   - UI
   - 
