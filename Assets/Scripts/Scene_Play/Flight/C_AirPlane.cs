@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class C_AirPlane : MonoBehaviour
+public class C_AirPlane : MonoBehaviour, I_StateBase
 {
     /* ========== Fields ========== */
 
@@ -59,6 +59,75 @@ public class C_AirPlane : MonoBehaviour
         t_HUDUpDown = m_HUDUpDown;
         t_velocityText = m_velocityText;
         t_directionImage = m_directionImage;
+    }
+
+
+    public void Execute()
+    {
+
+    }
+
+    
+    public void ChangeState()
+    {
+
+    }
+
+
+    public void StateUpdate()
+    {
+#if PLATFORM_STANDALONE_WIN
+        // 화면 크기 변경 시
+        if (m_currentScreenHeight != Screen.height)
+        {
+            m_currentScreenHeight = Screen.height;
+            m_powerImageLength = m_powerImageRaito * m_currentScreenHeight;
+            EnginePowerUIUpdate();
+        }
+#endif
+
+        // 엔진 출력 제어
+        if (Input.GetKey(KeyCode.LeftShift) && m_maxEnginePower > m_power)
+        {
+            m_power += Time.deltaTime * m_powerMovement;
+
+            // 엔진 출력 표시
+            EnginePowerUIUpdate();
+        }
+        else if (Input.GetKey(KeyCode.LeftControl) && m_minEnginePower < m_power)
+        {
+            m_power -= Time.deltaTime * m_powerMovement;
+
+            // 엔진 출력 표시
+            EnginePowerUIUpdate();
+        }
+
+        // 은폐 (임시)
+        if (Input.GetKeyDown(KeyCode.C) && 0 == (m_stealthActive & 0b10))
+        {
+            if (1 <= (1 & m_stealthActive))
+            {
+                m_stealthActive -= 0b01;
+            }
+            else
+            {
+                m_stealthActive += 0b01;
+            }
+
+            m_stealthActive += 0b10;
+        }
+
+        // 다형성
+        m_state[(int)m_currentState].StateUpdate();
+
+        // 고도 표시
+        m_altitudeText.text = Mathf.RoundToInt(transform.localPosition.y).ToString();
+    }
+
+
+    public void StateFixedUpdate()
+    {
+        
     }
 
 
@@ -279,49 +348,10 @@ public class C_AirPlane : MonoBehaviour
     }
 
 
+    // 상태에 영향받지 않는 Update 동작
     private void Update()
     {
-#if PLATFORM_STANDALONE_WIN
-        // 화면 크기 변경 시
-        if (m_currentScreenHeight != Screen.height)
-        {
-            m_currentScreenHeight = Screen.height;
-            m_powerImageLength = m_powerImageRaito * m_currentScreenHeight;
-            EnginePowerUIUpdate();
-        }
-#endif
-
-        // 엔진 출력 제어
-        if (Input.GetKey(KeyCode.LeftShift) && m_maxEnginePower > m_power)
-        {
-            m_power += Time.deltaTime * m_powerMovement;
-
-            // 엔진 출력 표시
-            EnginePowerUIUpdate();
-        }
-        else if (Input.GetKey(KeyCode.LeftControl) && m_minEnginePower < m_power)
-        {
-            m_power -= Time.deltaTime * m_powerMovement;
-
-            // 엔진 출력 표시
-            EnginePowerUIUpdate();
-        }
-
-        // 은폐 (임시)
-        if (Input.GetKeyDown(KeyCode.C) && 0 == (m_stealthActive & 0b10))
-        {
-            if (1 <= (1 & m_stealthActive))
-            {
-                m_stealthActive -= 0b01;
-            }
-            else
-            {
-                m_stealthActive += 0b01;
-            }
-
-            m_stealthActive += 0b10;
-        }
-
+        // 은폐 메타리얼 값 전달
         if (1 <= (m_stealthActive & 0b10))
         {
             if (1 <= (0b01 & m_stealthActive))
@@ -347,15 +377,10 @@ public class C_AirPlane : MonoBehaviour
             m_materials[0].SetFloat("_DissolveAmount", m_stealth);
             m_materials[1].SetFloat("_DissolveAmount", m_stealth);
         }
-
-        // 다형성
-        m_state[(int)m_currentState].Update();
-
-        // 고도 표시
-        m_altitudeText.text = Mathf.RoundToInt(transform.localPosition.y).ToString();
     }
 
 
+    // 상태에 영향받지 않는 FixedUpdate 동작
     private void FixedUpdate()
     {
         // 엔진 출력 전달
@@ -366,7 +391,7 @@ public class C_AirPlane : MonoBehaviour
         }
 
         // 다형성
-        m_state[(int)m_currentState].FixedUpdate();
+        m_state[(int)m_currentState].StateFixedUpdate();
 
         // 지면 뚫기 방지
         if (0.0f > transform.localPosition.y)

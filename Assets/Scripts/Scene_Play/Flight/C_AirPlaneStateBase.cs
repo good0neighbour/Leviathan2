@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-public abstract class C_AirPlaneStateBase : C_StateBase
+public abstract class C_AirPlaneStateBase : I_StateBase
 {
     /* ========== Fields ========== */
 
@@ -61,6 +61,18 @@ public abstract class C_AirPlaneStateBase : C_StateBase
         m_currentScreenHeight = Screen.height;
 #endif
     }
+
+
+    public abstract void Execute();
+
+    
+    public abstract void ChangeState();
+
+    
+    public abstract void StateUpdate();
+
+    
+    public abstract void StateFixedUpdate();
 
 
 

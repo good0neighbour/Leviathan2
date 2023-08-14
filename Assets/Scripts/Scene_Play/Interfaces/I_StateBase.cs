@@ -1,4 +1,4 @@
-public abstract class C_StateBase
+public interface I_StateBase
 {
     /// <summary>
     /// 상태 변경 후 한 번 실행
@@ -13,10 +13,10 @@ public abstract class C_StateBase
     /// <summary>
     /// Update 함수에 호출
     /// </summary>
-    public abstract void Update();
+    public abstract void StateUpdate();
 
     /// <summary>
     /// FixedUpdate 함수에 호출
     /// </summary>
-    public abstract void FixedUpdate();
+    public abstract void StateFixedUpdate();
 }

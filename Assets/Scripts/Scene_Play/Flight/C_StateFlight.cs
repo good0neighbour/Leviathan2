@@ -44,7 +44,7 @@ public class C_StateFlight : C_AirPlaneStateBase
     }
 
 
-    public override void FixedUpdate()
+    public override void StateFixedUpdate()
     {
         // 전방으로 가속
         Vector3 t_acceleration = new Vector3(0.0f, 0.0f, power * m_flightPowerMultiply);
@@ -63,7 +63,7 @@ public class C_StateFlight : C_AirPlaneStateBase
             // 기체 조작에 의한 회전
             new Vector3(
                 m_rotationUpDown * m_rotatePower.x,
-                m_rotationY * m_rotatePower.y,
+                m_rotationY * m_rotatePower.y * 0.5f,
                 m_rotationLeftRight * m_rotatePower.z
             ) * Time.fixedDeltaTime * t_velocityZ
             // 양력에 의한 회전
@@ -76,7 +76,7 @@ public class C_StateFlight : C_AirPlaneStateBase
     }
 
 
-    public override void Update()
+    public override void StateUpdate()
     {
         #region 조작
         // 위, 아래 기울기

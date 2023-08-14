@@ -42,7 +42,7 @@ public class C_StateHover : C_AirPlaneStateBase
     }
 
 
-    public override void FixedUpdate()
+    public override void StateFixedUpdate()
     {
         // 기체의 위 방향으로 가속
         Vector3 t_acceleration = new Vector3(0.0f, power, 0.0f);
@@ -72,7 +72,7 @@ public class C_StateHover : C_AirPlaneStateBase
     }
 
 
-    public override void Update()
+    public override void StateUpdate()
     {
         #region 조작
         // 전, 후 기울기

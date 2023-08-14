@@ -21,7 +21,7 @@ MonoBehaviour:
   m_flightFalldownForce: 10
   m_liftPower: 0.01
   m_airResist: {x: 0.0003, y: 0.0005, z: 0.00001}
-  m_maxEnginePower: 100
+  m_maxEnginePower: 50
   m_minEnginePower: 0
   m_powerMovement: 20
   m_HUDColour:
