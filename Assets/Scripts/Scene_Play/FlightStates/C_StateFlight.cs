@@ -1,5 +1,4 @@
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 public class C_StateFlight : C_AirPlaneStateBase
 {
@@ -18,29 +17,29 @@ public class C_StateFlight : C_AirPlaneStateBase
 
     /* ========== Public Methods ========== */
 
-    public C_StateFlight(C_AirPlane t_machine, C_AirplaneSettings t_settings, Animator t_animator) : base(t_machine, t_settings)
+    public C_StateFlight(C_AirPlane tp_machine, C_AirplaneSettings tp_settings, Animator tp_animator) : base(tp_machine, tp_settings)
     {
-        m_rotateSpeedmult = t_settings.m_flightRotateSpeedmult;
-        m_rotatePower = t_settings.m_flightRotatePower;
-        m_flightPowerMultiply = t_settings.m_flightPowerMultiply;
-        m_flightFalldownForce = t_settings.m_flightFalldownForce;
-        m_liftPower = t_settings.m_liftPower;
-        m_animator = t_animator;
+        m_rotateSpeedmult = tp_settings.m_flightRotateSpeedmult;
+        m_rotatePower = tp_settings.m_flightRotatePower;
+        m_flightPowerMultiply = tp_settings.m_flightPowerMultiply;
+        m_flightFalldownForce = tp_settings.m_flightFalldownForce;
+        m_liftPower = tp_settings.m_liftPower;
+        mp_animator = tp_animator;
     }
 
 
     public override void ChangeState()
     {
-        C_AirPlaneStateBase t_state = m_machine.GetState(E_FlightStates.eHover);
-        t_state.power = power;
-        t_state.velocity = velocity;
-        t_state.Execute();
+        C_AirPlaneStateBase tp_state = mp_machine.GetState(E_FlightStates.HOVER);
+        tp_state.power = power;
+        tp_state.velocity = velocity;
+        tp_state.Execute();
     }
 
 
     public override void Execute()
     {
-        m_machine.SetState(E_FlightStates.eFlight);
+        mp_machine.SetState(E_FlightStates.FLIGHT);
     }
 
 
@@ -53,13 +52,13 @@ public class C_StateFlight : C_AirPlaneStateBase
         float t_velocityZ;
 
         // 위치 이동
-        m_transform.localPosition += SetVelocity(t_acceleration, out t_velocityZ) * Time.fixedDeltaTime;
+        mp_transform.localPosition += SetVelocity(t_acceleration, out t_velocityZ) * Time.fixedDeltaTime;
 
         // Z축 회전
-        float t_rotationZ = m_transform.localRotation.eulerAngles.z * Mathf.Deg2Rad;
+        float t_rotationZ = mp_transform.localRotation.eulerAngles.z * Mathf.Deg2Rad;
 
         // 기체 회전
-        m_transform.localRotation *= Quaternion.Euler(
+        mp_transform.localRotation *= Quaternion.Euler(
             // 기체 조작에 의한 회전
             new Vector3(
                 m_rotationUpDown * m_rotatePower.x,
@@ -78,6 +77,8 @@ public class C_StateFlight : C_AirPlaneStateBase
 
     public override void StateUpdate()
     {
+#if PLATFORM_STANDALONE_WIN
+
         #region 조작
         // 위, 아래 기울기
         if (Input.GetKey(KeyCode.S))
@@ -187,13 +188,15 @@ public class C_StateFlight : C_AirPlaneStateBase
             }
         }
         #endregion
-
+        #region 상태 변경
         // 비행 상태 변경
         if (Input.GetKeyDown(KeyCode.F))
         {
-            m_animator.SetBool("FlightMode", false);
+            mp_animator.SetBool("FlightMode", false);
             ChangeState();
         }
+        #endregion
+#endif
 
         HUDUpdate();
     }

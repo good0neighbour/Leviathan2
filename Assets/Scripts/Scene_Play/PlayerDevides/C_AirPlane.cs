@@ -16,7 +16,7 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
     [SerializeField] private TMP_Text m_altitudeText = null;
     private C_AirPlaneStateBase[] m_state = null;
     private Material[] m_materials = new Material[2];
-    private E_FlightStates m_currentState = E_FlightStates.eHover;
+    private E_FlightStates m_currentState = E_FlightStates.HOVER;
     private float m_currentPower = 0.0f;
     private float m_maxEnginePower = 0.0f;
     private float m_minEnginePower = 0.0f;
@@ -77,6 +77,8 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
     public void StateUpdate()
     {
 #if PLATFORM_STANDALONE_WIN
+
+        #region HUD 크기 변경
         // 화면 크기 변경 시
         if (m_currentScreenHeight != Screen.height)
         {
@@ -84,8 +86,8 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
             m_powerImageLength = m_powerImageRaito * m_currentScreenHeight;
             EnginePowerUIUpdate();
         }
-#endif
-
+        #endregion
+        #region 조작
         // 엔진 출력 제어
         if (Input.GetKey(KeyCode.LeftShift) && m_maxEnginePower > m_power)
         {
@@ -116,6 +118,8 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
 
             m_stealthActive += 0b10;
         }
+        #endregion
+#endif
 
         // 다형성
         m_state[(int)m_currentState].StateUpdate();
@@ -310,9 +314,9 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
         Animator t_animator = GetComponent<Animator>();
 
         // 상태 클래스 생성
-        m_state = new C_AirPlaneStateBase[(int)E_FlightStates.end];
-        m_state[(int)E_FlightStates.eHover] = new C_StateHover(this, t_settings, t_animator);
-        m_state[(int)E_FlightStates.eFlight] = new C_StateFlight(this, t_settings, t_animator);
+        m_state = new C_AirPlaneStateBase[(int)E_FlightStates.END];
+        m_state[(int)E_FlightStates.HOVER] = new C_StateHover(this, t_settings, t_animator);
+        m_state[(int)E_FlightStates.FLIGHT] = new C_StateFlight(this, t_settings, t_animator);
 
         // 항공기 메타리얼 복사, 인덱스 0은 외곽선 메타리얼, 인덱스 1은 주 메타리얼
         MeshRenderer[] t_renderers = GetComponentsInChildren<MeshRenderer>();

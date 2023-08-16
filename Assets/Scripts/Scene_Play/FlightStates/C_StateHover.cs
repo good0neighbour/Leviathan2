@@ -17,28 +17,28 @@ public class C_StateHover : C_AirPlaneStateBase
 
     /* ========== Public Methods ========== */
 
-    public C_StateHover(C_AirPlane t_machine, C_AirplaneSettings t_settings, Animator t_animator) : base(t_machine, t_settings)
+    public C_StateHover(C_AirPlane tp_machine, C_AirplaneSettings tp_settings, Animator tp_animator) : base(tp_machine, tp_settings)
     {
-        m_rotateSpeedmult = t_settings.m_hoverRotateSpeedmult;
-        m_rotatePower = t_settings.m_hoverRotatePower;
-        m_rotateRestorePower = t_settings.m_hoverRotateRestorePower;
-        m_animator = t_animator;
+        m_rotateSpeedmult = tp_settings.m_hoverRotateSpeedmult;
+        m_rotatePower = tp_settings.m_hoverRotatePower;
+        m_rotateRestorePower = tp_settings.m_hoverRotateRestorePower;
+        mp_animator = tp_animator;
         m_reverseRotateSpeedmult = m_rotateSpeedmult * 0.5f;
     }
 
 
     public override void ChangeState()
     {
-        C_AirPlaneStateBase t_state = m_machine.GetState(E_FlightStates.eFlight);
-        t_state.power = power;
-        t_state.velocity = velocity;
-        t_state.Execute();
+        C_AirPlaneStateBase tp_state = mp_machine.GetState(E_FlightStates.FLIGHT);
+        tp_state.power = power;
+        tp_state.velocity = velocity;
+        tp_state.Execute();
     }
 
 
     public override void Execute()
     {
-        m_machine.SetState(E_FlightStates.eHover);
+        mp_machine.SetState(E_FlightStates.HOVER);
     }
 
 
@@ -48,14 +48,14 @@ public class C_StateHover : C_AirPlaneStateBase
         Vector3 t_acceleration = new Vector3(0.0f, power, 0.0f);
 
         // 위치 이동
-        m_transform.localPosition += SetVelocity(t_acceleration) * Time.fixedDeltaTime;
+        mp_transform.localPosition += SetVelocity(t_acceleration) * Time.fixedDeltaTime;
 
         // 기체 회전
-        m_transform.localRotation *= Quaternion.Euler(new Vector3(m_rotationFront, m_rotationY, m_rotationSide) * Time.fixedDeltaTime * m_rotatePower);
+        mp_transform.localRotation *= Quaternion.Euler(new Vector3(m_rotationFront, m_rotationY, m_rotationSide) * Time.fixedDeltaTime * m_rotatePower);
 
         // 기체 회전 회복
-        float t_rotationX = m_transform.localRotation.eulerAngles.x;
-        float t_rotationZ = m_transform.localRotation.eulerAngles.z;
+        float t_rotationX = mp_transform.localRotation.eulerAngles.x;
+        float t_rotationZ = mp_transform.localRotation.eulerAngles.z;
         if (180.0f < t_rotationX)
         {
             t_rotationX -= 360.0f;
@@ -64,7 +64,7 @@ public class C_StateHover : C_AirPlaneStateBase
         {
             t_rotationZ -= 360.0f;
         }
-        m_transform.localRotation *= Quaternion.Euler(
+        mp_transform.localRotation *= Quaternion.Euler(
             (-t_rotationX) * Time.fixedDeltaTime * m_rotateRestorePower,
             0.0f,
             (-t_rotationZ) * Time.fixedDeltaTime * m_rotateRestorePower
@@ -74,6 +74,8 @@ public class C_StateHover : C_AirPlaneStateBase
 
     public override void StateUpdate()
     {
+#if PLATFORM_STANDALONE_WIN
+
         #region 조작
         // 전, 후 기울기
         if (Input.GetKey(KeyCode.W))
@@ -183,18 +185,25 @@ public class C_StateHover : C_AirPlaneStateBase
             }
         }
         #endregion
-
-        if (!m_stateChangeAvailable && 1.0f <= m_animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
-        {
-            m_stateChangeAvailable = true;
-            ChangeState();
-        }
-
+        #region 상태 변경
         // 비행 상태 변경
         if (Input.GetKeyDown(KeyCode.F) && m_stateChangeAvailable)
         {
-            m_animator.SetBool("FlightMode", true);
+            mp_animator.SetBool("FlightMode", true);
             m_stateChangeAvailable = false;
+        }
+        // 가이드 미사일 화면으로 전환
+        else if (Input.GetKeyDown(KeyCode.V))
+        {
+            C_PlayManager.instance.ChangeState(E_PlayState.GUIDEDMISSLE);
+        }
+        #endregion
+#endif
+
+        if (!m_stateChangeAvailable && 1.0f <= mp_animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
+        {
+            m_stateChangeAvailable = true;
+            ChangeState();
         }
 
         HUDUpdate();
