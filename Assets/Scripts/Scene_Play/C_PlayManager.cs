@@ -1,13 +1,27 @@
 using UnityEngine;
 
-public class C_PlayManager : MonoBehaviour
+public delegate void D_PlayDelegate();
+
+public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayState>
 {
     /* ========== Fields ========== */
 
-    private I_StateBase[] m_states = new I_StateBase[(int)E_PlayState.END];
+    private I_State<E_PlayState>[] m_states = new I_State<E_PlayState>[(int)E_PlayState.END];
     private E_PlayState m_currentState = E_PlayState.AIRPLANE;
 
     public static C_PlayManager instance
+    {
+        get;
+        set;
+    }
+
+    public D_PlayDelegate earlyFixedUpdate
+    {
+        get;
+        set;
+    }
+
+    public D_PlayDelegate lateFixedUpdate
     {
         get;
         set;
@@ -17,10 +31,14 @@ public class C_PlayManager : MonoBehaviour
 
     /* ========== Public Methods ========== */
 
-    public void ChangeState(E_PlayState t_state)
+    public void SetState(E_PlayState t_state)
     {
+        // 참조 변경
         m_currentState = t_state;
-        C_CameraMove.instance.ChangeState(m_currentState);
+        C_CameraMove.instance.SetState(m_currentState);
+
+        // 상태 실행
+        m_states[(int)m_currentState].Execute();
     }
 
 
@@ -44,6 +62,9 @@ public class C_PlayManager : MonoBehaviour
         C_GuidedMissle tp_guidedMissle = FindAnyObjectByType<C_GuidedMissle>();
         m_states[(int)E_PlayState.GUIDEDMISSLE] = tp_guidedMissle;
         C_CameraMove.instance.SetTargetTransform(E_PlayState.GUIDEDMISSLE, tp_guidedMissle.transform);
+
+        // 상태 실행
+        m_states[(int)m_currentState].Execute();
     }
 
     private void Update()
@@ -53,6 +74,13 @@ public class C_PlayManager : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // 빠른 FixedUpdate
+        earlyFixedUpdate?.Invoke();
+
+        // 다형성
         m_states[(int)m_currentState].StateFixedUpdate();
+
+        // 늦은 FixedUpdate
+        lateFixedUpdate?.Invoke();
     }
 }

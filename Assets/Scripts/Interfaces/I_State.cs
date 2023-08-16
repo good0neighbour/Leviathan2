@@ -1,4 +1,4 @@
-public interface I_StateBase
+public interface I_State<T>
 {
     /// <summary>
     /// 상태 변경 후 한 번 실행
@@ -8,7 +8,7 @@ public interface I_StateBase
     /// <summary>
     /// 상태 변경
     /// </summary>
-    public abstract void ChangeState();
+    public abstract void ChangeState(T t_state);
 
     /// <summary>
     /// Update 함수에 호출

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class C_CameraMove : MonoBehaviour
+public class C_CameraMove : MonoBehaviour, I_StateMachine<E_PlayState>
 {
     /* ========== Fields ========== */
 
@@ -19,7 +19,7 @@ public class C_CameraMove : MonoBehaviour
 
     /* ========== Public Methods ========== */
 
-    public void ChangeState(E_PlayState t_state)
+    public void SetState(E_PlayState t_state)
     {
         m_currentState = t_state;
     }
@@ -37,14 +37,7 @@ public class C_CameraMove : MonoBehaviour
 
     /* ========== Private Methods ========== */
 
-    private void Awake()
-    {
-        // 유니티식 싱글턴패턴
-        instance = this;
-    }
-
-
-    private void FixedUpdate()
+    private void LateFixedUpdate()
     {
         Transform tp_target = mp_targets[(int)m_currentState];
 
@@ -74,5 +67,19 @@ public class C_CameraMove : MonoBehaviour
 #endif
                 break;
         }
+    }
+
+
+    private void Awake()
+    {
+        // 유니티식 싱글턴패턴
+        instance = this;
+    }
+
+
+    private void Start()
+    {
+        // 대리자 등록
+        C_PlayManager.instance.lateFixedUpdate += LateFixedUpdate;
     }
 }

@@ -28,9 +28,9 @@ public class C_StateFlight : C_AirPlaneStateBase
     }
 
 
-    public override void ChangeState()
+    public override void ChangeState(E_FlightStates t_state)
     {
-        C_AirPlaneStateBase tp_state = mp_machine.GetState(E_FlightStates.HOVER);
+        C_AirPlaneStateBase tp_state = mp_machine.GetState(t_state);
         tp_state.power = power;
         tp_state.velocity = velocity;
         tp_state.Execute();
@@ -193,7 +193,7 @@ public class C_StateFlight : C_AirPlaneStateBase
         if (Input.GetKeyDown(KeyCode.F))
         {
             mp_animator.SetBool("FlightMode", false);
-            ChangeState();
+            ChangeState(E_FlightStates.HOVER);
         }
         #endregion
 #endif

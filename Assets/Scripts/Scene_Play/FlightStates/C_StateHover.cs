@@ -27,9 +27,9 @@ public class C_StateHover : C_AirPlaneStateBase
     }
 
 
-    public override void ChangeState()
+    public override void ChangeState(E_FlightStates t_state)
     {
-        C_AirPlaneStateBase tp_state = mp_machine.GetState(E_FlightStates.FLIGHT);
+        C_AirPlaneStateBase tp_state = mp_machine.GetState(t_state);
         tp_state.power = power;
         tp_state.velocity = velocity;
         tp_state.Execute();
@@ -192,18 +192,13 @@ public class C_StateHover : C_AirPlaneStateBase
             mp_animator.SetBool("FlightMode", true);
             m_stateChangeAvailable = false;
         }
-        // 가이드 미사일 화면으로 전환
-        else if (Input.GetKeyDown(KeyCode.V))
-        {
-            C_PlayManager.instance.ChangeState(E_PlayState.GUIDEDMISSLE);
-        }
         #endregion
 #endif
 
         if (!m_stateChangeAvailable && 1.0f <= mp_animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
         {
             m_stateChangeAvailable = true;
-            ChangeState();
+            ChangeState(E_FlightStates.FLIGHT);
         }
 
         HUDUpdate();

@@ -2,20 +2,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class C_AirPlane : MonoBehaviour, I_StateBase
+public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_FlightStates>
 {
     /* ========== Fields ========== */
 
     [SerializeField][Range(0.0f, 100.0f)] private float m_power = 9.8f;
     [SerializeField][Range(0.0f, 1.0f)] private float m_stealth = 0.0f;
     [Header("HUD 참조")]
-    [SerializeField] private RectTransform m_HUDUpDown = null;
-    [SerializeField] private RectTransform m_directionImage = null;
-    [SerializeField] private RectTransform m_powerImage = null;
-    [SerializeField] private TMP_Text m_velocityText = null;
-    [SerializeField] private TMP_Text m_altitudeText = null;
-    private C_AirPlaneStateBase[] m_state = null;
-    private Material[] m_materials = new Material[2];
+    [SerializeField] private GameObject mp_HUDCanvas = null;
+    [SerializeField] private RectTransform mp_HUDUpDown = null;
+    [SerializeField] private RectTransform mp_directionImage = null;
+    [SerializeField] private RectTransform mp_powerImage = null;
+    [SerializeField] private TextMeshProUGUI mp_velocityText = null;
+    [SerializeField] private TextMeshProUGUI mp_altitudeText = null;
+    private C_AirPlaneStateBase[] mp_state = null;
+    private Material[] mp_materials = new Material[2];
     private E_FlightStates m_currentState = E_FlightStates.HOVER;
     private float m_currentPower = 0.0f;
     private float m_maxEnginePower = 0.0f;
@@ -47,30 +48,40 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
     /// </summary>
     public C_AirPlaneStateBase GetState(E_FlightStates t_state)
     {
-        return m_state[(int)t_state];
+        return mp_state[(int)t_state];
     }
 
 
     /// <summary>
     /// 헤드업디스플레이 가져오기
     /// </summary>
-    public void GetHUDs(out RectTransform t_HUDUpDown, out TMP_Text t_velocityText, out RectTransform t_directionImage)
+    public void GetHUDs(out RectTransform tp_HUDUpDown, out TextMeshProUGUI tp_velocityText, out RectTransform tp_directionImage)
     {
-        t_HUDUpDown = m_HUDUpDown;
-        t_velocityText = m_velocityText;
-        t_directionImage = m_directionImage;
+        tp_HUDUpDown = mp_HUDUpDown;
+        tp_velocityText = mp_velocityText;
+        tp_directionImage = mp_directionImage;
     }
 
 
     public void Execute()
     {
-
+        mp_HUDCanvas.SetActive(true);
     }
 
     
-    public void ChangeState()
+    public void ChangeState(E_PlayState t_state)
     {
+        mp_HUDCanvas.SetActive(false);
 
+        switch (m_currentState)
+        {
+            case E_FlightStates.HOVER:
+                C_PlayManager.instance.SetState(t_state);
+                return;
+
+            default:
+                return;
+        }
     }
 
 
@@ -118,14 +129,19 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
 
             m_stealthActive += 0b10;
         }
+        // 가이드 미사일 화면으로 전환
+        else if (Input.GetKeyDown(KeyCode.V))
+        {
+            ChangeState(E_PlayState.GUIDEDMISSLE);
+        }
         #endregion
 #endif
 
         // 다형성
-        m_state[(int)m_currentState].StateUpdate();
+        mp_state[(int)m_currentState].StateUpdate();
 
         // 고도 표시
-        m_altitudeText.text = Mathf.RoundToInt(transform.localPosition.y).ToString();
+        mp_altitudeText.text = Mathf.RoundToInt(transform.localPosition.y).ToString();
     }
 
 
@@ -149,16 +165,17 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
 
             #region 위, 아래 각도 표시용 HUD 선분
             // 좌측
-            GameObject t_gameObject = new GameObject("HUDUpDownLineImageLeft", typeof(CanvasRenderer), typeof(Image));
-            t_gameObject.transform.SetParent(m_HUDUpDown);
+            GameObject tp_gameObject = new GameObject("HUDUpDownLineImageLeft", typeof(CanvasRenderer), typeof(Image));
+            tp_gameObject.transform.SetParent(mp_HUDUpDown);
 
-            RectTransform t_rectTransform = t_gameObject.GetComponent<RectTransform>();
-            t_rectTransform.offsetMax = Vector2.zero;
-            t_rectTransform.offsetMin = Vector2.zero;
-            t_rectTransform.anchorMax = new Vector2(0.45f, t_height + t_HUDLineWidth);
-            t_rectTransform.anchorMin = new Vector2(0.1f, t_height - t_HUDLineWidth);
+            RectTransform tp_rectTransform = tp_gameObject.GetComponent<RectTransform>();
+            tp_rectTransform.offsetMax = Vector2.zero;
+            tp_rectTransform.offsetMin = Vector2.zero;
+            tp_rectTransform.anchorMax = new Vector2(0.45f, t_height + t_HUDLineWidth);
+            tp_rectTransform.anchorMin = new Vector2(0.1f, t_height - t_HUDLineWidth);
+            tp_rectTransform.localScale = Vector3.one;
 
-            Image t_image = t_gameObject.GetComponent<Image>();
+            Image t_image = tp_gameObject.GetComponent<Image>();
 
             if (18 > t_i)
             {
@@ -174,23 +191,24 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
                 switch (t_i)
                 {
                     case 18:
-                        t_rectTransform.anchorMax = new Vector2(0.45f, 1.0f / 36.0f * t_i + t_HUDLineWidth * t_HUDHorizonWidthMultiply);
-                        t_rectTransform.anchorMin = new Vector2(0.0f, 1.0f / 36.0f * t_i - t_HUDLineWidth * t_HUDHorizonWidthMultiply);
+                        tp_rectTransform.anchorMax = new Vector2(0.45f, 1.0f / 36.0f * t_i + t_HUDLineWidth * t_HUDHorizonWidthMultiply);
+                        tp_rectTransform.anchorMin = new Vector2(0.0f, 1.0f / 36.0f * t_i - t_HUDLineWidth * t_HUDHorizonWidthMultiply);
                         break;
                 }
             }
 
             // 우측
-            t_gameObject = new GameObject("HUDUpDownLineImageRight", typeof(CanvasRenderer), typeof(Image));
-            t_gameObject.transform.SetParent(m_HUDUpDown);
+            tp_gameObject = new GameObject("HUDUpDownLineImageRight", typeof(CanvasRenderer), typeof(Image));
+            tp_gameObject.transform.SetParent(mp_HUDUpDown);
 
-            t_rectTransform = t_gameObject.GetComponent<RectTransform>();
-            t_rectTransform.offsetMax = Vector2.zero;
-            t_rectTransform.offsetMin = Vector2.zero;
-            t_rectTransform.anchorMax = new Vector2(0.9f, t_height + t_HUDLineWidth);
-            t_rectTransform.anchorMin = new Vector2(0.55f, t_height - t_HUDLineWidth);
+            tp_rectTransform = tp_gameObject.GetComponent<RectTransform>();
+            tp_rectTransform.offsetMax = Vector2.zero;
+            tp_rectTransform.offsetMin = Vector2.zero;
+            tp_rectTransform.anchorMax = new Vector2(0.9f, t_height + t_HUDLineWidth);
+            tp_rectTransform.anchorMin = new Vector2(0.55f, t_height - t_HUDLineWidth);
+            tp_rectTransform.localScale = Vector3.one;
 
-            t_image = t_gameObject.GetComponent<Image>();
+            t_image = tp_gameObject.GetComponent<Image>();
 
             if (18 > t_i)
             {
@@ -207,8 +225,8 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
                 switch (t_i)
                 {
                     case 18:
-                        t_rectTransform.anchorMax = new Vector2(1.0f, 1.0f / 36.0f * t_i + t_HUDLineWidth * t_HUDHorizonWidthMultiply);
-                        t_rectTransform.anchorMin = new Vector2(0.55f, 1.0f / 36.0f * t_i - t_HUDLineWidth * t_HUDHorizonWidthMultiply);
+                        tp_rectTransform.anchorMax = new Vector2(1.0f, 1.0f / 36.0f * t_i + t_HUDLineWidth * t_HUDHorizonWidthMultiply);
+                        tp_rectTransform.anchorMin = new Vector2(0.55f, 1.0f / 36.0f * t_i - t_HUDLineWidth * t_HUDHorizonWidthMultiply);
                         break;
                 }
             }
@@ -223,25 +241,26 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
 
             #region 각도 숫자 표시
             // 좌측
-            t_gameObject = new GameObject("HUDUpDownTextLeft", typeof(CanvasRenderer), typeof(TextMeshProUGUI));
-            t_gameObject.transform.SetParent(m_HUDUpDown);
+            tp_gameObject = new GameObject("HUDUpDownTextLeft", typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            tp_gameObject.transform.SetParent(mp_HUDUpDown);
 
-            t_rectTransform = t_gameObject.GetComponent<RectTransform>();
-            t_rectTransform.offsetMax = Vector2.zero;
-            t_rectTransform.offsetMin = Vector2.zero;
-            t_rectTransform.anchorMax = new Vector2(0.09f, t_height + t_HUDTextSize);
-            t_rectTransform.anchorMin = new Vector2(0.0f, t_height - t_HUDTextSize);
+            tp_rectTransform = tp_gameObject.GetComponent<RectTransform>();
+            tp_rectTransform.offsetMax = Vector2.zero;
+            tp_rectTransform.offsetMin = Vector2.zero;
+            tp_rectTransform.anchorMax = new Vector2(0.09f, t_height + t_HUDTextSize);
+            tp_rectTransform.anchorMin = new Vector2(0.0f, t_height - t_HUDTextSize);
+            tp_rectTransform.localScale = Vector3.one;
 
-            TextMeshProUGUI t_text = t_gameObject.GetComponent<TextMeshProUGUI>();
-            t_text.text = ((t_i - 18) * 5).ToString();
-            t_text.enableAutoSizing = true;
-            t_text.fontSizeMax = 100.0f;
-            t_text.fontSizeMin = 0.0f;
-            t_text.alignment = TextAlignmentOptions.Right;
+            TextMeshProUGUI tp_text = tp_gameObject.GetComponent<TextMeshProUGUI>();
+            tp_text.text = ((t_i - 18) * 5).ToString();
+            tp_text.enableAutoSizing = true;
+            tp_text.fontSizeMax = 100.0f;
+            tp_text.fontSizeMin = 0.0f;
+            tp_text.alignment = TextAlignmentOptions.Right;
 
             if (18 > t_i)
             {
-                t_text.color = new Color32(
+                tp_text.color = new Color32(
                     (byte)(t_HUDColour.r * t_HUDColourDarkMultiply),
                     (byte)(t_HUDColour.g * t_HUDColourDarkMultiply),
                     (byte)(t_HUDColour.b * t_HUDColourDarkMultiply),
@@ -250,29 +269,30 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
             }
             else
             {
-                t_text.color = t_HUDColour;
+                tp_text.color = t_HUDColour;
             }
 
             // 우측
-            t_gameObject = new GameObject("HUDUpDownTextRight", typeof(CanvasRenderer), typeof(TextMeshProUGUI));
-            t_gameObject.transform.SetParent(m_HUDUpDown);
+            tp_gameObject = new GameObject("HUDUpDownTextRight", typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            tp_gameObject.transform.SetParent(mp_HUDUpDown);
 
-            t_rectTransform = t_gameObject.GetComponent<RectTransform>();
-            t_rectTransform.offsetMax = Vector2.zero;
-            t_rectTransform.offsetMin = Vector2.zero;
-            t_rectTransform.anchorMax = new Vector2(1.0f, t_height + t_HUDTextSize);
-            t_rectTransform.anchorMin = new Vector2(0.91f, t_height - t_HUDTextSize);
+            tp_rectTransform = tp_gameObject.GetComponent<RectTransform>();
+            tp_rectTransform.offsetMax = Vector2.zero;
+            tp_rectTransform.offsetMin = Vector2.zero;
+            tp_rectTransform.anchorMax = new Vector2(1.0f, t_height + t_HUDTextSize);
+            tp_rectTransform.anchorMin = new Vector2(0.91f, t_height - t_HUDTextSize);
+            tp_rectTransform.localScale = Vector3.one;
 
-            t_text = t_gameObject.GetComponent<TextMeshProUGUI>();
-            t_text.text = ((t_i - 18) * 5).ToString();
-            t_text.enableAutoSizing = true;
-            t_text.fontSizeMax = 100.0f;
-            t_text.fontSizeMin = 0.0f;
-            t_text.alignment = TextAlignmentOptions.Left;
+            tp_text = tp_gameObject.GetComponent<TextMeshProUGUI>();
+            tp_text.text = ((t_i - 18) * 5).ToString();
+            tp_text.enableAutoSizing = true;
+            tp_text.fontSizeMax = 100.0f;
+            tp_text.fontSizeMin = 0.0f;
+            tp_text.alignment = TextAlignmentOptions.Left;
 
             if (18 > t_i)
             {
-                t_text.color = new Color32(
+                tp_text.color = new Color32(
                     (byte)(t_HUDColour.r * t_HUDColourDarkMultiply),
                     (byte)(t_HUDColour.g * t_HUDColourDarkMultiply),
                     (byte)(t_HUDColour.b * t_HUDColourDarkMultiply),
@@ -281,7 +301,7 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
             }
             else
             {
-                t_text.color = t_HUDColour;
+                tp_text.color = t_HUDColour;
             }
             #endregion
         }
@@ -293,7 +313,17 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
     /// </summary>
     private void EnginePowerUIUpdate()
     {
-        m_powerImage.localPosition = new Vector3(m_powerImage.localPosition.x, m_power / m_maxEnginePower * m_powerImageLength - m_powerImageLength * 0.5f, 0.0f);
+        mp_powerImage.localPosition = new Vector3(mp_powerImage.localPosition.x, m_power / m_maxEnginePower * m_powerImageLength - m_powerImageLength * 0.5f, 0.0f);
+    }
+
+
+    /// <summary>
+    /// FixedUpdate 중에서 제일 먼저 동작할 것
+    /// </summary>
+    private void EarlyFixedUpdate()
+    {
+        // 다형성
+        mp_state[(int)m_currentState].StateFixedUpdate();
     }
 
 
@@ -314,29 +344,29 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
         Animator t_animator = GetComponent<Animator>();
 
         // 상태 클래스 생성
-        m_state = new C_AirPlaneStateBase[(int)E_FlightStates.END];
-        m_state[(int)E_FlightStates.HOVER] = new C_StateHover(this, t_settings, t_animator);
-        m_state[(int)E_FlightStates.FLIGHT] = new C_StateFlight(this, t_settings, t_animator);
+        mp_state = new C_AirPlaneStateBase[(int)E_FlightStates.END];
+        mp_state[(int)E_FlightStates.HOVER] = new C_StateHover(this, t_settings, t_animator);
+        mp_state[(int)E_FlightStates.FLIGHT] = new C_StateFlight(this, t_settings, t_animator);
 
         // 항공기 메타리얼 복사, 인덱스 0은 외곽선 메타리얼, 인덱스 1은 주 메타리얼
         MeshRenderer[] t_renderers = GetComponentsInChildren<MeshRenderer>();
-        m_materials[0] = new Material(t_renderers[0].materials[0]);
-        m_materials[1] = new Material(t_renderers[0].materials[1]);
+        mp_materials[0] = new Material(t_renderers[0].materials[0]);
+        mp_materials[1] = new Material(t_renderers[0].materials[1]);
 
         // 복사한 메타리얼 붙여넣기
         for (byte t_i = 0; t_i < t_renderers.Length; ++t_i)
         {
-            t_renderers[t_i].materials = m_materials;
+            t_renderers[t_i].materials = mp_materials;
         }
 
         // HUD 크기 화면에 맞춤
         float t_FOV = 1.0f / Camera.main.fieldOfView;
-        m_HUDUpDown.offsetMax = new Vector2(
-            m_HUDUpDown.offsetMax.x,
+        mp_HUDUpDown.offsetMax = new Vector2(
+            mp_HUDUpDown.offsetMax.x,
             Screen.height * t_FOV * 90.0f
         );
-        m_HUDUpDown.offsetMin = new Vector2(
-            m_HUDUpDown.offsetMin.x,
+        mp_HUDUpDown.offsetMin = new Vector2(
+            mp_HUDUpDown.offsetMin.x,
             -Screen.height * t_FOV * 90.0f
         );
 
@@ -349,6 +379,13 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
             t_settings.m_HUDTextSize
         );
         EnginePowerUIUpdate();
+    }
+
+
+    private void Start()
+    {
+        // 대리자 등록
+        C_PlayManager.instance.earlyFixedUpdate += EarlyFixedUpdate;
     }
 
 
@@ -378,8 +415,8 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
             }
 
             // 메타리얼 값 전달, 인덱스 0은 외곽선 메타리얼, 인덱스 1은 주 메타리얼
-            m_materials[0].SetFloat("_DissolveAmount", m_stealth);
-            m_materials[1].SetFloat("_DissolveAmount", m_stealth);
+            mp_materials[0].SetFloat("_DissolveAmount", m_stealth);
+            mp_materials[1].SetFloat("_DissolveAmount", m_stealth);
         }
     }
 
@@ -391,11 +428,8 @@ public class C_AirPlane : MonoBehaviour, I_StateBase
         if (m_currentPower != m_power)
         {
             m_currentPower = m_power;
-            m_state[(int)m_currentState].power = m_power;
+            mp_state[(int)m_currentState].power = m_power;
         }
-
-        // 다형성
-        m_state[(int)m_currentState].StateFixedUpdate();
 
         // 지면 뚫기 방지
         if (0.0f > transform.localPosition.y)

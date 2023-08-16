@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-public abstract class C_AirPlaneStateBase : I_StateBase
+public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
 {
     /* ========== Fields ========== */
 
@@ -12,7 +12,7 @@ public abstract class C_AirPlaneStateBase : I_StateBase
     protected float m_HUDUpDownMoveAmount = 0.0f;
     private RectTransform mp_HUDUpDown = null;
     private RectTransform mp_directionImage = null;
-    private TMP_Text mp_velocityText = null;
+    private TextMeshProUGUI mp_velocityText = null;
     private float m_power = 0.0f;
     private float m_maxEnginePower = 0.0f;
 #if PLATFORM_STANDALONE_WIN
@@ -66,7 +66,7 @@ public abstract class C_AirPlaneStateBase : I_StateBase
     public abstract void Execute();
 
     
-    public abstract void ChangeState();
+    public abstract void ChangeState(E_FlightStates t_state);
 
     
     public abstract void StateUpdate();
