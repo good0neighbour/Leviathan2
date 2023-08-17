@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Rendering;
 
 public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_FlightStates>
 {
@@ -159,6 +160,8 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
     /// </summary>
     private void CreateHUD(Color32 t_HUDColour, float t_HUDColourDarkMultiply, float t_HUDLineWidth, float t_HUDHorizonWidthMultiply, float t_HUDTextSize)
     {
+        TMP_FontAsset tp_font = Resources.Load<TMP_FontAsset>("TacticalFont SDF");
+
         for (byte t_i = 0; t_i <= 36; ++t_i)
         {
             float t_height = 1.0f / 36.0f * t_i;
@@ -254,6 +257,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
             TextMeshProUGUI tp_text = tp_gameObject.GetComponent<TextMeshProUGUI>();
             tp_text.text = ((t_i - 18) * 5).ToString();
             tp_text.enableAutoSizing = true;
+            tp_text.font = tp_font;
             tp_text.fontSizeMax = 100.0f;
             tp_text.fontSizeMin = 0.0f;
             tp_text.alignment = TextAlignmentOptions.Right;
@@ -286,6 +290,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
             tp_text = tp_gameObject.GetComponent<TextMeshProUGUI>();
             tp_text.text = ((t_i - 18) * 5).ToString();
             tp_text.enableAutoSizing = true;
+            tp_text.font = tp_font;
             tp_text.fontSizeMax = 100.0f;
             tp_text.fontSizeMin = 0.0f;
             tp_text.alignment = TextAlignmentOptions.Left;
@@ -330,33 +335,33 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
     private void Awake()
     {
         // 항공기 설정 가져온다.
-        C_AirplaneSettings t_settings = Resources.Load<C_AirplaneSettings>("AirplaneSettings");
-        m_maxEnginePower = t_settings.m_maxEnginePower;
-        m_minEnginePower = t_settings.m_minEnginePower;
-        m_powerMovement = t_settings.m_powerMovement;
-        m_powerImageLength = t_settings.m_powerImageLength * Screen.height;
+        C_AirplaneSettings tp_settings = Resources.Load<C_AirplaneSettings>("AirplaneSettings");
+        m_maxEnginePower = tp_settings.m_maxEnginePower;
+        m_minEnginePower = tp_settings.m_minEnginePower;
+        m_powerMovement = tp_settings.m_powerMovement;
+        m_powerImageLength = tp_settings.m_powerImageLength * Screen.height;
 #if PLATFORM_STANDALONE_WIN
         m_currentScreenHeight = Screen.height;
-        m_powerImageRaito = t_settings.m_powerImageLength;
+        m_powerImageRaito = tp_settings.m_powerImageLength;
 #endif
 
         // 애니메이터 가져온다.
-        Animator t_animator = GetComponent<Animator>();
+        Animator tp_animator = GetComponent<Animator>();
 
         // 상태 클래스 생성
         mp_state = new C_AirPlaneStateBase[(int)E_FlightStates.END];
-        mp_state[(int)E_FlightStates.HOVER] = new C_StateHover(this, t_settings, t_animator);
-        mp_state[(int)E_FlightStates.FLIGHT] = new C_StateFlight(this, t_settings, t_animator);
+        mp_state[(int)E_FlightStates.HOVER] = new C_StateHover(this, tp_settings, tp_animator);
+        mp_state[(int)E_FlightStates.FLIGHT] = new C_StateFlight(this, tp_settings, tp_animator);
 
         // 항공기 메타리얼 복사, 인덱스 0은 외곽선 메타리얼, 인덱스 1은 주 메타리얼
-        MeshRenderer[] t_renderers = GetComponentsInChildren<MeshRenderer>();
-        mp_materials[0] = new Material(t_renderers[0].materials[0]);
-        mp_materials[1] = new Material(t_renderers[0].materials[1]);
+        MeshRenderer[] tp_renderers = GetComponentsInChildren<MeshRenderer>();
+        mp_materials[0] = new Material(tp_renderers[0].materials[0]);
+        mp_materials[1] = new Material(tp_renderers[0].materials[1]);
 
         // 복사한 메타리얼 붙여넣기
-        for (byte t_i = 0; t_i < t_renderers.Length; ++t_i)
+        for (byte t_i = 0; t_i < tp_renderers.Length; ++t_i)
         {
-            t_renderers[t_i].materials = mp_materials;
+            tp_renderers[t_i].materials = mp_materials;
         }
 
         // HUD 크기 화면에 맞춤
@@ -372,11 +377,11 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
 
         // HUD 초기화
         CreateHUD(
-            t_settings.m_HUDColour,
-            t_settings.m_HUDColourDarkMultiply,
-            t_settings.m_HUDLineWidth,
-            t_settings.m_HUDHorizonWidthMultiply,
-            t_settings.m_HUDTextSize
+            tp_settings.m_HUDColour,
+            tp_settings.m_HUDColourDarkMultiply,
+            tp_settings.m_HUDLineWidth,
+            tp_settings.m_HUDHorizonWidthMultiply,
+            tp_settings.m_HUDTextSize
         );
         EnginePowerUIUpdate();
     }
