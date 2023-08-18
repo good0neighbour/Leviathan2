@@ -4,8 +4,16 @@ using UnityEngine;
 public class C_GuidedMissleSettings : ScriptableObject
 {
     [Header("Browsing")]
-    public float m_cameraRotateSpeedmult = 30.0f;
+    public float m_cameraRotateSpeed = 30.0f;
     [Range(0.0f, 1.0f)] public float m_movingCircleLerpWeight = 0.1f;
+    [Space(10.0f)]
+    [Header("Launching")]
+    [Space(10.0f)]
+    public float m_missleAccelerator = 100.0f;
+    [Header("General")]
+    public float m_noiseSpeedmult = 123.456f;
+    [Range(0.0f, 1.0f)] public float m_minNoiseAlpha = 0.2f;
+    public float m_noiseAlphaSpeed = 2.0f;
     [Space(10.0f)]
     [Header("PostProcess")]
     public float m_saturation = -50.0f;

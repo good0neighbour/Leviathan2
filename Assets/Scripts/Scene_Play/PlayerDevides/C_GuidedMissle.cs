@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering;
@@ -8,23 +9,31 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     /* ========== Fields ========== */
     
     [SerializeField] private Transform mp_attachedTarget = null;
-    [SerializeField] private Vector3 m_attachingOffset = Vector3.zero;
     [Header("HUD 참조")]
     [SerializeField] private GameObject mp_HUDCanvas = null;
     [SerializeField] private TextMeshProUGUI mp_altitudeText = null;
+    [SerializeField] private Image mp_noiseImage = null;
     [SerializeField] private RectTransform mp_centerCircle = null;
     [SerializeField] private RectTransform mp_movingCircle = null;
     [SerializeField] private RectTransform mp_noise = null;
     [SerializeField] private Volume mp_volume = null;
     private ColorAdjustments mp_colourAdjustment = null;
     private ChromaticAberration mp_chromaticAberration = null;
+    private Material mp_noiseMaterial = null;
     private Quaternion m_currentRotationX = Quaternion.Euler(45.0f, 0.0f, 0.0f);
     private Quaternion m_currentRotationY = Quaternion.identity;
-    private float m_cameraRotateSpeedmult = 0.0f;
+    private Vector3 m_attachingOffset = new Vector3(0.0f, -0.2f, 0.0f);
+    private E_GuidedMissleStates m_currentState = E_GuidedMissleStates.BROWSING;
+    private float m_cameraRotateSpeed = 0.0f;
     private float m_movingCircleLerpWeight = 0.0f;
+    private float m_missleAccelerator = 0.0f;
+    private float m_noiseSpeed = 0.0f;
+    private float m_minNoiseAlpha = 0.0f;
+    private float m_noiseAlphaSpeed = 0.0f;
     private float m_saturation = 0.0f;
     private float m_CAIntensity = 0.0f;
     private float m_UIMoveAmount = 0.0f;
+    private float m_missleVelocity = 0.0f;
 #if PLATFORM_STANDALONE_WIN
     private float m_currentScreenHeight = 0.0f;
 #endif
@@ -37,6 +46,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     {
         mp_colourAdjustment.saturation.Override(m_saturation);
         mp_chromaticAberration.intensity.Override(m_CAIntensity);
+        StateBrowsingExecute();
         mp_HUDCanvas.SetActive(true);
     }
 
@@ -67,7 +77,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         {
             if (0.0f < m_currentRotationX.eulerAngles.x && 270.0f > m_currentRotationX.eulerAngles.x)
             {
-                float t_amount = -m_cameraRotateSpeedmult * Time.deltaTime;
+                float t_amount = -m_cameraRotateSpeed * Time.deltaTime;
 
                 m_currentRotationX *= Quaternion.Euler(t_amount, 0.0f, 0.0f);
                 mp_movingCircle.localPosition += new Vector3(
@@ -85,7 +95,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         {
             if (90.0f > m_currentRotationX.eulerAngles.x && 180.0f > m_currentRotationX.eulerAngles.z)
             {
-                float t_amount = m_cameraRotateSpeedmult * Time.deltaTime;
+                float t_amount = m_cameraRotateSpeed * Time.deltaTime;
 
                 m_currentRotationX *= Quaternion.Euler(t_amount, 0.0f, 0.0f);
                 mp_movingCircle.localPosition += new Vector3(
@@ -103,7 +113,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         // 좌, 우 회전
         if (Input.GetKey(KeyCode.A))
         {
-            float t_amount = -m_cameraRotateSpeedmult * Time.deltaTime;
+            float t_amount = -m_cameraRotateSpeed * Time.deltaTime;
             m_currentRotationY *= Quaternion.Euler(0.0f, t_amount, 0.0f);
             mp_movingCircle.localPosition += new Vector3(
                 -t_amount * m_UIMoveAmount,
@@ -113,7 +123,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            float t_amount = m_cameraRotateSpeedmult * Time.deltaTime;
+            float t_amount = m_cameraRotateSpeed * Time.deltaTime;
             m_currentRotationY *= Quaternion.Euler(0.0f, t_amount, 0.0f);
             mp_movingCircle.localPosition += new Vector3(
                 -t_amount * m_UIMoveAmount,
@@ -124,44 +134,145 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         #endregion
         #region 상태 변경
         // 비행기로 상태 변경
-        if (Input.GetKeyDown(KeyCode.V))
+        if (Input.GetKeyDown(KeyCode.V) && m_currentState == E_GuidedMissleStates.BROWSING)
         {
             ChangeState(E_PlayState.AIRPLANE);
         }
         #endregion
 #endif
-
+        
         // 고도 표시
         mp_altitudeText.text = Mathf.RoundToInt(transform.localPosition.y).ToString();
 
-        // 장식용 중앙 원 회전
-        mp_centerCircle.localRotation = Quaternion.Euler(0.0f, 0.0f, transform.localRotation.eulerAngles.y);
-
-        mp_noise.localPosition += new Vector3(0.0f, 5.0f, 0.0f);
+        // 노이즈 애니메이션
+        mp_noise.localPosition += new Vector3(0.0f, m_noiseSpeed, 0.0f);
         if (m_currentScreenHeight * 0.5f < mp_noise.localPosition.y)
         {
             mp_noise.localPosition -= new Vector3(0.0f, m_currentScreenHeight, 0.0f);
+        }
+
+        // 노이즈 어두워지기
+        mp_noiseMaterial.color = new Color(
+            1.0f,
+            1.0f,
+            1.0f,
+            mp_noiseMaterial.color.a + (m_minNoiseAlpha - mp_noiseMaterial.color.a) * Time.deltaTime * m_noiseAlphaSpeed
+        );
+
+        // 상태에 따른 Update 동작
+        switch (m_currentState)
+        {
+            case E_GuidedMissleStates.BROWSING:
+                #region Browsing 상태에서 Update 동작
+#if PLATFORM_STANDALONE_WIN
+                // 미사일 발사
+                if (Input.GetKeyDown(KeyCode.F))
+                {
+                    StateLaunchingExecute();
+                }
+#endif
+                // 장식용 중앙 원 회전
+                mp_centerCircle.localRotation = Quaternion.Euler(0.0f, 0.0f, transform.localRotation.eulerAngles.y);
+
+                // 장식용 움직이는 원 이동
+                mp_movingCircle.localPosition = Vector3.Lerp(
+                    mp_movingCircle.localPosition,
+                    Vector3.zero,
+                    m_movingCircleLerpWeight
+                );
+                #endregion
+                return;
+
+            case E_GuidedMissleStates.LAUNCHING:
+                #region Launching 상태에서 Update 동작
+#if PLATFORM_STANDALONE_WIN
+                // 미사일 포기
+                if (Input.GetKeyDown(KeyCode.F))
+                {
+                    StateBrowsingExecute();
+                }
+#endif
+                #endregion
+                return;
+
+            default:
+#if UNITY_EDITOR
+                Debug.LogError("잘못된 GuidedMissle 상태");
+#endif
+                return;
         }
     }
 
 
     public void StateFixedUpdate()
     {
-        // 비행기에 달라붙는 위치
-        transform.localPosition = mp_attachedTarget.localPosition + m_attachingOffset;
+        // 회전
         transform.localRotation = mp_attachedTarget.localRotation * m_currentRotationY * m_currentRotationX;
+
+        // 위치
+        switch (m_currentState)
+        {
+            case E_GuidedMissleStates.BROWSING:
+                transform.localPosition = mp_attachedTarget.localPosition + m_attachingOffset;
+                return;
+
+            case E_GuidedMissleStates.LAUNCHING:
+                m_missleVelocity += m_missleAccelerator * Time.fixedDeltaTime;
+                transform.localPosition += transform.localRotation
+                    * new Vector3(0.0f, 0.0f, m_missleVelocity * Time.fixedDeltaTime);
+                if (0.0f >= transform.localPosition.y)
+                {
+                    StateBrowsingExecute();
+                }
+                return;
+
+            default:
+#if UNITY_EDITOR
+                Debug.LogError("잘못된 GuidedMissle 상태");
+#endif
+                return;
+        }
     }
 
 
 
     /* ========== Private Methods ========== */
 
+    /// <summary>
+    /// Browsing 상태 실행
+    /// </summary>
+    private void StateBrowsingExecute()
+    {
+        m_currentState = E_GuidedMissleStates.BROWSING;
+        mp_movingCircle.localPosition = Vector3.zero;
+        mp_centerCircle.gameObject.SetActive(true);
+        mp_movingCircle.gameObject.SetActive(true);
+        mp_noiseMaterial.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+
+    /// <summary>
+    /// Launching 상태 실행
+    /// </summary>
+    private void StateLaunchingExecute()
+    {
+        m_currentState = E_GuidedMissleStates.LAUNCHING;
+        m_missleVelocity = 0.0f;
+        mp_centerCircle.gameObject.SetActive(false);
+        mp_movingCircle.gameObject.SetActive(false);
+    }
+
+
     private void Awake()
     {
         // 가이드 미사일 설정 가져온다.
         C_GuidedMissleSettings tp_settings = Resources.Load<C_GuidedMissleSettings>("GuidedMissleSettings");
-        m_cameraRotateSpeedmult = tp_settings.m_cameraRotateSpeedmult;
+        m_cameraRotateSpeed = tp_settings.m_cameraRotateSpeed;
         m_movingCircleLerpWeight = tp_settings.m_movingCircleLerpWeight;
+        m_missleAccelerator = tp_settings.m_missleAccelerator;
+        m_noiseSpeed = tp_settings.m_noiseSpeedmult;
+        m_minNoiseAlpha = tp_settings.m_minNoiseAlpha;
+        m_noiseAlphaSpeed = tp_settings.m_noiseAlphaSpeed;
         m_saturation = tp_settings.m_saturation;
         m_CAIntensity = tp_settings.m_CAIntensity;
 
@@ -171,19 +282,12 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         m_currentScreenHeight = Screen.height;
 #endif
 
+        // 후처리 요소
         mp_volume.profile.TryGet(out mp_colourAdjustment);
         mp_volume.profile.TryGet(out mp_chromaticAberration);
-    }
 
-
-    // 상태에 영향받지 않는 Update 동작
-    private void Update()
-    {
-        // 장식용 움직이는 원 이동
-        mp_movingCircle.localPosition = Vector3.Lerp(
-            mp_movingCircle.localPosition,
-            Vector3.zero,
-            m_movingCircleLerpWeight
-        );
+        // 노이즈 메타리얼 복사
+        mp_noiseMaterial = new Material(mp_noiseImage.material);
+        mp_noiseImage.material = mp_noiseMaterial;
     }
 }

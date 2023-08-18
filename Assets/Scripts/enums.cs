@@ -11,3 +11,10 @@ public enum E_FlightStates
     FLIGHT,
     END
 }
+
+public enum E_GuidedMissleStates
+{
+    BROWSING,
+    LAUNCHING,
+    END
+}

@@ -72,12 +72,11 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
     
     public void ChangeState(E_PlayState t_state)
     {
-        mp_HUDCanvas.SetActive(false);
-
         switch (m_currentState)
         {
             case E_FlightStates.HOVER:
                 C_PlayManager.instance.SetState(t_state);
+                mp_HUDCanvas.SetActive(false);
                 return;
 
             default:

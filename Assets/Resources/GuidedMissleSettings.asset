@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcfdcf8611018504ba748c436cf91b25, type: 3}
   m_Name: GuidedMissleSettings
   m_EditorClassIdentifier: 
-  m_cameraRotateSpeedmult: 30
-  m_movingCircleLerpWeight: 0.02
+  m_cameraRotateSpeed: 30
+  m_movingCircleLerpWeight: 0.05
+  m_missleAccelerator: 100
+  m_noiseSpeedmult: 78.6543
+  m_minNoiseAlpha: 0.05
+  m_noiseAlphaSpeed: 4
   m_saturation: -50
   m_CAIntensity: 0.5
