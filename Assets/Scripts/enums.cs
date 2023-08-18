@@ -2,6 +2,7 @@ public enum E_PlayState
 {
     AIRPLANE,
     GUIDEDMISSLE,
+    ACTOR,
     END
 }
 

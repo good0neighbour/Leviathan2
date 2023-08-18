@@ -32,7 +32,7 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: MovingSpeedmult
     m_Mirror: 0
-  m_BlendParameter: MovingSpeedmult
+  m_BlendParameter: MovingSpeed
   m_BlendParameterY: Blend
   m_MinThreshold: 0
   m_MaxThreshold: 1
@@ -74,7 +74,7 @@ AnimatorController:
   m_Name: controller_actor
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: MovingSpeedmult
+  - m_Name: MovingSpeed
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0

@@ -7,7 +7,7 @@ public class C_CameraMove : MonoBehaviour, I_StateMachine<E_PlayState>
     [SerializeField] private Vector3 m_cameraPosition = Vector3.zero;
     [SerializeField] float m_lerpWeight = 0.1f;
     private Transform[] mp_targets = new Transform[(int)E_PlayState.END];
-    private E_PlayState m_currentState = E_PlayState.AIRPLANE;
+    private E_PlayState m_currentState = E_PlayState.ACTOR;
 
     public static C_CameraMove instance
     {
@@ -54,18 +54,22 @@ public class C_CameraMove : MonoBehaviour, I_StateMachine<E_PlayState>
                     transform.localRotation,
                     m_lerpWeight
                 );
-                break;
+                return;
 
             case E_PlayState.GUIDEDMISSLE:
                 transform.localPosition = tp_target.localPosition;
                 transform.localRotation = tp_target.localRotation;
-                break;
+                return;
+
+            case E_PlayState.ACTOR:
+                transform.localPosition = tp_target.localPosition + transform.localRotation * new Vector3(0.0f, 1.0f, -5.0f);
+                return;
 
             default:
 #if UNITY_EDITOR
                 Debug.Log("잘못된 카메라 상태");
 #endif
-                break;
+                return;
         }
     }
 
