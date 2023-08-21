@@ -4,10 +4,11 @@ public class C_CameraMove : MonoBehaviour, I_StateMachine<E_PlayState>
 {
     /* ========== Fields ========== */
 
-    [SerializeField] private Vector3 m_cameraPosition = Vector3.zero;
+    [SerializeField] private Vector3 m_airPlaneCameraPosition = Vector3.zero;
+    [SerializeField] private Vector3 m_actorCameraPosition = Vector3.zero;
     [SerializeField] float m_lerpWeight = 0.1f;
     private Transform[] mp_targets = new Transform[(int)E_PlayState.END];
-    private E_PlayState m_currentState = E_PlayState.ACTOR;
+    private E_PlayState m_currentState = E_PlayState.AIRPLANE;
 
     public static C_CameraMove instance
     {
@@ -21,7 +22,26 @@ public class C_CameraMove : MonoBehaviour, I_StateMachine<E_PlayState>
 
     public void SetState(E_PlayState t_state)
     {
+        // 상태 변경
         m_currentState = t_state;
+
+        // 카메라 즉시 이동
+        switch (m_currentState)
+        {
+            case E_PlayState.AIRPLANE:
+                Transform tp_target = mp_targets[(int)m_currentState];
+                transform.localPosition = tp_target.localPosition + tp_target.localRotation * m_airPlaneCameraPosition;
+                transform.localRotation = tp_target.localRotation;
+                return;
+
+            case E_PlayState.ACTOR:
+                transform.localRotation = Quaternion.Euler(
+                    0.0f,
+                    transform.localRotation.eulerAngles.y,
+                    0.0f
+                );
+                return;
+        }
     }
 
 
@@ -45,7 +65,7 @@ public class C_CameraMove : MonoBehaviour, I_StateMachine<E_PlayState>
         {
             case E_PlayState.AIRPLANE:
                 transform.localPosition = Vector3.Lerp(
-                    tp_target.localPosition + tp_target.localRotation * m_cameraPosition,
+                    tp_target.localPosition + tp_target.localRotation * m_airPlaneCameraPosition,
                     transform.localPosition,
                     m_lerpWeight
                 );
@@ -62,12 +82,12 @@ public class C_CameraMove : MonoBehaviour, I_StateMachine<E_PlayState>
                 return;
 
             case E_PlayState.ACTOR:
-                transform.localPosition = tp_target.localPosition + transform.localRotation * new Vector3(0.0f, 1.0f, -5.0f);
+                transform.localPosition = tp_target.localPosition + transform.localRotation * m_actorCameraPosition;
                 return;
 
             default:
 #if UNITY_EDITOR
-                Debug.Log("잘못된 카메라 상태");
+                Debug.LogError("잘못된 카메라 상태");
 #endif
                 return;
         }

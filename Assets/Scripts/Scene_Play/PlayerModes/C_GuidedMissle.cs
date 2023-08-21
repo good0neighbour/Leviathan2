@@ -17,11 +17,13 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     [SerializeField] private RectTransform mp_movingCircle = null;
     [SerializeField] private RectTransform mp_noise = null;
     [SerializeField] private Volume mp_volume = null;
+    [Header("Actor")]
+    [SerializeField] private Transform mp_actor = null;
     private ColorAdjustments mp_colourAdjustment = null;
     private ChromaticAberration mp_chromaticAberration = null;
     private Material mp_noiseMaterial = null;
-    private Quaternion m_currentRotationX = Quaternion.Euler(45.0f, 0.0f, 0.0f);
-    private Quaternion m_currentRotationY = Quaternion.identity;
+    private float m_currentRotationX = 45.0f;
+    private float m_currentRotationY = 0.0f;
     private Vector3 m_attachingOffset = new Vector3(0.0f, -0.2f, 0.0f);
     private E_GuidedMissleStates m_currentState = E_GuidedMissleStates.BROWSING;
     private float m_cameraRotateSpeed = 0.0f;
@@ -75,11 +77,11 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         // 상,하 회전
         if (Input.GetKey(KeyCode.W))
         {
-            if (0.0f < m_currentRotationX.eulerAngles.x && 270.0f > m_currentRotationX.eulerAngles.x)
+            if (0.0f < m_currentRotationX && 270.0f > m_currentRotationX)
             {
                 float t_amount = -m_cameraRotateSpeed * Time.deltaTime;
 
-                m_currentRotationX *= Quaternion.Euler(t_amount, 0.0f, 0.0f);
+                m_currentRotationX += t_amount;
                 mp_movingCircle.localPosition += new Vector3(
                     0.0f,
                     t_amount * m_UIMoveAmount,
@@ -88,16 +90,16 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
             }
             else
             {
-                m_currentRotationX = Quaternion.Euler(0.0f, 0.0f, 0.0f);
+                m_currentRotationX = 0.0f;
             }
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            if (90.0f > m_currentRotationX.eulerAngles.x && 180.0f > m_currentRotationX.eulerAngles.z)
+            if (90.0f > m_currentRotationX && 180.0f > m_currentRotationX)
             {
                 float t_amount = m_cameraRotateSpeed * Time.deltaTime;
 
-                m_currentRotationX *= Quaternion.Euler(t_amount, 0.0f, 0.0f);
+                m_currentRotationX += t_amount;
                 mp_movingCircle.localPosition += new Vector3(
                     0.0f,
                     t_amount * m_UIMoveAmount,
@@ -106,7 +108,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
             }
             else
             {
-                m_currentRotationX = Quaternion.Euler(90.0f, 0.0f, 0.0f);
+                m_currentRotationX = 90.0f;
             }
         }
 
@@ -114,7 +116,8 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         if (Input.GetKey(KeyCode.A))
         {
             float t_amount = -m_cameraRotateSpeed * Time.deltaTime;
-            m_currentRotationY *= Quaternion.Euler(0.0f, t_amount, 0.0f);
+
+            m_currentRotationY += t_amount;
             mp_movingCircle.localPosition += new Vector3(
                 -t_amount * m_UIMoveAmount,
                 0.0f,
@@ -124,7 +127,8 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         else if (Input.GetKey(KeyCode.D))
         {
             float t_amount = m_cameraRotateSpeed * Time.deltaTime;
-            m_currentRotationY *= Quaternion.Euler(0.0f, t_amount, 0.0f);
+
+            m_currentRotationY += t_amount;
             mp_movingCircle.localPosition += new Vector3(
                 -t_amount * m_UIMoveAmount,
                 0.0f,
@@ -133,10 +137,32 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         }
         #endregion
         #region 상태 변경
-        // 비행기로 상태 변경
+        // Airplane으로 상태 변경
         if (Input.GetKeyDown(KeyCode.V) && m_currentState == E_GuidedMissleStates.BROWSING)
         {
             ChangeState(E_PlayState.AIRPLANE);
+        }
+
+        // Actor로 상태 변경
+        if (Input.GetKeyDown(KeyCode.B) && m_currentState == E_GuidedMissleStates.BROWSING)
+        {
+            // 소환 위치 찾는다.
+            RaycastHit t_raycast;
+            Physics.Raycast(
+                transform.localPosition,
+                transform.localRotation * new Vector3(0.0f, 0.0f, 1.0f),
+                out t_raycast,
+                float.MaxValue,
+                1 << LayerMask.NameToLayer("layer_ground")
+            );
+
+            // Actor 소환
+            mp_actor.localPosition = t_raycast.point;
+            mp_actor.localRotation = Quaternion.Euler(0.0f, transform.localRotation.eulerAngles.y, 0.0f);
+            mp_actor.gameObject.SetActive(true);
+
+            // 상태 변경
+            ChangeState(E_PlayState.ACTOR);
         }
         #endregion
 #endif
@@ -207,7 +233,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     public void StateFixedUpdate()
     {
         // 회전
-        transform.localRotation = mp_attachedTarget.localRotation * m_currentRotationY * m_currentRotationX;
+        transform.localRotation = Quaternion.Euler(m_currentRotationX, m_currentRotationY, 0.0f);
 
         // 위치
         switch (m_currentState)

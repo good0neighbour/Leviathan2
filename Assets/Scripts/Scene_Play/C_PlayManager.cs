@@ -7,7 +7,6 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayState>
     /* ========== Fields ========== */
 
     private I_State<E_PlayState>[] m_states = new I_State<E_PlayState>[(int)E_PlayState.END];
-    private E_PlayState m_currentState = E_PlayState.ACTOR;
 
     public static C_PlayManager instance
     {
@@ -27,6 +26,12 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayState>
         set;
     }
 
+    public E_PlayState currentState
+    {
+        get;
+        private set;
+    }
+
 
 
     /* ========== Public Methods ========== */
@@ -34,11 +39,11 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayState>
     public void SetState(E_PlayState t_state)
     {
         // 참조 변경
-        m_currentState = t_state;
-        C_CameraMove.instance.SetState(m_currentState);
+        currentState = t_state;
+        C_CameraMove.instance.SetState(currentState);
 
         // 상태 실행
-        m_states[(int)m_currentState].Execute();
+        m_states[(int)currentState].Execute();
     }
 
 
@@ -68,12 +73,15 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayState>
         C_CameraMove.instance.SetTargetTransform(E_PlayState.ACTOR, ((C_Actor)tp_state).transform);
 
         // 상태 실행
-        m_states[(int)m_currentState].Execute();
+        m_states[(int)currentState].Execute();
+
+        // 처음 상태
+        currentState = E_PlayState.AIRPLANE;
     }
 
     private void Update()
     {
-        m_states[(int)m_currentState].StateUpdate();
+        m_states[(int)currentState].StateUpdate();
     }
 
     private void FixedUpdate()
@@ -82,7 +90,7 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayState>
         earlyFixedUpdate?.Invoke();
 
         // 다형성
-        m_states[(int)m_currentState].StateFixedUpdate();
+        m_states[(int)currentState].StateFixedUpdate();
 
         // 늦은 FixedUpdate
         lateFixedUpdate?.Invoke();

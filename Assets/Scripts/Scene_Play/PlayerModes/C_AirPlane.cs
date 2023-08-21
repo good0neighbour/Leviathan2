@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.Rendering;
 
 public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_FlightStates>
 {
@@ -19,7 +18,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
     private C_AirPlaneStateBase[] mp_state = null;
     private Material[] mp_materials = new Material[2];
     private E_FlightStates m_currentState = E_FlightStates.HOVER;
-    private float m_currentPower = 0.0f;
+    private float m_curPower = 0.0f;
     private float m_maxEnginePower = 0.0f;
     private float m_minEnginePower = 0.0f;
     private float m_powerMovement = 0.0f;
@@ -27,7 +26,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
     private byte m_stealthActive = 0;
 #if PLATFORM_STANDALONE_WIN
     private float m_powerImageRaito = 0.0f;
-    private float m_currentScreenHeight = 0.0f;
+    private float m_curScreenHeight = 0.0f;
 #endif
 
 
@@ -91,10 +90,10 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
 
         #region HUD 크기 변경
         // 화면 크기 변경 시
-        if (m_currentScreenHeight != Screen.height)
+        if (m_curScreenHeight != Screen.height)
         {
-            m_currentScreenHeight = Screen.height;
-            m_powerImageLength = m_powerImageRaito * m_currentScreenHeight;
+            m_curScreenHeight = Screen.height;
+            m_powerImageLength = m_powerImageRaito * m_curScreenHeight;
             EnginePowerUIUpdate();
         }
         #endregion
@@ -118,16 +117,16 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
         // 은폐 (임시)
         if (Input.GetKeyDown(KeyCode.C) && 0 == (m_stealthActive & 0b10))
         {
-            if (1 <= (1 & m_stealthActive))
+            if (1 <= (C_Constants.STEALTH_ENABLE & m_stealthActive))
             {
-                m_stealthActive -= 0b01;
+                m_stealthActive ^= C_Constants.STEALTH_ENABLE;
             }
             else
             {
-                m_stealthActive += 0b01;
+                m_stealthActive |= C_Constants.STEALTH_ENABLE;
             }
 
-            m_stealthActive += 0b10;
+            m_stealthActive |= C_Constants.STEALTH_ANIMATION;
         }
         // 가이드 미사일 화면으로 전환
         else if (Input.GetKeyDown(KeyCode.V))
@@ -326,8 +325,16 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
     /// </summary>
     private void EarlyFixedUpdate()
     {
-        // 다형성
-        mp_state[(int)m_currentState].StateFixedUpdate();
+        switch (C_PlayManager.instance.currentState)
+        {
+            case E_PlayState.ACTOR:
+                // Actor 상태일 때는 실행하지 않는다.
+                return;
+            default:
+                // 다형성
+                mp_state[(int)m_currentState].StateFixedUpdate();
+                return;
+        }
     }
 
 
@@ -340,7 +347,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
         m_powerMovement = tp_settings.m_powerMovement;
         m_powerImageLength = tp_settings.m_powerImageLength * Screen.height;
 #if PLATFORM_STANDALONE_WIN
-        m_currentScreenHeight = Screen.height;
+        m_curScreenHeight = Screen.height;
         m_powerImageRaito = tp_settings.m_powerImageLength;
 #endif
 
@@ -397,15 +404,15 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
     private void Update()
     {
         // 은폐 메타리얼 값 전달
-        if (1 <= (m_stealthActive & 0b10))
+        if (0 < (C_Constants.STEALTH_ANIMATION & m_stealthActive))
         {
-            if (1 <= (0b01 & m_stealthActive))
+            if (0 < (C_Constants.STEALTH_ENABLE & m_stealthActive))
             {
                 m_stealth += Time.deltaTime;
                 if (1.0f < m_stealth)
                 {
                     m_stealth = 1.0f;
-                    m_stealthActive -= 0b10;
+                    m_stealthActive ^= C_Constants.STEALTH_ANIMATION;
                 }
             }
             else
@@ -414,7 +421,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
                 if (0.0f > m_stealth)
                 {
                     m_stealth = 0.0f;
-                    m_stealthActive -= 0b10;
+                    m_stealthActive ^= C_Constants.STEALTH_ANIMATION;
                 }
             }
 
@@ -429,9 +436,9 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
     private void FixedUpdate()
     {
         // 엔진 출력 전달
-        if (m_currentPower != m_power)
+        if (m_curPower != m_power)
         {
-            m_currentPower = m_power;
+            m_curPower = m_power;
             mp_state[(int)m_currentState].power = m_power;
         }
 
