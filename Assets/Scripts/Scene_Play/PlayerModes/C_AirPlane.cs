@@ -325,16 +325,8 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
     /// </summary>
     private void EarlyFixedUpdate()
     {
-        switch (C_PlayManager.instance.currentState)
-        {
-            case E_PlayState.ACTOR:
-                // Actor 상태일 때는 실행하지 않는다.
-                return;
-            default:
-                // 다형성
-                mp_state[(int)m_currentState].StateFixedUpdate();
-                return;
-        }
+        // 다형성
+        mp_state[(int)m_currentState].StateFixedUpdate();
     }
 
 

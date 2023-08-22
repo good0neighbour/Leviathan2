@@ -44,15 +44,22 @@ public class C_StateHover : C_AirPlaneStateBase
 
     public override void StateFixedUpdate()
     {
-        // 기체의 위 방향으로 가속
-        Vector3 t_acceleration = new Vector3(0.0f, power, 0.0f);
+        switch (C_PlayManager.instance.currentState)
+        {
+            case E_PlayState.ACTOR:
+                // Actor 상태에서는 이동하지 않는다.
+                break;
 
-        // 위치 이동
-        mp_transform.localPosition += SetVelocity(t_acceleration) * Time.fixedDeltaTime;
-
-        // 기체 회전
-        mp_transform.localRotation *= Quaternion.Euler(new Vector3(m_rotationFront, m_rotationY, m_rotationSide) * Time.fixedDeltaTime * m_rotatePower);
-
+            default:
+                // 기체의 위 방향으로 가속
+                Vector3 t_acceleration = new Vector3(0.0f, power, 0.0f);
+                // 위치 이동
+                mp_transform.localPosition += SetVelocity(t_acceleration) * Time.fixedDeltaTime;
+                // 기체 회전
+                mp_transform.localRotation *= Quaternion.Euler(new Vector3(m_rotationFront, m_rotationY, m_rotationSide) * Time.fixedDeltaTime * m_rotatePower);
+                break;
+        }
+        
         // 기체 회전 회복
         float t_rotationX = mp_transform.localRotation.eulerAngles.x;
         float t_rotationZ = mp_transform.localRotation.eulerAngles.z;

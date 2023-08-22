@@ -15,4 +15,4 @@ MonoBehaviour:
   m_maxWalkSpeed: 2
   m_maxRunSpeed: 5
   m_accelerator: 5
-  m_cameraRotateSpeed: 20
+  m_cameraRotateSpeed: 25

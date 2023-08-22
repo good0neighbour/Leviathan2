@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class C_Enemy : MonoBehaviour
 {
     /* ========== Fields ========== */
 
-    C_BehaviourTree mp_behaviourTree = null;
+    private C_BehaviourTree mp_behaviourTree = null;
+    private NavMeshAgent mp_agent = null;
 
 
 
@@ -12,6 +14,7 @@ public class C_Enemy : MonoBehaviour
 
     private void Awake()
     {
+        // 행동트리
         mp_behaviourTree = new C_BehaviourTree();
         mp_behaviourTree
             .Selector()
@@ -21,7 +24,11 @@ public class C_Enemy : MonoBehaviour
                         Collider[] t_colliders = Physics.OverlapSphere(transform.localPosition, 5.0f);
                         foreach (Collider t_col in t_colliders)
                         {
-                            Debug.Log($"{t_col.gameObject.layer}");
+                            if (t_col.tag.Equals("tag_actor"))
+                            {
+                                mp_agent.destination = transform.localPosition;
+                                return C_BehaviourTree.E_NodeStatus.SUCCESS;
+                            }
                         }
                         return C_BehaviourTree.E_NodeStatus.FAILURE;
                     })
@@ -34,6 +41,15 @@ public class C_Enemy : MonoBehaviour
                 .Sequence()
                     .Action(() =>
                     {
+                        Collider[] t_colliders = Physics.OverlapSphere(transform.localPosition, 10.0f);
+                        foreach (Collider t_col in t_colliders)
+                        {
+                            if (t_col.tag.Equals("tag_actor"))
+                            {
+                                mp_agent.destination = t_col.transform.localPosition;
+                                return C_BehaviourTree.E_NodeStatus.SUCCESS;
+                            }
+                        }
                         return C_BehaviourTree.E_NodeStatus.FAILURE;
                     })
                     .Action(() =>
@@ -46,6 +62,9 @@ public class C_Enemy : MonoBehaviour
                     return C_BehaviourTree.E_NodeStatus.SUCCESS;
                 })
             .Escape();
+
+        // 참조
+        mp_agent = GetComponent<NavMeshAgent>();
     }
 
 

@@ -23,13 +23,14 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>
 
     public void ChangeState(E_PlayState t_state)
     {
+        gameObject.SetActive(false);
         C_PlayManager.instance.SetState(t_state);
     }
 
 
     public void Execute()
     {
-        
+        gameObject.SetActive(true);
     }
 
 
