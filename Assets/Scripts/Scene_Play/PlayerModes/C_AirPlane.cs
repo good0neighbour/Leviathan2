@@ -6,8 +6,6 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
 {
     /* ========== Fields ========== */
 
-    [SerializeField][Range(0.0f, 100.0f)] private float m_power = 9.8f;
-    [SerializeField][Range(0.0f, 1.0f)] private float m_stealth = 0.0f;
     [Header("HUD ÂüÁ¶")]
     [SerializeField] private GameObject mp_HUDCanvas = null;
     [SerializeField] private RectTransform mp_HUDUpDown = null;
@@ -18,6 +16,8 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
     private C_AirPlaneStateBase[] mp_state = null;
     private Material[] mp_materials = new Material[2];
     private E_FlightStates m_currentState = E_FlightStates.HOVER;
+    private float m_power = 9.83f;
+    private float m_stealth = 0.0f;
     private float m_curPower = 0.0f;
     private float m_maxEnginePower = 0.0f;
     private float m_minEnginePower = 0.0f;

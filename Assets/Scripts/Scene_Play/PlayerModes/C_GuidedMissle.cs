@@ -52,6 +52,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         mp_colourAdjustment.saturation.Override(m_saturation);
         mp_chromaticAberration.intensity.Override(m_CAIntensity);
         StateBrowsingExecute();
+        gameObject.SetActive(true);
         mp_HUDCanvas.SetActive(true);
     }
 
@@ -61,6 +62,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         mp_colourAdjustment.saturation.Override(0.0f);
         mp_chromaticAberration.intensity.Override(0.0f);
         mp_HUDCanvas.SetActive(false);
+        gameObject.SetActive(false);
         C_PlayManager.instance.SetState(t_state);
     }
 
@@ -236,7 +238,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     public void StateFixedUpdate()
     {
         // 회전
-        transform.localRotation = Quaternion.Euler(m_currentRotationX, m_currentRotationY, 0.0f);
+        transform.localRotation = mp_attachedTarget.localRotation * Quaternion.Euler(m_currentRotationX, m_currentRotationY, 0.0f);
 
         // 위치
         switch (m_currentState)
@@ -343,6 +345,9 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         // 노이즈 메타리얼 복사
         mp_noiseMaterial = new Material(mp_noiseImage.material);
         mp_noiseImage.material = mp_noiseMaterial;
+
+        // 처음에는 비활성화
+        gameObject.SetActive(false);
     }
 
 

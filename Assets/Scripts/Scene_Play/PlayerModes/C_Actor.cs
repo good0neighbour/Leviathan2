@@ -284,7 +284,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
         #region 상태 변경
         if (Input.GetKeyDown(KeyCode.B))
         {
-            ChangeState(E_PlayState.AIRPLANE);
+            ChangeState(E_PlayState.GUIDEDMISSLE);
         }
         #endregion
 #endif
@@ -335,6 +335,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
 
         // 참조
         mp_animator = GetComponent<Animator>();
+
+        // 처음에는 비활성화
+        gameObject.SetActive(false);
     }
 
 

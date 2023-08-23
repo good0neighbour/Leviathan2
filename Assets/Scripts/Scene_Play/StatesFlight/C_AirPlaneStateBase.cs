@@ -103,9 +103,9 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
 
             // 공기저항
             * new Vector3(
-                (float)(t_velocity.x - m_airResist.x * Mathf.Abs(t_velocity.x) * t_velocity.x),
-                (float)(t_velocity.y - m_airResist.y * Mathf.Abs(t_velocity.y) * t_velocity.y),
-                (float)(t_velocity.z - m_airResist.z * Mathf.Abs(t_velocity.z) * t_velocity.z)
+                t_velocity.x * (1.0f - m_airResist.x * Mathf.Abs(t_velocity.x)),
+                t_velocity.y * (1.0f - m_airResist.y * Mathf.Abs(t_velocity.y)),
+                t_velocity.z * (1.0f - m_airResist.z * Mathf.Abs(t_velocity.z))
             )
 
             // 중력가속도
@@ -132,9 +132,9 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
 
             // 공기저항
             * new Vector3(
-                (float)(t_velocity.x - m_airResist.x * Mathf.Abs(t_velocity.x) * t_velocity.x),
-                (float)(t_velocity.y - m_airResist.y * Mathf.Abs(t_velocity.y) * t_velocity.y),
-                (float)(t_velocity.z - m_airResist.z * Mathf.Abs(t_velocity.z) * t_velocity.z)
+                t_velocity.x * (1.0f - m_airResist.x * Mathf.Abs(t_velocity.x)),
+                t_velocity.y * (1.0f - m_airResist.y * Mathf.Abs(t_velocity.y)),
+                t_velocity.z * (1.0f - m_airResist.z * Mathf.Abs(t_velocity.z))
             )
 
             // 중력가속도
@@ -184,17 +184,18 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
         // 기체 이동 방향
         float t_velocity = Mathf.Sqrt(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z);
         Vector3 t_direction;
+
         switch (t_velocity)
         {
             case 0.0f:
-                t_direction = Vector3.zero;
+                t_direction = new Vector3(0.0f, 0.0f, 1.0f);
                 break;
 
             default:
                 t_direction = Quaternion.Inverse(mp_transform.localRotation) * velocity / t_velocity;
                 break;
         }
-
+        
         // 속력 표시
         mp_velocityText.text = Mathf.RoundToInt(t_velocity).ToString();
 

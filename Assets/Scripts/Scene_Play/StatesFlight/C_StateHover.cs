@@ -48,19 +48,23 @@ public class C_StateHover : C_AirPlaneStateBase
     {
         switch (C_PlayManager.instance.currentState)
         {
+            case E_PlayState.GUIDEDMISSLE:
+                // GuidedMissle 상태에서는 회전하지 않는다.
+                m_rotationFront = 0.0f;
+                m_rotationSide = 0.0f;
+                MovePosition();
+                break;
+
             case E_PlayState.ACTOR:
-                // Actor 상태에서는 이동하지 않는다.
+                // Actor 상태에서는 회전, 이동하지 않는다.
+                m_rotationFront = 0.0f;
+                m_rotationSide = 0.0f;
+                velocity = Vector3.zero;
                 break;
 
             default:
-                // 기체의 위 방향으로 가속
-                Vector3 t_acceleration = new Vector3(
-                    0.0f,
-                    power * (1.0f - mp_transform.localPosition.y * m_altitudeLimitMult),
-                    0.0f
-                );
-                // 위치 이동
-                SetVelocity(t_acceleration);
+                //기체 이동
+                MovePosition();
                 // 기체 회전
                 mp_transform.localRotation *= Quaternion.Euler(new Vector3(m_rotationFront, m_rotationY, m_rotationSide) * Time.fixedDeltaTime * m_rotatePower);
                 break;
@@ -215,5 +219,24 @@ public class C_StateHover : C_AirPlaneStateBase
         }
 
         HUDUpdate();
+    }
+
+
+
+    /* ========== Private Methods ========== */
+
+    /// <summary>
+    /// 기체 이동
+    /// </summary>
+    private void MovePosition()
+    {
+        // 기체의 위 방향으로 가속
+        Vector3 t_acceleration = new Vector3(
+            0.0f,
+            power * (1.0f - mp_transform.localPosition.y * m_altitudeLimitMult),
+            0.0f
+        );
+        // 위치 이동
+        SetVelocity(t_acceleration);
     }
 }
