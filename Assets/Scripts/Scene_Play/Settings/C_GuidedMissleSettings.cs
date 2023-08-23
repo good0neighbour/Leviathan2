@@ -10,6 +10,8 @@ public class C_GuidedMissleSettings : ScriptableObject
     [Header("Launching")]
     [Space(10.0f)]
     public float m_missleAccelerator = 100.0f;
+    public float m_damageRange = 5.0f;
+    public byte m_damage = 200;
     [Header("General")]
     public float m_noiseSpeedmult = 123.456f;
     [Range(0.0f, 1.0f)] public float m_minNoiseAlpha = 0.2f;

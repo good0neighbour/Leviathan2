@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+using TMPro;
 
 public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
 {
@@ -11,6 +11,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     [SerializeField] private Transform mp_attachedTarget = null;
     [Header("HUD 참조")]
     [SerializeField] private GameObject mp_HUDCanvas = null;
+    [SerializeField] private GameObject mp_explosionParticle = null;
     [SerializeField] private TextMeshProUGUI mp_altitudeText = null;
     [SerializeField] private Image mp_noiseImage = null;
     [SerializeField] private RectTransform mp_centerCircle = null;
@@ -36,6 +37,8 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     private float m_CAIntensity = 0.0f;
     private float m_UIMoveAmount = 0.0f;
     private float m_missleVelocity = 0.0f;
+    private float m_damageRange = 0.0f;
+    private byte m_damage = 0;
 #if PLATFORM_STANDALONE_WIN
     private float m_currentScreenHeight = 0.0f;
 #endif
@@ -215,7 +218,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
                 // 미사일 포기
                 if (Input.GetKeyDown(KeyCode.F))
                 {
-                    StateBrowsingExecute();
+                    MissleExplode();
                 }
 #endif
                 #endregion
@@ -248,7 +251,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
                     * new Vector3(0.0f, 0.0f, m_missleVelocity * Time.fixedDeltaTime);
                 if (0.0f >= transform.localPosition.y)
                 {
-                    StateBrowsingExecute();
+                    MissleExplode();
                 }
                 return;
 
@@ -289,6 +292,29 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     }
 
 
+    /// <summary>
+    /// 가이드 미사일 폭발
+    /// </summary>
+    private void MissleExplode()
+    {
+        foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_damageRange))
+        {
+            if (t_col.tag.Equals("tag_enemy"))
+            {
+                t_col.GetComponent<C_Enemy>().Hit((byte)(
+                    m_damage
+                    * (1.0f
+                    - Vector3.Distance(transform.localPosition, t_col.transform.localPosition)
+                    / m_damageRange)
+                ));
+            }
+        }
+        GameObject t_particle = Instantiate(mp_explosionParticle);
+        t_particle.transform.localPosition = transform.localPosition;
+        StateBrowsingExecute();
+    }
+
+
     private void Awake()
     {
         // 가이드 미사일 설정 가져온다.
@@ -301,6 +327,8 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         m_noiseAlphaSpeed = tp_settings.m_noiseAlphaSpeed;
         m_saturation = tp_settings.m_saturation;
         m_CAIntensity = tp_settings.m_CAIntensity;
+        m_damageRange = tp_settings.m_damageRange;
+        m_damage = tp_settings.m_damage;
 
         // 1픽셀 당 각도
         m_UIMoveAmount = Screen.height / Camera.main.fieldOfView;
@@ -315,5 +343,15 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         // 노이즈 메타리얼 복사
         mp_noiseMaterial = new Material(mp_noiseImage.material);
         mp_noiseImage.material = mp_noiseMaterial;
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (0 < (LayerMask.GetMask("layer_ground") & 1 << other.gameObject.layer)
+            || other.gameObject.tag.Equals("tag_enemy"))
+        {
+            MissleExplode();
+        }
     }
 }

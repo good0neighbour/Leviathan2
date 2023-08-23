@@ -1,5 +1,10 @@
+using UnityEngine;
+
 public static class C_Constants
 {
+    // 수학
+    public const float DOUBLE_PI = Mathf.PI * 2.0f;
+
     // C_Actor 전용, Actor 이동 방향
     public const byte ACTOR_FORWARD = 0b00001;
     public const byte ACTOR_BACKWARD = 0b00010;
@@ -9,4 +14,9 @@ public static class C_Constants
     // C_Airplane 전용, 은폐 활성화
     public const byte STEALTH_ENABLE = 0b01;
     public const byte STEALTH_ANIMATION = 0b10;
+
+    // C_Enemy 전용, 행동트리 상태
+    public const byte ENEMY_PATROL = 0;
+    public const byte ENEMY_HEAD_TO_ENEMY = 1;
+    public const byte ENEMY_ATTACK = 2;
 }

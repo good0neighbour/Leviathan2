@@ -11,6 +11,7 @@ public class C_StateHover : C_AirPlaneStateBase
     private float m_rotatePower = 0.0f;
     private float m_reverseRotateSpeedmult = 0.0f;
     private float m_rotateRestorePower = 0.0f;
+    private float m_altitudeLimitMult = 0.0f;
     private bool m_stateChangeAvailable = true;
 
 
@@ -22,6 +23,7 @@ public class C_StateHover : C_AirPlaneStateBase
         m_rotateSpeedmult = tp_settings.m_hoverRotateSpeedmult;
         m_rotatePower = tp_settings.m_hoverRotatePower;
         m_rotateRestorePower = tp_settings.m_hoverRotateRestorePower;
+        m_altitudeLimitMult = 1.0f / tp_settings.m_altitudeLimit;
         mp_animator = tp_animator;
         m_reverseRotateSpeedmult = m_rotateSpeedmult * 0.5f;
     }
@@ -52,9 +54,13 @@ public class C_StateHover : C_AirPlaneStateBase
 
             default:
                 // 기체의 위 방향으로 가속
-                Vector3 t_acceleration = new Vector3(0.0f, power, 0.0f);
+                Vector3 t_acceleration = new Vector3(
+                    0.0f,
+                    power * (1.0f - mp_transform.localPosition.y * m_altitudeLimitMult),
+                    0.0f
+                );
                 // 위치 이동
-                mp_transform.localPosition += SetVelocity(t_acceleration) * Time.fixedDeltaTime;
+                SetVelocity(t_acceleration);
                 // 기체 회전
                 mp_transform.localRotation *= Quaternion.Euler(new Vector3(m_rotationFront, m_rotationY, m_rotationSide) * Time.fixedDeltaTime * m_rotatePower);
                 break;

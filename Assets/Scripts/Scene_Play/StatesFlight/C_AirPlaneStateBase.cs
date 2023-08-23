@@ -13,6 +13,7 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
     private RectTransform mp_HUDUpDown = null;
     private RectTransform mp_directionImage = null;
     private TextMeshProUGUI mp_velocityText = null;
+    private Rigidbody mp_rigidbody = null;
     private float m_power = 0.0f;
     private float m_maxEnginePower = 0.0f;
 #if PLATFORM_STANDALONE_WIN
@@ -39,7 +40,14 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
 
     public Vector3 velocity
     {
-        get; set;
+        get
+        {
+            return mp_rigidbody.velocity;
+        }
+        set
+        {
+            mp_rigidbody.velocity = value;
+        }
     }
 
 
@@ -50,6 +58,7 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
     {
         mp_machine = tp_machine;
         mp_transform = tp_machine.transform;
+        mp_rigidbody = tp_machine.GetComponent<Rigidbody>();
         tp_machine.GetHUDs(out mp_HUDUpDown, out mp_velocityText, out mp_directionImage);
 
         m_airResist = tp_settings.m_airResist;
@@ -81,7 +90,7 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
     /// <summary>
     /// 속력 결정
     /// </summary>
-    protected Vector3 SetVelocity(Vector3 t_acceleration)
+    protected void SetVelocity(Vector3 t_acceleration)
     {
         // 로칼 좌표계 기준 속력
         Vector3 t_velocity = Quaternion.Inverse(mp_transform.localRotation) * velocity
@@ -101,16 +110,13 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
 
             // 중력가속도
             + new Vector3(0.0f, -9.8f, 0.0f) * Time.fixedDeltaTime;
-
-        // 반환
-        return velocity;
     }
 
 
     /// <summary>
     /// 속력 결정 및 로칼 좌표계 기준 속력
     /// </summary>
-    protected Vector3 SetVelocity(Vector3 t_acceleration, out float t_localVelocityZ)
+    protected void SetVelocity(Vector3 t_acceleration, out float t_localVelocityZ)
     {
         // 로칼 좌표계 기준 속력
         Vector3 t_velocity = Quaternion.Inverse(mp_transform.localRotation) * velocity
@@ -133,9 +139,6 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
 
             // 중력가속도
             + new Vector3(0.0f, -9.8f, 0.0f) * Time.fixedDeltaTime;
-
-        // 반환
-        return velocity;
     }
 
 
@@ -180,7 +183,17 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
 
         // 기체 이동 방향
         float t_velocity = Mathf.Sqrt(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z);
-        Vector3 t_direction = Quaternion.Inverse(mp_transform.localRotation) * velocity / t_velocity;
+        Vector3 t_direction;
+        switch (t_velocity)
+        {
+            case 0.0f:
+                t_direction = Vector3.zero;
+                break;
+
+            default:
+                t_direction = Quaternion.Inverse(mp_transform.localRotation) * velocity / t_velocity;
+                break;
+        }
 
         // 속력 표시
         mp_velocityText.text = Mathf.RoundToInt(t_velocity).ToString();

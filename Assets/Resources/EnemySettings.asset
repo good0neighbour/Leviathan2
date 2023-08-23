@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e92ff64cd6104214dbb7c5ed77f63176, type: 3}
-  m_Name: ActorSettings
+  m_Script: {fileID: 11500000, guid: 85018f2f7f8214e49929b4915360f2ae, type: 3}
+  m_Name: EnemySettings
   m_EditorClassIdentifier: 
-  m_maxWalkSpeed: 2
-  m_maxRunSpeed: 6
-  m_accelerator: 10
-  m_cameraRotateSpeed: 40
+  m_minPatrolUpdateTime: 5
+  m_maxPatrolUpdateTime: 20
+  m_sightRange: 20
+  m_attackRange: 5

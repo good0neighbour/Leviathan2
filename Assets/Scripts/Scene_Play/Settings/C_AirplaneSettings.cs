@@ -11,7 +11,7 @@ public class C_AirplaneSettings : ScriptableObject
     [Header("FlightMode")]
     public Vector3 m_flightRotatePower = new Vector3(0.5f, 0.1f, 0.2f);
     public float m_flightPowerMultiply = 5.0f;
-    public float m_flightRotateSpeedmult = 4.0f;
+    public float m_flightRotateSpeed = 4.0f;
     public float m_flightFalldownForce = 10.0f;
     public float m_liftPower = 0.005f;
     [Space(10)]
@@ -20,6 +20,7 @@ public class C_AirplaneSettings : ScriptableObject
     public float m_maxEnginePower = 20.0f;
     public float m_minEnginePower = 0.0f;
     public float m_powerMovement = 10.0f;
+    public float m_altitudeLimit = 1000.0f;
     [Space(10)]
     [Header("HUDSettings")]
     public Color32 m_HUDColour = new Color32(0, 255, 255, 255);

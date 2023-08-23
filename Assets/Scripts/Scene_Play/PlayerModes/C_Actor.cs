@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class C_Actor : MonoBehaviour, I_State<E_PlayState>
+public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
 {
     /* ========== Fields ========== */
 
@@ -13,6 +13,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>
     private float m_currentMaxMovingSpeed = 0.0f;
     private float m_accelerator = 0.0f;
     private float m_cameraRotateSpeed = 0.0f;
+    private short m_hitPoint = 0;
     private byte m_isMoving = 0;
     private bool m_isRunning = false;
     private bool m_aniChange = false;
@@ -300,6 +301,22 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>
     }
 
 
+    public void Hit(byte t_damage)
+    {
+        m_hitPoint -= t_damage;
+        if (0 >= m_hitPoint)
+        {
+            Die();
+        }
+    }
+
+
+    public void Die()
+    {
+        ChangeState(E_PlayState.AIRPLANE);
+    }
+
+
 
     /* ========== Private Methods ========== */
 
@@ -311,6 +328,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>
         m_maxRunSpeed = t_settings.m_maxRunSpeed;
         m_accelerator = t_settings.m_accelerator;
         m_cameraRotateSpeed = t_settings.m_cameraRotateSpeed;
+        m_hitPoint = t_settings.m_hitPoint;
 
         // °È±â »óÅÂ
         m_currentMaxMovingSpeed = m_maxWalkSpeed;

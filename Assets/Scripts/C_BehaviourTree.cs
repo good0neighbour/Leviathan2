@@ -106,7 +106,8 @@ public class C_BehaviourTree
     public enum E_NodeStatus
     {
         SUCCESS,
-        FAILURE
+        FAILURE,
+        RUNNING
     }
 
 
@@ -136,7 +137,7 @@ public class C_BehaviourTree
                     case E_NodeStatus.SUCCESS:
                         return E_NodeStatus.SUCCESS;
 
-                    case E_NodeStatus.FAILURE:
+                    default:
                         continue;
                 }
             }
@@ -164,11 +165,11 @@ public class C_BehaviourTree
             {
                 switch (t_node.Execute())
                 {
-                    case E_NodeStatus.SUCCESS:
-                        continue;
-
                     case E_NodeStatus.FAILURE:
                         return E_NodeStatus.FAILURE;
+
+                    default:
+                        continue;
                 }
             }
 
