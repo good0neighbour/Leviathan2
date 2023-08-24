@@ -16,6 +16,7 @@ public class C_GuidedMissleSettings : ScriptableObject
     public float m_noiseSpeedmult = 123.456f;
     [Range(0.0f, 1.0f)] public float m_minNoiseAlpha = 0.2f;
     public float m_noiseAlphaSpeed = 2.0f;
+    public float m_angleLimit = 20.0f;
     [Space(10.0f)]
     [Header("PostProcess")]
     public float m_saturation = -50.0f;

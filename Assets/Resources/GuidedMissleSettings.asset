@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_cameraRotateSpeed: 30
   m_movingCircleLerpWeight: 0.05
-  m_missleAccelerator: 50
+  m_missleAccelerator: 40
   m_damageRange: 15
-  m_damage: 200
-  m_noiseSpeedmult: 78.6543
+  m_damage: 150
+  m_noiseSpeedmult: 54.321
   m_minNoiseAlpha: 0.05
   m_noiseAlphaSpeed: 4
+  m_angleLimit: 20
   m_saturation: -50
   m_CAIntensity: 0.5

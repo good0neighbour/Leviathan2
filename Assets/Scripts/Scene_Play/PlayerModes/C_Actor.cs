@@ -1,18 +1,35 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
 {
     /* ========== Fields ========== */
 
+    private enum E_ActorState
+    {
+        ENABLING,
+        PLAYING,
+        DISABLING
+    }
+
+
+
+    /* ========== Fields ========== */
+
+    private List<Material> mp_materials = new List<Material>();
+    private SkinnedMeshRenderer[] mp_renderers = null;
     private Animator mp_animator = null;
     private Transform mp_cameraTransform = null;
     private Vector3 m_velocity = Vector3.zero;
+    private E_ActorState m_currentState = E_ActorState.PLAYING;
     private float m_velocityScalar = 0.0f;
     private float m_maxWalkSpeed = 0.0f;
     private float m_maxRunSpeed = 0.0f;
     private float m_currentMaxMovingSpeed = 0.0f;
     private float m_accelerator = 0.0f;
     private float m_cameraRotateSpeed = 0.0f;
+    private float m_dissolveAmount = 1.0f;
     private short m_hitPoint = 0;
     private byte m_isMoving = 0;
     private bool m_isRunning = false;
@@ -32,6 +49,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
     public void Execute()
     {
         gameObject.SetActive(true);
+        m_currentState = E_ActorState.ENABLING;
     }
 
 
@@ -282,12 +300,13 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
         }
         #endregion
         #region 상태 변경
-        if (Input.GetKeyDown(KeyCode.B))
+        if (Input.GetKeyDown(KeyCode.B) && E_ActorState.PLAYING == m_currentState)
         {
-            ChangeState(E_PlayState.GUIDEDMISSLE);
+            m_currentState = E_ActorState.DISABLING;
         }
         #endregion
 #endif
+        // 이동 시에만 Animator에 값 전달
         if (m_aniChange)
         {
             mp_animator.SetFloat("MovingSpeed", m_velocityScalar);
@@ -298,15 +317,48 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
                     break;
             }
         }
+
+        // Dissolve
+        switch (m_currentState)
+        {
+            case E_ActorState.ENABLING:
+                m_dissolveAmount -= Time.deltaTime;
+                if (0.0f >= m_dissolveAmount)
+                {
+                    m_dissolveAmount = 0.0f;
+                    m_currentState = E_ActorState.PLAYING;
+                }
+                DissolveMaterials(m_dissolveAmount);
+                return;
+
+            case E_ActorState.DISABLING:
+                m_dissolveAmount += Time.deltaTime;
+                if (1.0f <= m_dissolveAmount)
+                {
+                    m_dissolveAmount = 1.0f;
+                    ChangeState(E_PlayState.GUIDEDMISSLE);
+                }
+                DissolveMaterials(m_dissolveAmount);
+                return;
+        }
     }
 
 
     public void Hit(byte t_damage)
     {
-        m_hitPoint -= t_damage;
-        if (0 >= m_hitPoint)
+        switch (m_currentState)
         {
-            Die();
+            case E_ActorState.PLAYING:
+                m_hitPoint -= t_damage;
+                if (0 >= m_hitPoint)
+                {
+                    Die();
+                }
+                return;
+
+            default:
+                // 다른 상태에서는 무적이다.
+                return;
         }
     }
 
@@ -320,6 +372,18 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
 
     /* ========== Private Methods ========== */
 
+    /// <summary>
+    /// 메타리얼의 DissolveAmount 값 전달
+    /// </summary>
+    private void DissolveMaterials(float t_amount)
+    {
+        foreach (Material t_mtl in mp_materials)
+        {
+            t_mtl.SetFloat("_DissolveAmount", t_amount);
+        }
+    }
+
+
     private void Awake()
     {
         // 설정 가져온다.
@@ -329,6 +393,44 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
         m_accelerator = t_settings.m_accelerator;
         m_cameraRotateSpeed = t_settings.m_cameraRotateSpeed;
         m_hitPoint = t_settings.m_hitPoint;
+
+        // 메타리얼 복사
+        List<string> tp_nameList = new List<string>();
+        mp_renderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+        foreach (Renderer t_ren in mp_renderers)
+        {
+            // 메타리얼 배열 생성
+            byte t_length = (byte)t_ren.materials.Length;
+            Material[] tp_materials = new Material[t_length];
+
+            // MeshRenderer가 가지고 있는 메타리얼 전부 순회
+            for (byte t_i = 0; t_i < t_length; ++t_i)
+            {
+                // 이미 복사한 메타리얼인지 검사
+                byte t_j;
+                byte t_nameLength = (byte)tp_nameList.Count;
+                for (t_j = 0; t_j < t_nameLength; ++t_j)
+                {
+                    if (t_ren.materials[t_i].name.Equals(tp_nameList[t_j]))
+                    {
+                        tp_materials[t_i] = mp_materials[t_j];
+                        break;
+                    }
+                }
+
+                // 복사한 메타리얼이 없을 경우
+                if (t_nameLength == t_j)
+                {
+                    Material t_mtl = new Material(t_ren.materials[t_i]);
+                    tp_nameList.Add(t_ren.materials[t_i].name);
+                    mp_materials.Add(t_mtl);
+                    tp_materials[t_i] = t_mtl;
+                }
+            }
+
+            // 메타리얼 배열 전달
+            t_ren.materials = tp_materials;
+        }
 
         // 걷기 상태
         m_currentMaxMovingSpeed = m_maxWalkSpeed;
