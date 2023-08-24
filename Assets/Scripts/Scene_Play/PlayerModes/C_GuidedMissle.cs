@@ -207,7 +207,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
                 }
 #endif
                 // 장식용 중앙 원 회전
-                mp_centerCircle.localRotation = Quaternion.Euler(0.0f, 0.0f, transform.localRotation.eulerAngles.y);
+                mp_centerCircle.localRotation = Quaternion.Euler(0.0f, 0.0f, m_currentRotationY);
 
                 // 장식용 움직이는 원 이동
                 mp_movingCircle.localPosition = Vector3.Lerp(

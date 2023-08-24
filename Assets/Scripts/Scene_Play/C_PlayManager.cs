@@ -26,6 +26,12 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayState>
         set;
     }
 
+    public D_PlayDelegate onStateChange
+    {
+        get;
+        set;
+    }
+
     public E_PlayState currentState
     {
         get;
@@ -44,6 +50,9 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayState>
 
         // 상태 실행
         m_states[(int)currentState].Execute();
+
+        // 대리자 호출
+        onStateChange?.Invoke();
     }
 
 

@@ -16,3 +16,4 @@ MonoBehaviour:
   m_maxRunSpeed: 6
   m_accelerator: 10
   m_cameraRotateSpeed: 40
+  m_hitPoint: 5
