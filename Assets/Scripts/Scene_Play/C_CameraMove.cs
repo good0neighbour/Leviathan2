@@ -25,11 +25,16 @@ public class C_CameraMove : MonoBehaviour, I_StateMachine<E_PlayState>
         // 상태 변경
         m_currentState = t_state;
 
+        // 대상
+        Transform tp_target = mp_targets[(int)m_currentState];
+
+        // 대상 전달
+        C_MinimapCameraMove.instance.target = tp_target;
+
         // 카메라 즉시 이동
         switch (m_currentState)
         {
             case E_PlayState.AIRPLANE:
-                Transform tp_target = mp_targets[(int)m_currentState];
                 transform.localPosition = tp_target.localPosition + tp_target.localRotation * m_airPlaneCameraPosition;
                 transform.localRotation = tp_target.localRotation;
                 return;

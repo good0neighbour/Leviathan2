@@ -27,7 +27,7 @@ MonoBehaviour:
   m_altitudeLimit: 500
   m_HUDColour:
     serializedVersion: 2
-    rgba: 4294967040
+    rgba: 4294901960
   m_HUDColourDarkMultiply: 0.5
   m_HUDLineWidth: 0.0004
   m_HUDTextSize: 0.005

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
 {
@@ -9,6 +10,8 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
     private SkinnedMeshRenderer[] mp_renderers = null;
     private Animator mp_animator = null;
     private Transform mp_cameraTransform = null;
+    private GameObject mp_canvas = null;
+    private Image mp_hitPointBar = null;
     private Vector3 m_velocity = Vector3.zero;
     private E_ActorState m_currentState = E_ActorState.STANDBY;
     private float m_velocityScalar = 0.0f;
@@ -19,7 +22,8 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
     private float m_cameraRotateSpeed = 0.0f;
     private float m_dissolveAmount = 1.0f;
     private float m_interactRange = 1.0f;
-    private short m_hitPoint = 0;
+    private short m_maxHitPoint = 0;
+    private short m_currentHitPoint = 0;
     private byte m_isMoving = 0;
     private bool m_isRunning = false;
     private bool m_aniChange = false;
@@ -31,13 +35,16 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
     public void ChangeState(E_PlayState t_state)
     {
         gameObject.SetActive(false);
+        mp_canvas.SetActive(false);
         C_PlayManager.instance.SetState(t_state);
     }
 
 
     public void Execute()
     {
+        mp_hitPointBar.fillAmount = (float)m_currentHitPoint / m_maxHitPoint;
         gameObject.SetActive(true);
+        mp_canvas.SetActive(true);
         m_currentState = E_ActorState.ENABLING;
     }
 
@@ -260,8 +267,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
         switch (m_currentState)
         {
             case E_ActorState.STANDBY:
-                m_hitPoint -= t_damage;
-                if (0 >= m_hitPoint)
+                m_currentHitPoint -= t_damage;
+                mp_hitPointBar.fillAmount = (float)m_currentHitPoint / m_maxHitPoint;
+                if (0 >= m_currentHitPoint)
                 {
                     Die();
                 }
@@ -278,6 +286,29 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
     {
         ChangeState(E_PlayState.AIRPLANE);
     }
+
+
+    /// <summary>
+    /// Actor 초기화
+    /// </summary>
+    public void ActorInitialize(C_ActorSettings tp_settings, GameObject tp_canvas)
+    {
+        // 설정 복사
+        m_maxWalkSpeed = tp_settings.m_maxWalkSpeed;
+        m_maxRunSpeed = tp_settings.m_maxRunSpeed;
+        m_accelerator = tp_settings.m_accelerator;
+        m_cameraRotateSpeed = tp_settings.m_cameraRotateSpeed;
+        m_interactRange = tp_settings.m_interactRange;
+        m_maxHitPoint = tp_settings.m_hitPoint;
+        m_currentHitPoint = m_maxHitPoint;
+
+        // 걷기 상태
+        m_currentMaxMovingSpeed = m_maxWalkSpeed;
+
+        // HUD 참조
+        mp_canvas = tp_canvas;
+        mp_hitPointBar = mp_canvas.transform.Find("ImageHitPoint").GetComponent<Image>();
+    }    
 
 
 
@@ -430,15 +461,6 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
 
     private void Awake()
     {
-        // 설정 가져온다.
-        C_ActorSettings t_settings = Resources.Load< C_ActorSettings>("ActorSettings");
-        m_maxWalkSpeed = t_settings.m_maxWalkSpeed;
-        m_maxRunSpeed = t_settings.m_maxRunSpeed;
-        m_accelerator = t_settings.m_accelerator;
-        m_cameraRotateSpeed = t_settings.m_cameraRotateSpeed;
-        m_interactRange = t_settings.m_interactRange;
-        m_hitPoint = t_settings.m_hitPoint;
-
         // 메타리얼 복사
         List<string> tp_nameList = new List<string>();
         mp_renderers = GetComponentsInChildren<SkinnedMeshRenderer>();
@@ -476,9 +498,6 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
             // 메타리얼 배열 전달
             t_ren.materials = tp_materials;
         }
-
-        // 걷기 상태
-        m_currentMaxMovingSpeed = m_maxWalkSpeed;
 
         // 참조
         mp_animator = GetComponent<Animator>();
