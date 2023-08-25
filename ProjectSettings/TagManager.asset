@@ -6,6 +6,7 @@ TagManager:
   tags:
   - tag_actor
   - tag_enemy
+  - tag_enemyDevice
   layers:
   - Default
   - TransparentFX

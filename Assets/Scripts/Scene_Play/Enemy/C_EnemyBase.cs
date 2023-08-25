@@ -4,10 +4,11 @@ public class C_EnemyBase : MonoBehaviour
 {
     /* ========== Fields ========== */
 
+    [Header("적 생성")]
     [SerializeField] private GameObject mp_enemy = null;
     [SerializeField] private float m_areaRadius = 10.0f;
     [SerializeField] private byte m_numOfEnemies = 5;
-    private C_Enemy[] mp_enemyArray = null;
+    private C_PatrolEnemy[] mp_enemyArray = null;
     private E_PlayState m_state = E_PlayState.AIRPLANE;
     private float m_minPatrolUpdateTime = 0.0f;
     private float m_maxPatrolUpdateTime = 0.0f;
@@ -33,7 +34,7 @@ public class C_EnemyBase : MonoBehaviour
         m_maxPatrolUpdateTime = t_settings.m_maxPatrolUpdateTime;
 
         // 배열 생성
-        mp_enemyArray = new C_Enemy[m_numOfEnemies];
+        mp_enemyArray = new C_PatrolEnemy[m_numOfEnemies];
 
         // 적 생성
         for (byte t_i = 0; t_i < m_numOfEnemies; ++t_i)
@@ -51,7 +52,7 @@ public class C_EnemyBase : MonoBehaviour
             );
 
             // 적 초기화
-            C_Enemy t_enemy = t_enemyTrans.GetComponent<C_Enemy>();
+            C_PatrolEnemy t_enemy = t_enemyTrans.GetComponent<C_PatrolEnemy>();
             t_enemy.EnemyInitialize(
                 transform.localPosition,
                 m_areaRadius,
@@ -66,7 +67,11 @@ public class C_EnemyBase : MonoBehaviour
             // 배열에 추가
             mp_enemyArray[t_i] = t_enemy;
         }
+    }
 
+
+    private void Start()
+    {
         // 대리자 등록
         C_PlayManager.instance.onStateChange += OnStateChange;
     }

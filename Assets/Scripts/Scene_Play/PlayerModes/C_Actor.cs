@@ -1,20 +1,8 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
 {
-    /* ========== Fields ========== */
-
-    private enum E_ActorState
-    {
-        ENABLING,
-        PLAYING,
-        DISABLING
-    }
-
-
-
     /* ========== Fields ========== */
 
     private List<Material> mp_materials = new List<Material>();
@@ -22,7 +10,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
     private Animator mp_animator = null;
     private Transform mp_cameraTransform = null;
     private Vector3 m_velocity = Vector3.zero;
-    private E_ActorState m_currentState = E_ActorState.PLAYING;
+    private E_ActorState m_currentState = E_ActorState.STANDBY;
     private float m_velocityScalar = 0.0f;
     private float m_maxWalkSpeed = 0.0f;
     private float m_maxRunSpeed = 0.0f;
@@ -30,6 +18,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
     private float m_accelerator = 0.0f;
     private float m_cameraRotateSpeed = 0.0f;
     private float m_dissolveAmount = 1.0f;
+    private float m_interactRange = 1.0f;
     private short m_hitPoint = 0;
     private byte m_isMoving = 0;
     private bool m_isRunning = false;
@@ -246,17 +235,149 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
 
     public void StateUpdate()
     {
-#if PLATFORM_STANDALONE_WIN
+        // 일반 조작
+        GeneralControl();
 
-        #region 조작
+        // 이동 시에만 Animator에 값 전달
+        if (m_aniChange)
+        {
+            mp_animator.SetFloat("MovingSpeed", m_velocityScalar);
+            switch (m_velocityScalar)
+            {
+                case 0.0f:
+                    m_aniChange = false;
+                    break;
+            }
+        }
+
+        // 상태에 따른 동작
+        UpdateByActorState();
+    }
+
+
+    public void Hit(byte t_damage)
+    {
+        switch (m_currentState)
+        {
+            case E_ActorState.STANDBY:
+                m_hitPoint -= t_damage;
+                if (0 >= m_hitPoint)
+                {
+                    Die();
+                }
+                return;
+
+            default:
+                // 다른 상태에서는 무적이다.
+                return;
+        }
+    }
+
+
+    public void Die()
+    {
+        ChangeState(E_PlayState.AIRPLANE);
+    }
+
+
+
+    /* ========== Private Methods ========== */
+
+    /// <summary>
+    /// 상태에 따른 동작
+    /// </summary>
+    private void UpdateByActorState()
+    {
+        switch (m_currentState)
+        {
+            // 생겨난다.
+            case E_ActorState.ENABLING:
+                m_dissolveAmount -= Time.deltaTime;
+                if (0.0f >= m_dissolveAmount)
+                {
+                    m_dissolveAmount = 0.0f;
+                    m_currentState = E_ActorState.STANDBY;
+                }
+                DissolveMaterials(m_dissolveAmount);
+                return;
+
+            // 상호작용 범위
+            case E_ActorState.STANDBY:
+                foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_interactRange))
+                {
+                    if (t_col.tag.Equals("tag_enemyDevice"))
+                    {
+                        m_currentState = E_ActorState.NEARDEVICE;
+                    }
+                }
+                return;
+
+            //상호작용
+            case E_ActorState.NEARDEVICE:
+#if PLATFORM_STANDALONE_WIN
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+
+                }
+                else if (Input.GetKeyUp(KeyCode.E))
+                {
+
+                }
+#endif
+                foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_interactRange))
+                {
+                    if (t_col.tag.Equals("tag_enemyDevice"))
+                    {
+                        return;
+                    }
+                }
+                m_currentState = E_ActorState.STANDBY;
+                return;
+
+            // 사라진다.
+            case E_ActorState.DISABLING:
+                m_dissolveAmount += Time.deltaTime;
+                if (1.0f <= m_dissolveAmount)
+                {
+                    m_dissolveAmount = 1.0f;
+                    ChangeState(E_PlayState.GUIDEDMISSLE);
+                    m_isMoving = 0;
+                    m_velocity = Vector3.zero;
+                    m_velocityScalar = 0.0f;
+                    m_currentMaxMovingSpeed = m_maxWalkSpeed;
+                }
+                DissolveMaterials(m_dissolveAmount);
+                return;
+        }
+    }
+
+
+    /// <summary>
+    /// 메타리얼의 DissolveAmount 값 전달
+    /// </summary>
+    private void DissolveMaterials(float t_amount)
+    {
+        foreach (Material t_mtl in mp_materials)
+        {
+            t_mtl.SetFloat("_DissolveAmount", t_amount);
+        }
+    }
+
+
+    /// <summary>
+    /// 일반 조작
+    /// </summary>
+    private void GeneralControl()
+    {
+#if PLATFORM_STANDALONE_WIN
         // 전방 이동
         if (Input.GetKeyDown(KeyCode.W))
         {
-            m_isMoving |= C_Constants.ACTOR_FORWARD;
+            m_isMoving += C_Constants.ACTOR_FORWARD;
         }
         else if (Input.GetKeyUp(KeyCode.W))
         {
-            m_isMoving ^= C_Constants.ACTOR_FORWARD;
+            m_isMoving ^=  C_Constants.ACTOR_FORWARD;
         }
 
         // 후방 이동
@@ -298,89 +419,12 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
         {
             m_isRunning = false;
         }
-        #endregion
-        #region 상태 변경
-        if (Input.GetKeyDown(KeyCode.B) && E_ActorState.PLAYING == m_currentState)
+        // 상태 변경
+        if (Input.GetKeyDown(KeyCode.B) && E_ActorState.STANDBY == m_currentState)
         {
             m_currentState = E_ActorState.DISABLING;
         }
-        #endregion
 #endif
-        // 이동 시에만 Animator에 값 전달
-        if (m_aniChange)
-        {
-            mp_animator.SetFloat("MovingSpeed", m_velocityScalar);
-            switch (m_velocityScalar)
-            {
-                case 0.0f:
-                    m_aniChange = false;
-                    break;
-            }
-        }
-
-        // Dissolve
-        switch (m_currentState)
-        {
-            case E_ActorState.ENABLING:
-                m_dissolveAmount -= Time.deltaTime;
-                if (0.0f >= m_dissolveAmount)
-                {
-                    m_dissolveAmount = 0.0f;
-                    m_currentState = E_ActorState.PLAYING;
-                }
-                DissolveMaterials(m_dissolveAmount);
-                return;
-
-            case E_ActorState.DISABLING:
-                m_dissolveAmount += Time.deltaTime;
-                if (1.0f <= m_dissolveAmount)
-                {
-                    m_dissolveAmount = 1.0f;
-                    ChangeState(E_PlayState.GUIDEDMISSLE);
-                }
-                DissolveMaterials(m_dissolveAmount);
-                return;
-        }
-    }
-
-
-    public void Hit(byte t_damage)
-    {
-        switch (m_currentState)
-        {
-            case E_ActorState.PLAYING:
-                m_hitPoint -= t_damage;
-                if (0 >= m_hitPoint)
-                {
-                    Die();
-                }
-                return;
-
-            default:
-                // 다른 상태에서는 무적이다.
-                return;
-        }
-    }
-
-
-    public void Die()
-    {
-        ChangeState(E_PlayState.AIRPLANE);
-    }
-
-
-
-    /* ========== Private Methods ========== */
-
-    /// <summary>
-    /// 메타리얼의 DissolveAmount 값 전달
-    /// </summary>
-    private void DissolveMaterials(float t_amount)
-    {
-        foreach (Material t_mtl in mp_materials)
-        {
-            t_mtl.SetFloat("_DissolveAmount", t_amount);
-        }
     }
 
 
@@ -392,6 +436,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
         m_maxRunSpeed = t_settings.m_maxRunSpeed;
         m_accelerator = t_settings.m_accelerator;
         m_cameraRotateSpeed = t_settings.m_cameraRotateSpeed;
+        m_interactRange = t_settings.m_interactRange;
         m_hitPoint = t_settings.m_hitPoint;
 
         // 메타리얼 복사

@@ -19,3 +19,11 @@ public enum E_GuidedMissleStates
     LAUNCHING,
     END
 }
+
+public enum E_ActorState
+{
+    ENABLING,
+    STANDBY,
+    NEARDEVICE,
+    DISABLING
+}

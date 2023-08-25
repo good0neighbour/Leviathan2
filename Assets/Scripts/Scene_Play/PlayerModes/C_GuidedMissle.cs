@@ -198,7 +198,6 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         switch (m_currentState)
         {
             case E_GuidedMissleStates.BROWSING:
-                #region Browsing 상태에서 Update 동작
 #if PLATFORM_STANDALONE_WIN
                 // 미사일 발사
                 if (Input.GetKeyDown(KeyCode.F))
@@ -215,24 +214,15 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
                     Vector3.zero,
                     m_movingCircleLerpWeight
                 );
-                #endregion
                 return;
 
             case E_GuidedMissleStates.LAUNCHING:
-                #region Launching 상태에서 Update 동작
 #if PLATFORM_STANDALONE_WIN
                 // 미사일 포기
                 if (Input.GetKeyDown(KeyCode.F))
                 {
                     MissleExplode();
                 }
-#endif
-                #endregion
-                return;
-
-            default:
-#if UNITY_EDITOR
-                Debug.LogError("잘못된 GuidedMissle 상태");
 #endif
                 return;
         }
@@ -261,12 +251,6 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
                 {
                     MissleExplode();
                 }
-                return;
-
-            default:
-#if UNITY_EDITOR
-                Debug.LogError("잘못된 GuidedMissle 상태");
-#endif
                 return;
         }
     }
@@ -310,7 +294,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         {
             if (t_col.tag.Equals("tag_enemy"))
             {
-                t_col.GetComponent<C_Enemy>().Hit((byte)(
+                t_col.GetComponent<C_PatrolEnemy>().Hit((byte)(
                     m_damage
                     * (1.0f
                     - Vector3.Distance(transform.localPosition, t_col.transform.localPosition)
@@ -365,10 +349,15 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
 
     private void OnTriggerEnter(Collider other)
     {
-        if (0 < (LayerMask.GetMask("layer_ground") & 1 << other.gameObject.layer)
-            || other.gameObject.tag.Equals("tag_enemy"))
+        switch (m_currentState)
         {
-            MissleExplode();
+            case E_GuidedMissleStates.LAUNCHING:
+                if (0 < (LayerMask.GetMask("layer_ground") & 1 << other.gameObject.layer)
+                    || other.gameObject.tag.Equals("tag_enemy"))
+                {
+                    MissleExplode();
+                }
+                break;
         }
     }
 }

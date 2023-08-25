@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using TMPro;
 
-public class C_Enemy : MonoBehaviour, I_Actor
+public class C_PatrolEnemy : MonoBehaviour, I_Actor
 {
     /* ========== Fields ========== */
 
