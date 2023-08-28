@@ -145,7 +145,7 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
     /// <summary>
     /// 헤드업디스플레이 업데이트
     /// </summary>
-    protected void HUDUpdate()
+    protected void HUDUpdate(bool t_fixedPos)
     {
 #if PLATFORM_STANDALONE_WIN
         // 화면 크기 바뀐 경우 HUD 크기 변경
@@ -209,14 +209,29 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
         // 방향 표시 이미지 위치
         mp_directionImage.localPosition = new Vector3(t_degreeX, t_degreeY, 0.0f);
 
-        // 위, 아래 각도 HUD 위치
-        mp_HUDUpDown.localPosition = new Vector3(
-            t_rotation.x * t_sinZ * m_HUDUpDownMoveAmount + t_degreeX * t_cosZ,
-            t_rotation.x * t_cosZ * m_HUDUpDownMoveAmount + t_degreeY * Mathf.Abs(t_sinZ),
-            0.0f
-        );
-
         // 위, 아래 각도 HUD 회전
         mp_HUDUpDown.localRotation = Quaternion.Euler(0.0f, 0.0f, -t_rotation.z);
+
+        // 위, 아래 각도 HUD 위치
+        if (t_fixedPos)
+        {
+            mp_HUDUpDown.localPosition = new Vector3(
+                t_degreeX,
+                t_degreeY,
+                0.0f
+            ) + mp_HUDUpDown.localRotation * new Vector3(
+                0.0f,
+                t_rotation.x * m_HUDUpDownMoveAmount,
+                0.0f
+            );
+        }
+        else
+        {
+            mp_HUDUpDown.localPosition = new Vector3(
+                t_rotation.x * t_sinZ * m_HUDUpDownMoveAmount,
+                t_rotation.x * t_cosZ * m_HUDUpDownMoveAmount,
+                0.0f
+            );
+        }
     }
 }

@@ -1,4 +1,11 @@
-public enum E_PlayState
+public enum E_NodeStatuss
+{
+    SUCCESS,
+    FAILURE,
+    RUNNING
+}
+
+public enum E_PlayStates
 {
     AIRPLANE,
     GUIDEDMISSLE,
@@ -20,10 +27,20 @@ public enum E_GuidedMissleStates
     END
 }
 
-public enum E_ActorState
+public enum E_ActorStates
 {
     ENABLING,
     STANDBY,
     NEARDEVICE,
-    DISABLING
+    DISABLING,
+    END
+}
+
+public enum E_ObjectPool
+{
+    ATTACKENEMY_LANDFORCE,
+    ATTACKENEMY_OCEANFORCE,
+    ALLYMINION,
+    EXPLOSION,
+    END
 }

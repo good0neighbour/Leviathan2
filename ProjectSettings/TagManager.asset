@@ -4,9 +4,10 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - tag_actor
-  - tag_enemy
   - tag_enemyDevice
+  - tag_player
+  - tag_landForce
+  - tag_oceanForce
   layers:
   - Default
   - TransparentFX

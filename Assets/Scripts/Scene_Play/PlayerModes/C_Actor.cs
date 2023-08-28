@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
+public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
 {
     /* ========== Fields ========== */
 
@@ -10,10 +9,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
     private SkinnedMeshRenderer[] mp_renderers = null;
     private Animator mp_animator = null;
     private Transform mp_cameraTransform = null;
-    private GameObject mp_canvas = null;
-    private Image mp_hitPointBar = null;
+    private C_EnemyBase mp_enemyBase = null;
     private Vector3 m_velocity = Vector3.zero;
-    private E_ActorState m_currentState = E_ActorState.STANDBY;
+    private E_ActorStates m_currentState = E_ActorStates.STANDBY;
     private float m_velocityScalar = 0.0f;
     private float m_maxWalkSpeed = 0.0f;
     private float m_maxRunSpeed = 0.0f;
@@ -22,9 +20,12 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
     private float m_cameraRotateSpeed = 0.0f;
     private float m_dissolveAmount = 1.0f;
     private float m_interactRange = 1.0f;
-    private short m_maxHitPoint = 0;
+    private float m_maxHitPointMult = 0.0f;
+    private float m_conquestSpeed = 0.0f;
+    private float m_conquesting = 0.0f;
     private short m_currentHitPoint = 0;
     private byte m_isMoving = 0;
+    private byte m_conquestingPhase = 0;
     private bool m_isRunning = false;
     private bool m_aniChange = false;
 
@@ -32,20 +33,29 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
 
     /* ========== Public Methods ========== */
 
-    public void ChangeState(E_PlayState t_state)
+    public void ChangeState(E_PlayStates t_state)
     {
         gameObject.SetActive(false);
-        mp_canvas.SetActive(false);
+        C_CanvasActorHUD.instance.CanvasEnable(false);
         C_PlayManager.instance.SetState(t_state);
     }
 
 
     public void Execute()
     {
-        mp_hitPointBar.fillAmount = (float)m_currentHitPoint / m_maxHitPoint;
+        m_isMoving = 0;
+        m_velocity = Vector3.zero;
+        m_velocityScalar = 0.0f;
+        m_currentMaxMovingSpeed = m_maxWalkSpeed;
+        m_conquestingPhase = 0;
+        m_isRunning = false;
+        m_aniChange = false;
+        C_CanvasActorHUD.instance.actor = this;
+        C_CanvasActorHUD.instance.SetHitPointBar(m_currentHitPoint * m_maxHitPointMult);
+        C_CanvasActorHUD.instance.ConquestDisplayEnable(false);
         gameObject.SetActive(true);
-        mp_canvas.SetActive(true);
-        m_currentState = E_ActorState.ENABLING;
+        C_CanvasActorHUD.instance.CanvasEnable(true);
+        m_currentState = E_ActorStates.ENABLING;
     }
 
 
@@ -266,9 +276,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
     {
         switch (m_currentState)
         {
-            case E_ActorState.STANDBY:
+            case E_ActorStates.STANDBY:
                 m_currentHitPoint -= t_damage;
-                mp_hitPointBar.fillAmount = (float)m_currentHitPoint / m_maxHitPoint;
+                C_CanvasActorHUD.instance.SetHitPointBar(m_currentHitPoint * m_maxHitPointMult);
                 if (0 >= m_currentHitPoint)
                 {
                     Die();
@@ -284,14 +294,14 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
 
     public void Die()
     {
-        ChangeState(E_PlayState.AIRPLANE);
+        ChangeState(E_PlayStates.AIRPLANE);
     }
 
 
     /// <summary>
     /// Actor 초기화
     /// </summary>
-    public void ActorInitialize(C_ActorSettings tp_settings, GameObject tp_canvas)
+    public void ActorInitialize(C_ActorSettings tp_settings)
     {
         // 설정 복사
         m_maxWalkSpeed = tp_settings.m_maxWalkSpeed;
@@ -299,16 +309,29 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
         m_accelerator = tp_settings.m_accelerator;
         m_cameraRotateSpeed = tp_settings.m_cameraRotateSpeed;
         m_interactRange = tp_settings.m_interactRange;
-        m_maxHitPoint = tp_settings.m_hitPoint;
-        m_currentHitPoint = m_maxHitPoint;
+        m_currentHitPoint = tp_settings.m_hitPoint;
+        m_conquestSpeed = tp_settings.m_conquestSpeed;
+        m_maxHitPointMult = 1.0f / m_currentHitPoint;
 
         // 걷기 상태
         m_currentMaxMovingSpeed = m_maxWalkSpeed;
-
-        // HUD 참조
-        mp_canvas = tp_canvas;
-        mp_hitPointBar = mp_canvas.transform.Find("ImageHitPoint").GetComponent<Image>();
     }    
+
+
+    /// <summary>
+    /// UI 버튼으로 눌렀을 때 동작
+    /// </summary>
+    public void ButtonConquest(bool t_active)
+    {
+        if (t_active)
+        {
+            m_conquestingPhase = 1;
+        }
+        else
+        {
+            m_conquestingPhase = 3;
+        }
+    }
 
 
 
@@ -322,39 +345,79 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
         switch (m_currentState)
         {
             // 생겨난다.
-            case E_ActorState.ENABLING:
+            case E_ActorStates.ENABLING:
                 m_dissolveAmount -= Time.deltaTime;
                 if (0.0f >= m_dissolveAmount)
                 {
                     m_dissolveAmount = 0.0f;
-                    m_currentState = E_ActorState.STANDBY;
+                    m_currentState = E_ActorStates.STANDBY;
                 }
                 DissolveMaterials(m_dissolveAmount);
                 return;
 
             // 상호작용 범위
-            case E_ActorState.STANDBY:
+            case E_ActorStates.STANDBY:
                 foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_interactRange))
                 {
                     if (t_col.tag.Equals("tag_enemyDevice"))
                     {
-                        m_currentState = E_ActorState.NEARDEVICE;
+                        m_currentState = E_ActorStates.NEARDEVICE;
+                        mp_enemyBase = t_col.GetComponentInParent<C_EnemyBase>();
+                        C_CanvasActorHUD.instance.ConquestButtonEnable(true);
+                        return;
                     }
                 }
                 return;
 
             //상호작용
-            case E_ActorState.NEARDEVICE:
+            case E_ActorStates.NEARDEVICE:
 #if PLATFORM_STANDALONE_WIN
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-
+                    m_conquestingPhase = 1;
                 }
                 else if (Input.GetKeyUp(KeyCode.E))
                 {
-
+                    m_conquestingPhase = 3;
                 }
 #endif
+                // 적 기지 점령 동작
+                switch (m_conquestingPhase)
+                {
+                    // 대기
+                    case 0:
+                        break;
+
+                    // 점령 시작
+                    case 1:
+                        C_CanvasActorHUD.instance.ConquestDisplayEnable(true);
+                        m_conquesting = 0.0f;
+                        m_conquestingPhase = 2;
+                        break;
+
+                    // 점령 중
+                    case 2:
+                        m_conquesting += m_conquestSpeed * Time.deltaTime;
+                        if (1.0f <= m_conquesting)
+                        {
+                            m_conquesting = 1.0f;
+                            mp_enemyBase.BaseConquested();
+                            C_CanvasActorHUD.instance.ConquestDisplayEnable(false);
+                            C_CanvasActorHUD.instance.ConquestButtonEnable(false);
+                            m_currentState = E_ActorStates.STANDBY;
+                            m_conquestingPhase = 0;
+                            return;
+                        }
+                        C_CanvasActorHUD.instance.SetConquestBar(m_conquesting);
+                        break;
+
+                    // 점령 취소
+                    case 3:
+                        C_CanvasActorHUD.instance.ConquestDisplayEnable(false);
+                        m_conquestingPhase = 0;
+                        break;
+                }
+                // 아직도 주위에 적 기지 장치가 있는지 확인
                 foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_interactRange))
                 {
                     if (t_col.tag.Equals("tag_enemyDevice"))
@@ -362,20 +425,17 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
                         return;
                     }
                 }
-                m_currentState = E_ActorState.STANDBY;
+                m_currentState = E_ActorStates.STANDBY;
+                C_CanvasActorHUD.instance.ConquestButtonEnable(false);
                 return;
 
             // 사라진다.
-            case E_ActorState.DISABLING:
+            case E_ActorStates.DISABLING:
                 m_dissolveAmount += Time.deltaTime;
                 if (1.0f <= m_dissolveAmount)
                 {
                     m_dissolveAmount = 1.0f;
-                    ChangeState(E_PlayState.GUIDEDMISSLE);
-                    m_isMoving = 0;
-                    m_velocity = Vector3.zero;
-                    m_velocityScalar = 0.0f;
-                    m_currentMaxMovingSpeed = m_maxWalkSpeed;
+                    ChangeState(E_PlayStates.GUIDEDMISSLE);
                 }
                 DissolveMaterials(m_dissolveAmount);
                 return;
@@ -451,9 +511,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayState>, I_Actor
             m_isRunning = false;
         }
         // 상태 변경
-        if (Input.GetKeyDown(KeyCode.B) && E_ActorState.STANDBY == m_currentState)
+        if (Input.GetKeyDown(KeyCode.B) && E_ActorStates.STANDBY == m_currentState)
         {
-            m_currentState = E_ActorState.DISABLING;
+            m_currentState = E_ActorStates.DISABLING;
         }
 #endif
     }

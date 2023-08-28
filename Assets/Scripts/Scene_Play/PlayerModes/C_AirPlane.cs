@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_FlightStates>
+public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E_FlightStates>
 {
     /* ========== Fields ========== */
 
@@ -69,7 +69,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
     }
 
     
-    public void ChangeState(E_PlayState t_state)
+    public void ChangeState(E_PlayStates t_state)
     {
         switch (m_currentState)
         {
@@ -131,7 +131,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayState>, I_StateMachine<E_
         // 가이드 미사일 화면으로 전환
         else if (Input.GetKeyDown(KeyCode.V))
         {
-            ChangeState(E_PlayState.GUIDEDMISSLE);
+            ChangeState(E_PlayStates.GUIDEDMISSLE);
         }
         #endregion
 #endif

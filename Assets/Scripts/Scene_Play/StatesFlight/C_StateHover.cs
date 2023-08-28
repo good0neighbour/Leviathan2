@@ -48,14 +48,14 @@ public class C_StateHover : C_AirPlaneStateBase
     {
         switch (C_PlayManager.instance.currentState)
         {
-            case E_PlayState.GUIDEDMISSLE:
+            case E_PlayStates.GUIDEDMISSLE:
                 // GuidedMissle 상태에서는 회전하지 않는다.
                 m_rotationFront = 0.0f;
                 m_rotationSide = 0.0f;
                 MovePosition();
                 break;
 
-            case E_PlayState.ACTOR:
+            case E_PlayStates.ACTOR:
                 // Actor 상태에서는 회전, 이동하지 않는다.
                 m_rotationFront = 0.0f;
                 m_rotationSide = 0.0f;
@@ -91,6 +91,15 @@ public class C_StateHover : C_AirPlaneStateBase
 
     public override void StateUpdate()
     {
+
+        if (!m_stateChangeAvailable && 1.0f <= mp_animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
+        {
+            m_stateChangeAvailable = true;
+            ChangeState(E_FlightStates.FLIGHT);
+        }
+
+        HUDUpdate(false);
+
 #if PLATFORM_STANDALONE_WIN
 
         #region 조작
@@ -211,14 +220,6 @@ public class C_StateHover : C_AirPlaneStateBase
         }
         #endregion
 #endif
-
-        if (!m_stateChangeAvailable && 1.0f <= mp_animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
-        {
-            m_stateChangeAvailable = true;
-            ChangeState(E_FlightStates.FLIGHT);
-        }
-
-        HUDUpdate();
     }
 
 

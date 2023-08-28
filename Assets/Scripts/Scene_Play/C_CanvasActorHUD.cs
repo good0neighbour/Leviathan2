@@ -1,0 +1,76 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class C_CanvasActorHUD : MonoBehaviour
+{
+    /* ========== Fields ========== */
+
+    [SerializeField] private GameObject mp_conquestingDisplay = null;
+    [SerializeField] private GameObject mp_buttonConquest = null;
+    [SerializeField] private Image mp_hitPointBar = null;
+    [SerializeField] private Image mp_conquestBar = null;
+
+    public static C_CanvasActorHUD instance
+    {
+        get;
+        private set;
+    }
+
+    public C_Actor actor
+    {
+        private get;
+        set;
+    }
+
+
+
+    /* ========== Public Methods ========== */
+
+    public void CanvasEnable(bool t_enable)
+    {
+        gameObject.SetActive(t_enable);
+    }
+
+
+    public void ConquestButtonEnable(bool t_enable)
+    {
+        mp_buttonConquest.SetActive(t_enable);
+    }
+
+
+    public void SetHitPointBar(float t_amount)
+    {
+        mp_hitPointBar.fillAmount = t_amount;
+    }
+
+
+    public void ConquestDisplayEnable(bool  t_enable)
+    {
+        mp_conquestingDisplay.SetActive(t_enable);
+    }
+
+
+    public void SetConquestBar(float t_amount)
+    {
+        mp_conquestBar.fillAmount = t_amount;
+    }
+
+
+    public void ButtonConquest(bool t_active)
+    {
+        actor.ButtonConquest(t_active);
+    }
+
+
+
+    /* ========== Private Methods ========== */
+
+    private void Awake()
+    {
+        // 유니티식 싱글턴패턴
+        instance = this;
+
+        // 비활성화로 시작
+        gameObject.SetActive(false);
+    }
+}

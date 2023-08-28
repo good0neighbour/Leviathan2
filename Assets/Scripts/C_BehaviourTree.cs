@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public delegate C_BehaviourTree.E_NodeStatus D_ActionDelegate();
+public delegate E_NodeStatuss D_ActionDelegate();
 
 public class C_BehaviourTree
 {
@@ -103,12 +103,7 @@ public class C_BehaviourTree
 
     /* ========== Enum ========== */
 
-    public enum E_NodeStatus
-    {
-        SUCCESS,
-        FAILURE,
-        RUNNING
-    }
+    
 
 
 
@@ -116,7 +111,7 @@ public class C_BehaviourTree
 
     private abstract class C_Node
     {
-        public abstract E_NodeStatus Execute();
+        public abstract E_NodeStatuss Execute();
         public abstract void AddChild(C_Node t_child);
     }
 
@@ -128,21 +123,21 @@ public class C_BehaviourTree
     {
         public List<C_Node> mp_nodes = new List<C_Node>();
 
-        public override E_NodeStatus Execute()
+        public override E_NodeStatuss Execute()
         {
             foreach (C_Node t_node in mp_nodes)
             {
                 switch (t_node.Execute())
                 {
-                    case E_NodeStatus.SUCCESS:
-                        return E_NodeStatus.SUCCESS;
+                    case E_NodeStatuss.SUCCESS:
+                        return E_NodeStatuss.SUCCESS;
 
                     default:
                         continue;
                 }
             }
 
-            return E_NodeStatus.FAILURE;
+            return E_NodeStatuss.FAILURE;
         }
 
         public override void AddChild(C_Node t_child)
@@ -159,21 +154,21 @@ public class C_BehaviourTree
     {
         public List<C_Node> mp_nodes = new List<C_Node>();
 
-        public override E_NodeStatus Execute()
+        public override E_NodeStatuss Execute()
         {
             foreach (C_Node t_node in mp_nodes)
             {
                 switch (t_node.Execute())
                 {
-                    case E_NodeStatus.FAILURE:
-                        return E_NodeStatus.FAILURE;
+                    case E_NodeStatuss.FAILURE:
+                        return E_NodeStatuss.FAILURE;
 
                     default:
                         continue;
                 }
             }
 
-            return E_NodeStatus.SUCCESS;
+            return E_NodeStatuss.SUCCESS;
         }
 
         public override void AddChild(C_Node t_child)
@@ -192,7 +187,7 @@ public class C_BehaviourTree
             mp_action = t_action;
         }
 
-        public override E_NodeStatus Execute()
+        public override E_NodeStatuss Execute()
         {
             return mp_action.Invoke();
         }

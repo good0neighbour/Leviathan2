@@ -23,8 +23,11 @@ public class C_ParticleEnabled : MonoBehaviour
         m_timer += Time.deltaTime;
         if (m_duration < m_timer)
         {
-            // 임시
-            Destroy(gameObject);
+            // 비활성화
+            gameObject.SetActive(false);
+
+            // ObjectPool에 되돌린다.
+            C_ObjectPool.instance.ReturnObject(gameObject, E_ObjectPool.EXPLOSION);
         }
     }
 }

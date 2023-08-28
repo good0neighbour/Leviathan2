@@ -18,7 +18,7 @@ MonoBehaviour:
   m_flightRotatePower: {x: 0.35, y: 0.125, z: 1}
   m_flightPowerMultiply: 2
   m_flightRotateSpeed: 4
-  m_flightFalldownForce: 10
+  m_flightFalldownForce: 6
   m_liftPower: 0.01
   m_airResist: {x: 0.003, y: 0.005, z: 0.0001}
   m_maxEnginePower: 19.6

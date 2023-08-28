@@ -1444,7 +1444,7 @@ GameObject:
   - component: {fileID: 8818891996312934366}
   m_Layer: 3
   m_Name: actor_playerPhi
-  m_TagString: tag_actor
+  m_TagString: tag_player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1511,20 +1511,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37c8a318fea4afd4bb2d74504b0ae1e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mp_renderers:
-  - {fileID: 7662674095895891190}
-  - {fileID: 243777355817570435}
-  - {fileID: 4798769715764808158}
-  - {fileID: 5984428057470074372}
-  - {fileID: 3267853653216171591}
-  - {fileID: 4727060450826840780}
-  - {fileID: 3052748031299455847}
-  - {fileID: 1250219711169565672}
-  - {fileID: 1869270282024328804}
-  - {fileID: 5243195825373197614}
-  - {fileID: 893957582434751289}
-  - {fileID: 5447203549275966459}
-  - {fileID: 8704438983083251707}
 --- !u!136 &4889580447166398624
 CapsuleCollider:
   m_ObjectHideFlags: 0

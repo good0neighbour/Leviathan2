@@ -204,6 +204,6 @@ public class C_StateFlight : C_AirPlaneStateBase
         #endregion
 #endif
 
-        HUDUpdate();
+        HUDUpdate(true);
     }
 }

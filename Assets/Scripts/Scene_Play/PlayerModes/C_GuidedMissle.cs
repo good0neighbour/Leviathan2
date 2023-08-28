@@ -4,26 +4,24 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using TMPro;
 
-public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
+public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
 {
     /* ========== Fields ========== */
     
     [SerializeField] private C_AirPlane mp_airplane = null;
     [Header("HUD 참조")]
     [SerializeField] private GameObject mp_HUDCanvas = null;
-    [SerializeField] private GameObject mp_explosionParticle = null;
     [SerializeField] private TextMeshProUGUI mp_altitudeText = null;
     [SerializeField] private Image mp_noiseImage = null;
     [SerializeField] private RectTransform mp_centerCircle = null;
     [SerializeField] private RectTransform mp_movingCircle = null;
     [SerializeField] private RectTransform mp_noise = null;
     [SerializeField] private Volume mp_volume = null;
-    [Header("Actor")]
-    [SerializeField] private Transform mp_actor = null;
     private ColorAdjustments mp_colourAdjustment = null;
     private ChromaticAberration mp_chromaticAberration = null;
     private Material mp_noiseMaterial = null;
     private Transform mp_targetTransform = null;
+    private Transform mp_actor = null;
     private Vector3 m_attachingOffset = new Vector3(0.0f, -0.2f, 0.0f);
     private Vector3 m_initialVelocity = Vector3.zero;
     private E_GuidedMissleStates m_currentState = E_GuidedMissleStates.BROWSING;
@@ -47,6 +45,12 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     private float m_currentScreenHeight = 0.0f;
 #endif
 
+    public static C_GuidedMissle instance
+    {
+        get;
+        private set;
+    }
+
 
 
     /* ========== Public Methods ========== */
@@ -61,7 +65,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     }
 
 
-    public void ChangeState(E_PlayState t_state)
+    public void ChangeState(E_PlayStates t_state)
     {
         mp_colourAdjustment.saturation.Override(0.0f);
         mp_chromaticAberration.intensity.Override(0.0f);
@@ -149,7 +153,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
         // Airplane으로 상태 변경
         if (Input.GetKeyDown(KeyCode.V) && m_currentState == E_GuidedMissleStates.BROWSING)
         {
-            ChangeState(E_PlayState.AIRPLANE);
+            ChangeState(E_PlayStates.AIRPLANE);
         }
 
         // Actor로 상태 변경
@@ -171,7 +175,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
             mp_actor.gameObject.SetActive(true);
 
             // 상태 변경
-            ChangeState(E_PlayState.ACTOR);
+            ChangeState(E_PlayStates.ACTOR);
         }
         #endregion
 #endif
@@ -256,6 +260,12 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     }
 
 
+    public void SetActor(Transform tp_actor)
+    {
+        mp_actor = tp_actor;
+    }
+
+
 
     /* ========== Private Methods ========== */
 
@@ -292,9 +302,9 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
     {
         foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_damageRange))
         {
-            if (t_col.tag.Equals("tag_enemy"))
+            if (t_col.tag.Equals("tag_landForce") || t_col.tag.Equals("tag_oceanForce"))
             {
-                t_col.GetComponent<C_PatrolEnemy>().Hit((byte)(
+                t_col.GetComponent<C_Minion>().Hit((byte)(
                     m_damage
                     * (1.0f
                     - Vector3.Distance(transform.localPosition, t_col.transform.localPosition)
@@ -302,14 +312,18 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayState>
                 ));
             }
         }
-        GameObject t_particle = Instantiate(mp_explosionParticle);
+        GameObject t_particle = C_ObjectPool.instance.GetObject(E_ObjectPool.EXPLOSION);
         t_particle.transform.localPosition = transform.localPosition;
+        t_particle.SetActive(true);
         StateBrowsingExecute();
     }
 
 
     private void Awake()
     {
+        // 유니티식 싱글턴패턴
+        instance = this;
+
         // 가이드 미사일 설정 가져온다.
         C_GuidedMissleSettings tp_settings = Resources.Load<C_GuidedMissleSettings>("GuidedMissleSettings");
         m_cameraRotateSpeed = tp_settings.m_cameraRotateSpeed;

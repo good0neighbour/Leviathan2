@@ -16,7 +16,7 @@ public static class C_Constants
     public const byte STEALTH_ANIMATION = 0b10;
 
     // C_Enemy 전용, 행동트리 상태
-    public const byte ENEMY_PATROL = 0;
+    public const byte ENEMY_BASICACTION = 0;
     public const byte ENEMY_HEAD_TO_ENEMY = 1;
     public const byte ENEMY_ATTACK = 2;
 }
