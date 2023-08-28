@@ -16,7 +16,7 @@ MonoBehaviour:
   m_movingCircleLerpWeight: 0.03
   m_missleAccelerator: 40
   m_damageRange: 10
-  m_damage: 10
+  m_damage: 4
   m_noiseSpeedmult: 54.321
   m_minNoiseAlpha: 0.1
   m_noiseAlphaSpeed: 4

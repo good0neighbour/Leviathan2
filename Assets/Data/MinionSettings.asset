@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_minPatrolUpdateTime: 10
   m_maxPatrolUpdateTime: 60
-  m_sightRange: 20
-  m_attackRange: 5
+  m_sightRange: 30
+  m_attackRange: 10
   m_attackTimer: 3
   m_hitPoint: 2
   m_damage: 1
