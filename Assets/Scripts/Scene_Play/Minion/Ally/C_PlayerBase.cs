@@ -1,14 +1,37 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
-public class C_PlayerBase : MonoBehaviour
+public class C_PlayerBase : MonoBehaviour, I_Actor
 {
     /* ========== Fields ========== */
 
     [SerializeField] private float m_minionSpawnTimer = 10.0f;
     [SerializeField] private Vector2 m_minionSpawnPoint = Vector3.zero;
+    [SerializeField] private byte m_maxHitPoint = 100;
     private C_MinionSettings mp_settings = null;
     private float m_timer = 0.0f;
+    private short m_currentHitPoint = 0;
+
+
+
+    /* ========== Public Methodes ========== */
+
+    public void Hit(byte t_damage)
+    {
+        m_currentHitPoint -= t_damage;
+        if (0 >= m_currentHitPoint)
+        {
+            Die();
+        }
+        C_CanvasAlwaysShow.instance.SetPlayerBaseHitPointImage((float)m_currentHitPoint / m_maxHitPoint);
+    }
+
+
+    public void Die()
+    {
+        SceneManager.LoadScene("Scene_End");
+    }
 
 
 
@@ -19,6 +42,9 @@ public class C_PlayerBase : MonoBehaviour
         // 공격용 적 생성 위치 계산
         m_minionSpawnPoint.x += transform.localPosition.x;
         m_minionSpawnPoint.y += transform.localPosition.z;
+
+        // 채력 초기화
+        m_currentHitPoint = m_maxHitPoint;
     }
 
 

@@ -19,4 +19,7 @@ public static class C_Constants
     public const byte ENEMY_BASICACTION = 0;
     public const byte ENEMY_HEAD_TO_ENEMY = 1;
     public const byte ENEMY_ATTACK = 2;
+
+    // ¿œπ›
+    public const float DISTANCE_FADE = 500.0f;
 }

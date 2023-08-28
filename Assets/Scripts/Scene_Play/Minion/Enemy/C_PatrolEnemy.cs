@@ -25,6 +25,12 @@ public class C_PatrolEnemy : C_Minion
     }
 
 
+    public override void Die()
+    {
+        Destroy(gameObject);
+    }
+
+
 
     /* ========== Protected Methods ========== */
 
@@ -43,23 +49,21 @@ public class C_PatrolEnemy : C_Minion
                 break;
         }
 
-        // 주변 순찰
-        m_timer += Time.deltaTime;
-        if (m_patrolUpdate <= m_timer)
+        // 카메라 근처에 있을 때만 실행
+        if (m_isNearCamera)
         {
-            mp_agent.ResetPath();
-            mp_agent.SetDestination(PatrolDestination());
-            m_timer -= m_patrolUpdate;
+            // 주변 순찰
+            m_timer += Time.deltaTime;
+            if (m_patrolUpdate <= m_timer)
+            {
+                mp_agent.ResetPath();
+                mp_agent.SetDestination(PatrolDestination());
+                m_timer -= m_patrolUpdate;
+            }
         }
 
         // 반환
         return E_NodeStatuss.SUCCESS;
-    }
-
-
-    public override void Die()
-    {
-        Destroy(gameObject);
     }
 
 

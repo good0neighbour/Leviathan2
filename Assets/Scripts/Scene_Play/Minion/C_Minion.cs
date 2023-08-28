@@ -10,12 +10,14 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
     [Header("부모 클래스")]
     [SerializeField] protected GameObject mp_canvas = null;
     [SerializeField] protected NavMeshAgent mp_agent = null;
+    [SerializeField] private GameObject mp_renderingModel = null;
     [SerializeField] private TextMeshProUGUI mp_surprisedText = null;
     [SerializeField] private LineRenderer mp_lineRenderer = null;
     [SerializeField] private string[] mp_targetTags = new string[2];
     [SerializeField] private Color m_attackColour = Color.white;
     protected float m_timer = 0.0f;
     protected byte m_status = byte.MaxValue;
+    protected bool m_isNearCamera = true;
     private C_BehaviourTree mp_behaviourTree = null;
     private Transform mp_canvasTransform = null;
     private Transform mp_cameraTransform = null;
@@ -71,15 +73,18 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
 #if UNITY_EDITOR
     protected virtual void OnDrawGizmos()
     {
-        switch (mp_target)
+        if (m_isNearCamera)
         {
-            case null:
-                return;
+            switch (mp_target)
+            {
+                case null:
+                    return;
 
-            default:
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawLine(transform.localPosition, mp_target.localPosition);
-                return;
+                default:
+                    Gizmos.color = Color.yellow;
+                    Gizmos.DrawLine(transform.localPosition, mp_target.localPosition);
+                    return;
+            }
         }
     }
 #endif
@@ -87,6 +92,30 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
 
 
     /* ========== Private Methods ========== */
+
+    /// <summary>
+    /// 거리에 따른 비활성화
+    /// </summary>
+    private void DistanceFade()
+    {
+        if (m_isNearCamera)
+        {
+            if (C_Constants.DISTANCE_FADE < Vector3.Distance(transform.localPosition, Camera.main.transform.localPosition))
+            {
+                m_isNearCamera = false;
+                mp_renderingModel.SetActive(false);
+            }
+        }
+        else
+        {
+            if (C_Constants.DISTANCE_FADE > Vector3.Distance(transform.localPosition, Camera.main.transform.localPosition))
+            {
+                m_isNearCamera = true;
+                mp_renderingModel.SetActive(true);
+            }
+        }
+    }
+
 
     /// <summary>
     /// 공격 애니메이션
@@ -101,7 +130,6 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
                 break;
 
             default:
-                mp_actor.Hit(m_damage);
                 mp_lineRenderer.SetPosition(1, mp_target.localPosition + new Vector3(0.0f, 1.0f, 0.0f));
                 break;
         }
@@ -170,7 +198,6 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
                             default:
                                 if (m_attackRange > m_targetDistance)
                                 {
-                                    mp_agent.ResetPath();
                                     return E_NodeStatuss.SUCCESS;
                                 }
                                 break;
@@ -188,6 +215,7 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
 
                             default:
                                 m_status = C_Constants.ENEMY_ATTACK;
+                                mp_agent.ResetPath();
                                 m_timer = 0.0f;
                                 mp_surprisedText.color = Color.red;
                                 mp_canvas.SetActive(true);
@@ -196,7 +224,11 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
                         m_timer += Time.deltaTime;
                         if (m_attackTimer < m_timer)
                         {
-                            StartCoroutine(AttackAnimation());
+                            if (m_isNearCamera)
+                            {
+                                StartCoroutine(AttackAnimation());
+                            }
+                            mp_actor?.Hit(m_damage);
                             m_timer -= m_attackTimer;
                         }
                         mp_canvasTransform.rotation = mp_cameraTransform.localRotation;
@@ -214,7 +246,6 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
                                 return E_NodeStatuss.FAILURE;
 
                             default:
-                                mp_agent.SetDestination(mp_target.localPosition);
                                 return E_NodeStatuss.SUCCESS;
                         }
                         #endregion
@@ -229,6 +260,7 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
 
                             default:
                                 m_status = C_Constants.ENEMY_HEAD_TO_ENEMY;
+                                mp_agent.SetDestination(mp_target.localPosition);
                                 mp_surprisedText.color = Color.white;
                                 mp_canvas.SetActive(true);
                                 break;
@@ -248,6 +280,10 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
 
     private void Update()
     {
+        // 행동트리 실행
         mp_behaviourTree.Execute();
+
+        // 거리에 따른 활성화 여부
+        DistanceFade();
     }
 }

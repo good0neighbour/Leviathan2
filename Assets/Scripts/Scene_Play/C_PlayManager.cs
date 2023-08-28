@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public delegate void D_PlayDelegate();
 
@@ -8,7 +9,9 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 
     [SerializeField] private GameObject mp_actor = null;
     [SerializeField] private C_MinionSettings mp_minionSettings = null;
+    [SerializeField] private byte m_goalConquest = 16;
     private I_State<E_PlayStates>[] mp_states = new I_State<E_PlayStates>[(int)E_PlayStates.END];
+    private byte m_currentConquest = 0;
 
     public static C_PlayManager instance
     {
@@ -64,6 +67,19 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
     public C_MinionSettings GetEnemySettings()
     {
         return mp_minionSettings;
+    }
+
+
+    /// <summary>
+    /// 적 기지 점령 수 갱신
+    /// </summary>
+    public void OneMoreConquested()
+    {
+        ++m_currentConquest;
+        if (m_goalConquest <= m_currentConquest)
+        {
+            SceneManager.LoadScene("Scene_End");
+        }
     }
 
 

@@ -44,16 +44,19 @@ public class C_AllyMinion : C_Minion
 #if UNITY_EDITOR
     protected override void OnDrawGizmos()
     {
-        switch (m_status)
+        if (m_isNearCamera)
         {
-            case C_Constants.ENEMY_BASICACTION:
-                Gizmos.color = new Color(1.0f, 1.0f, 0.0f, 0.2f);
-                Gizmos.DrawLine(transform.localPosition, C_PlayManager.instance.landForceBasePosition);
-                return;
+            switch (m_status)
+            {
+                case C_Constants.ENEMY_BASICACTION:
+                    Gizmos.color = new Color(1.0f, 1.0f, 0.0f, 0.2f);
+                    Gizmos.DrawLine(transform.localPosition, C_PlayManager.instance.landForceBasePosition);
+                    return;
 
-            default:
-                base.OnDrawGizmos();
-                return;
+                default:
+                    base.OnDrawGizmos();
+                    return;
+            }
         }
     }
 #endif

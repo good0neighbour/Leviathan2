@@ -50,6 +50,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mp_canvas: {fileID: 2344387857047996654}
+  mp_renderingModel: {fileID: 3453252428479256830}
   mp_agent: {fileID: 2126466028261376921}
   mp_surprisedText: {fileID: 214289942345151175}
   mp_lineRenderer: {fileID: 3743298201541106290}

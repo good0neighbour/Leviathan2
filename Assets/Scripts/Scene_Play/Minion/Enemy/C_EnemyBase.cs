@@ -31,6 +31,7 @@ public class C_EnemyBase : MonoBehaviour
         mp_device.tag = "Untagged";
         mp_flag.material = mp_conquestedMaterial;
         m_enemyControl = false;
+        C_PlayManager.instance.OneMoreConquested();
     }
 
 
