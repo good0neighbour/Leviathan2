@@ -2,6 +2,12 @@ using UnityEngine;
 
 public class C_AllyMinion : C_Minion
 {
+    /* ========== Fields ========== */
+
+    private Vector3 m_destination = Vector3.zero;
+
+
+
     /* ========== Public Methods ========== */
 
     public override void Die()
@@ -22,7 +28,7 @@ public class C_AllyMinion : C_Minion
             case C_Constants.ENEMY_BASICACTION:
                 if (!mp_agent.hasPath)
                 {
-                    mp_agent.SetDestination(C_PlayManager.instance.RandomAllyDestination());
+                    mp_agent.SetDestination(m_destination);
                 }
                 break;
 
@@ -30,11 +36,20 @@ public class C_AllyMinion : C_Minion
                 m_status = C_Constants.ENEMY_BASICACTION;
                 mp_canvas.SetActive(false);
                 mp_agent.ResetPath();
-                mp_agent.SetDestination(C_PlayManager.instance.RandomAllyDestination());
+                mp_agent.SetDestination(m_destination);
                 break;
         }
 
         // ¹ÝÈ¯
         return E_NodeStatuss.SUCCESS;
+    }
+
+
+
+    /* ========== Private Methods ========== */
+
+    private void OnEnable()
+    {
+        m_destination = C_PlayManager.instance.RandomAllyDestination();
     }
 }

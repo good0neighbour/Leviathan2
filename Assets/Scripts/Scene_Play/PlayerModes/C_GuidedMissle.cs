@@ -71,6 +71,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
         mp_chromaticAberration.intensity.Override(0.0f);
         mp_HUDCanvas.SetActive(false);
         gameObject.SetActive(false);
+        Camera.main.fieldOfView = 45.0f;
         C_PlayManager.instance.SetState(t_state);
     }
 
@@ -178,8 +179,23 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
             ChangeState(E_PlayStates.ACTOR);
         }
         #endregion
+        #region
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            switch (Camera.main.fieldOfView)
+            {
+                case 45.0f:
+                    Camera.main.fieldOfView = 15.0f;
+                    break;
+
+                case 15.0f:
+                    Camera.main.fieldOfView = 45.0f;
+                    break;
+            }
+        }
+        #endregion
 #endif
-        
+
         // 고도 표시
         mp_altitudeText.text = Mathf.RoundToInt(transform.localPosition.y).ToString();
 
