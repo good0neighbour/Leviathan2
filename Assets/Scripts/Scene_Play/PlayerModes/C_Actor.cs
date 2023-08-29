@@ -52,6 +52,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
         m_aniChange = false;
         C_CanvasActorHUD.instance.actor = this;
         C_CanvasActorHUD.instance.SetHitPointBar(m_currentHitPoint * m_maxHitPointMult);
+        C_CanvasActorHUD.instance.ConquestButtonEnable(false);
         C_CanvasActorHUD.instance.ConquestDisplayEnable(false);
         gameObject.SetActive(true);
         C_CanvasActorHUD.instance.CanvasEnable(true);
@@ -277,6 +278,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
         switch (m_currentState)
         {
             case E_ActorStates.STANDBY:
+            case E_ActorStates.NEARDEVICE:
                 m_currentHitPoint -= t_damage;
                 C_CanvasActorHUD.instance.SetHitPointBar(m_currentHitPoint * m_maxHitPointMult);
                 if (0 >= m_currentHitPoint)

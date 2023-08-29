@@ -9,9 +9,13 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 
     [SerializeField] private GameObject mp_actor = null;
     [SerializeField] private C_MinionSettings mp_minionSettings = null;
-    [SerializeField] private byte m_goalConquest = 16;
+    [SerializeField] private Material mp_playerFlagMaterial = null;
+    [SerializeField] private Sprite mp_playerFlagSprite = null;
+    [SerializeField] private byte m_numOfLandBase = 6;
+    [SerializeField] private byte m_numOfOceanBase = 6;
+    private Vector3 m_landForceBasePosition = Vector3.zero;
+    private Vector3 m_oceanForceBasePosition = Vector3.zero;
     private I_State<E_PlayStates>[] mp_states = new I_State<E_PlayStates>[(int)E_PlayStates.END];
-    private byte m_currentConquest = 0;
 
     public static C_PlayManager instance
     {
@@ -32,12 +36,6 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
     }
 
     public Vector3 playerBasePosition
-    {
-        get;
-        private set;
-    }
-
-    public Vector3 landForceBasePosition
     {
         get;
         private set;
@@ -71,15 +69,55 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 
 
     /// <summary>
-    /// 적 기지 점령 수 갱신
+    /// 남은 적 기지 수 갱신
     /// </summary>
-    public void OneMoreConquested()
+    public void EnemyBaseConquested(E_ObjectPool t_enemyForce)
     {
-        ++m_currentConquest;
-        if (m_goalConquest <= m_currentConquest)
+        // 적 기지 수 감소
+        switch (t_enemyForce)
         {
+            case E_ObjectPool.ATTACKENEMY_LANDFORCE:
+                --m_numOfLandBase;
+                break;
+            case E_ObjectPool.ATTACKENEMY_OCEANFORCE:
+                --m_numOfOceanBase;
+                break;
+        }
+
+        // HUD 업데이트
+        C_CanvasAlwaysShow.instance.SetEnemyBaseNum(m_numOfLandBase, m_numOfOceanBase);
+
+        // 게임 종료 확인
+        if (0 == m_numOfLandBase && 0 == m_numOfOceanBase)
+        {
+            C_GameManager.instance.gameWin = true;
             SceneManager.LoadScene("Scene_End");
         }
+    }
+
+
+    public Vector3 RandomAllyDestination()
+    {
+        if (0 < Random.Range(0, 2))
+        {
+            return m_landForceBasePosition;
+        }
+        else
+        {
+            return m_oceanForceBasePosition;
+        }
+    }
+
+
+    public Material GetPlayerFlagMaterial()
+    {
+        return mp_playerFlagMaterial;
+    }
+
+
+    public Sprite GetPlayerFlagSprite()
+    {
+        return mp_playerFlagSprite;
     }
 
 
@@ -95,7 +133,10 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
         playerBasePosition = transform.Find("PlayerBase").localPosition;
 
         // 대륙세력 기지 위치
-        landForceBasePosition = transform.Find("LandForceBase").localPosition;
+        m_landForceBasePosition = transform.Find("LandForceBase").localPosition;
+
+        // 해양세력 기지 위치
+        m_oceanForceBasePosition = transform.Find("OceanForceBase").localPosition;
     }
 
 
@@ -118,6 +159,9 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
         C_GuidedMissle.instance.SetActor(tp_actor.transform);
         mp_states[(int)E_PlayStates.ACTOR] = tp_actor;
         C_CameraMove.instance.SetTargetTransform(E_PlayStates.ACTOR, tp_actor.transform);
+
+        // HUD 업데이트
+        C_CanvasAlwaysShow.instance.SetEnemyBaseNum(m_numOfLandBase, m_numOfOceanBase);
 
         // 처음 상태
         currentState = E_PlayStates.AIRPLANE;

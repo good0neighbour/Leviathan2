@@ -73,7 +73,7 @@ public class C_StateFlight : C_AirPlaneStateBase
             ) * Time.fixedDeltaTime * t_velocityZ
             // 양력에 의한 회전
             + new Vector3(
-                (m_flightFalldownForce * Mathf.Cos(t_rotationZ) - (m_flightFalldownForce - 1.0f / ((t_velocityZ + 1.0f) * m_liftPower))) * Time.fixedDeltaTime,
+                (m_flightFalldownForce * Mathf.Cos(t_rotationZ) - (m_flightFalldownForce - 1.0f / ((t_velocityZ + 1.0f) * m_liftPower))) * Time.fixedDeltaTime * 0.5f,
                 -m_flightFalldownForce * Mathf.Sin(t_rotationZ) * Time.fixedDeltaTime,
                 0.0f
             )

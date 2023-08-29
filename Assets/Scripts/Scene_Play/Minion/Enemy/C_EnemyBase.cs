@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.AI;
 
 public class C_EnemyBase : MonoBehaviour
@@ -14,13 +15,15 @@ public class C_EnemyBase : MonoBehaviour
     [Header("장치")]
     [SerializeField] private GameObject mp_device = null;
     [SerializeField] private MeshRenderer mp_flag = null;
-    [SerializeField] private Material mp_conquestedMaterial = null;
     [SerializeField] private Vector2 m_attackEnemySpawnPosint = Vector3.zero;
+    [Header("미니맵")]
+    [SerializeField] private Transform mp_canvasTransform = null;
+    [SerializeField] private Image mp_iconImage = null;
     private C_MinionSettings mp_settings = null;
+    private Transform mp_minimapCameraTransform = null;
     private float m_minPatrolUpdateTime = 0.0f;
     private float m_maxPatrolUpdateTime = 0.0f;
     private float m_timer = 0.0f;
-    private bool m_enemyControl = true;
 
 
 
@@ -29,9 +32,10 @@ public class C_EnemyBase : MonoBehaviour
     public void BaseConquested()
     {
         mp_device.tag = "Untagged";
-        mp_flag.material = mp_conquestedMaterial;
-        m_enemyControl = false;
-        C_PlayManager.instance.OneMoreConquested();
+        mp_flag.material = C_PlayManager.instance.GetPlayerFlagMaterial();
+        mp_iconImage.sprite = C_PlayManager.instance.GetPlayerFlagSprite();
+        C_PlayManager.instance.EnemyBaseConquested(m_enemyType);
+        m_enemyType = E_ObjectPool.ALLYMINION;
     }
 
 
@@ -78,42 +82,36 @@ public class C_EnemyBase : MonoBehaviour
 
             t_enemyTrans.GetComponent<NavMeshAgent>().enabled = true;
         }
+
+        // 참조
+        mp_minimapCameraTransform = C_MinimapCameraMove.instance.transform;
     }
 
 
     private void Update()
     {
+        // Minion 생성
         m_timer += Time.deltaTime;
         if (m_attackEnemyTimer <= m_timer)
         {
             m_timer -= m_attackEnemyTimer;
-            if (m_enemyControl)
-            {
-                // 적 생성
-                GameObject tp_enemy = C_ObjectPool.instance.GetObject(m_enemyType);
-                tp_enemy.transform.localPosition = new Vector3(
-                    m_attackEnemySpawnPosint.x,
-                    0.0f,
-                    m_attackEnemySpawnPosint.y
-                );
-                tp_enemy.GetComponent<C_AttackEnemy>().AttackEnemyInitialize(mp_settings);
-                tp_enemy.GetComponent<NavMeshAgent>().enabled = true;
-                tp_enemy.SetActive(true);
-            }
-            else
-            {
-                // 아군 생성
-                GameObject tp_ally = C_ObjectPool.instance.GetObject(E_ObjectPool.ALLYMINION);
-                tp_ally.transform.localPosition = new Vector3(
-                    m_attackEnemySpawnPosint.x,
-                    0.0f,
-                    m_attackEnemySpawnPosint.y
-                );
-                tp_ally.GetComponent<C_AllyMinion>().AllyMinionInitialize(mp_settings);
-                tp_ally.GetComponent<NavMeshAgent>().enabled = true;
-                tp_ally.SetActive(true);
-            }
+            GameObject tp_minion = C_ObjectPool.instance.GetObject(m_enemyType);
+            tp_minion.transform.localPosition = new Vector3(
+                m_attackEnemySpawnPosint.x,
+                0.0f,
+                m_attackEnemySpawnPosint.y
+            );
+            tp_minion.GetComponent<C_Minion>().MinionInitialize(mp_settings);
+            tp_minion.GetComponent<NavMeshAgent>().enabled = true;
+            tp_minion.SetActive(true);
         }
+
+        // 미니맵 아이콘 표시
+        mp_canvasTransform.rotation = Quaternion.Euler(
+            90.0f,
+            mp_minimapCameraTransform.localEulerAngles.y,
+            0.0f
+        );
     }
 
 

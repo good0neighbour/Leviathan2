@@ -10,12 +10,6 @@ public class C_AttackEnemy : C_Minion
 
     /* ========== Public Methods ========== */
 
-    public void AttackEnemyInitialize(C_MinionSettings tp_settings)
-    {
-        MinionInitialize(tp_settings);
-    }
-
-
     public override void Die()
     {
         gameObject.SetActive(false);
@@ -32,6 +26,10 @@ public class C_AttackEnemy : C_Minion
         switch (m_status)
         {
             case C_Constants.ENEMY_BASICACTION:
+                if (!mp_agent.hasPath)
+                {
+                    mp_agent.SetDestination(C_PlayManager.instance.playerBasePosition);
+                }
                 break;
 
             default:
@@ -45,25 +43,4 @@ public class C_AttackEnemy : C_Minion
         // ¹ÝÈ¯
         return E_NodeStatuss.SUCCESS;
     }
-
-
-#if UNITY_EDITOR
-    protected override void OnDrawGizmos()
-    {
-        if (m_isNearCamera)
-        {
-            switch (m_status)
-            {
-                case C_Constants.ENEMY_BASICACTION:
-                    Gizmos.color = new Color(1.0f, 1.0f, 0.0f, 0.2f);
-                    Gizmos.DrawLine(transform.localPosition, C_PlayManager.instance.playerBasePosition);
-                    return;
-
-                default:
-                    base.OnDrawGizmos();
-                    return;
-            }
-        }
-    }
-#endif
 }

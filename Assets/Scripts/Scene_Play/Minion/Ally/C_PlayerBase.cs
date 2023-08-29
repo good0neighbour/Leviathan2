@@ -30,6 +30,7 @@ public class C_PlayerBase : MonoBehaviour, I_Actor
 
     public void Die()
     {
+        C_GameManager.instance.gameWin = false;
         SceneManager.LoadScene("Scene_End");
     }
 
@@ -68,9 +69,15 @@ public class C_PlayerBase : MonoBehaviour, I_Actor
                 0.0f,
                 m_minionSpawnPoint.y
             );
-            tp_ally.GetComponent<C_AllyMinion>().AllyMinionInitialize(mp_settings);
+            tp_ally.GetComponent<C_AllyMinion>().MinionInitialize(mp_settings);
             tp_ally.GetComponent<NavMeshAgent>().enabled = true;
             tp_ally.SetActive(true);
+
+            // 기지 방어력 회복
+            if (m_maxHitPoint > m_currentHitPoint)
+            {
+                ++m_currentHitPoint;
+            }
         }
     }
 

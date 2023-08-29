@@ -44,17 +44,10 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
         }
     }
 
-
-    public abstract void Die();
-
-
-
-    /* ========== Protected Methods ========== */
-
     /// <summary>
     /// Enemy 초기화
     /// </summary>
-    protected void MinionInitialize(C_MinionSettings tp_settings)
+    public void MinionInitialize(C_MinionSettings tp_settings)
     {
         m_sightRange = tp_settings.m_sightRange;
         m_attackRange = tp_settings.m_attackRange;
@@ -64,30 +57,17 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
     }
 
 
+    public abstract void Die();
+
+
+
+    /* ========== Protected Methods ========== */
+
+
     /// <summary>
     /// 기본 행동
     /// </summary>
     protected abstract E_NodeStatuss BasicAction();
-
-
-#if UNITY_EDITOR
-    protected virtual void OnDrawGizmos()
-    {
-        if (m_isNearCamera)
-        {
-            switch (mp_target)
-            {
-                case null:
-                    return;
-
-                default:
-                    Gizmos.color = Color.yellow;
-                    Gizmos.DrawLine(transform.localPosition, mp_target.localPosition);
-                    return;
-            }
-        }
-    }
-#endif
 
 
 
@@ -246,6 +226,10 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
                                 return E_NodeStatuss.FAILURE;
 
                             default:
+                                if (!mp_agent.hasPath)
+                                {
+                                    mp_agent.SetDestination(mp_target.localPosition);
+                                }
                                 return E_NodeStatuss.SUCCESS;
                         }
                         #endregion
@@ -260,6 +244,7 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
 
                             default:
                                 m_status = C_Constants.ENEMY_HEAD_TO_ENEMY;
+                                mp_agent.ResetPath();
                                 mp_agent.SetDestination(mp_target.localPosition);
                                 mp_surprisedText.color = Color.white;
                                 mp_canvas.SetActive(true);
@@ -286,4 +271,16 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
         // 거리에 따른 활성화 여부
         DistanceFade();
     }
+
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (m_isNearCamera)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(transform.localPosition, mp_agent.destination);
+        }
+    }
+#endif
 }
