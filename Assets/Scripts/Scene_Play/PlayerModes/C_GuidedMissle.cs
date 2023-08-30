@@ -27,6 +27,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     private Transform mp_actor = null;
     private Vector3 m_attachingOffset = new Vector3(0.0f, -0.2f, 0.0f);
     private Vector3 m_initialVelocity = Vector3.zero;
+    private Quaternion m_initialRotation = Quaternion.identity;
     private E_GuidedMissleStates m_currentState = E_GuidedMissleStates.BROWSING;
     private float m_currentRotationX = 45.0f;
     private float m_currentRotationY = 0.0f;
@@ -193,17 +194,19 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
 
     public void StateFixedUpdate()
     {
-        // 회전
-        transform.localRotation = mp_targetTransform.localRotation * Quaternion.Euler(m_currentRotationX, m_currentRotationY, 0.0f);
-
-        // 위치
         switch (m_currentState)
         {
             case E_GuidedMissleStates.BROWSING:
+                // 회전
+                transform.localRotation = mp_targetTransform.localRotation * Quaternion.Euler(m_currentRotationX, m_currentRotationY, 0.0f);
+                // 위치
                 transform.localPosition = mp_targetTransform.localPosition + m_attachingOffset;
                 return;
 
             case E_GuidedMissleStates.LAUNCHING:
+                // 회전
+                transform.localRotation = m_initialRotation * Quaternion.Euler(m_currentRotationX, m_currentRotationY, 0.0f);
+                // 위치
                 m_initialVelocity.x -= m_initialVelocity.x * Time.fixedDeltaTime;
                 m_initialVelocity.y -= m_initialVelocity.y * Time.fixedDeltaTime;
                 m_initialVelocity.z -= m_initialVelocity.z * Time.fixedDeltaTime;
@@ -239,7 +242,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
             transform.localRotation * new Vector3(0.0f, 0.0f, 1.0f),
             out t_raycast,
             float.MaxValue,
-            1 << LayerMask.NameToLayer("layer_ground")
+            (1 << LayerMask.NameToLayer("layer_ground")) + (1 << LayerMask.NameToLayer("layer_stencilWall"))
         );
 
         // Actor 소환
@@ -298,6 +301,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     {
         m_currentState = E_GuidedMissleStates.LAUNCHING;
         m_initialVelocity = mp_airplane.GetState(E_FlightStates.HOVER).velocity;
+        m_initialRotation = mp_targetTransform.localRotation;
         m_missleVelocity = 0.0f;
         EnalbingButtons(false);
         mp_centerCircle.gameObject.SetActive(false);
@@ -412,7 +416,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
         switch (m_currentState)
         {
             case E_GuidedMissleStates.LAUNCHING:
-                if (0 < (LayerMask.GetMask("layer_ground") & 1 << other.gameObject.layer)
+                if (0 < ((LayerMask.GetMask("layer_ground") + LayerMask.GetMask("layer_stencilMask")) & (1 << other.gameObject.layer))
                     || other.gameObject.tag.Equals("tag_enemy"))
                 {
                     MissleExplode();

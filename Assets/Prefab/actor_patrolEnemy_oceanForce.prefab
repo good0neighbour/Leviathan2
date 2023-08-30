@@ -50,8 +50,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mp_canvas: {fileID: 2344387857047996654}
-  mp_renderingModel: {fileID: 3453252428479256830}
   mp_agent: {fileID: 2126466028261376921}
+  mp_renderingModel: {fileID: 3453252428479256830}
   mp_surprisedText: {fileID: 214289942345151175}
   mp_lineRenderer: {fileID: 3743298201541106290}
   mp_targetTags:
@@ -216,7 +216,7 @@ GameObject:
   - component: {fileID: 1402201791535987869}
   - component: {fileID: 7754548248249962542}
   - component: {fileID: 6747472179707905743}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}

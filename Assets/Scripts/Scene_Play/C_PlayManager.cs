@@ -98,13 +98,24 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 
     public Vector3 RandomAllyDestination()
     {
-        if (0 < Random.Range(0, 2))
+        if (0 == m_numOfLandBase)
+        {
+            return m_oceanForceBasePosition;
+        }
+        else if (0 == m_numOfOceanBase)
         {
             return m_landForceBasePosition;
         }
         else
         {
-            return m_oceanForceBasePosition;
+            if (0 < Random.Range(0, 2))
+            {
+                return m_landForceBasePosition;
+            }
+            else
+            {
+                return m_oceanForceBasePosition;
+            }
         }
     }
 
