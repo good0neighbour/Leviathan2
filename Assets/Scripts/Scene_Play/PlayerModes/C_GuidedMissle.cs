@@ -11,12 +11,15 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     [SerializeField] private C_AirPlane mp_airplane = null;
     [Header("HUD 참조")]
     [SerializeField] private GameObject mp_HUDCanvas = null;
+    [SerializeField] private GameObject[] mp_enableOnBrowsing = null;
+    [SerializeField] private GameObject mp_enableOnLaunching = null;
     [SerializeField] private TextMeshProUGUI mp_altitudeText = null;
     [SerializeField] private Image mp_noiseImage = null;
     [SerializeField] private RectTransform mp_centerCircle = null;
     [SerializeField] private RectTransform mp_movingCircle = null;
     [SerializeField] private RectTransform mp_noise = null;
     [SerializeField] private Volume mp_volume = null;
+    [SerializeField] private C_Joystick mp_joystick = null;
     private ColorAdjustments mp_colourAdjustment = null;
     private ChromaticAberration mp_chromaticAberration = null;
     private Material mp_noiseMaterial = null;
@@ -79,122 +82,61 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     public void StateUpdate()
     {
 #if PLATFORM_STANDALONE_WIN
-
-        #region 화면 크기 변경 시
+        // 화면 크기 변경 시
         if (m_currentScreenHeight != Screen.height)
         {
             m_currentScreenHeight = Screen.height;
             m_UIMoveAmount = m_currentScreenHeight / Camera.main.fieldOfView;
         }
-        #endregion
-        #region 조작
+
         // 상,하 회전
         if (Input.GetKey(KeyCode.W))
         {
-            if (m_angleLimitTop < m_currentRotationX)
-            {
-                float t_amount = -m_cameraRotateSpeed * Time.deltaTime;
-
-                m_currentRotationX += t_amount;
-                mp_movingCircle.localPosition += new Vector3(
-                    0.0f,
-                    t_amount * m_UIMoveAmount,
-                    0.0f
-                );
-            }
-            else
-            {
-                m_currentRotationX = m_angleLimitTop;
-            }
+            mp_joystick.value.y = 1.0f;
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            if (m_angleLimitBottom > m_currentRotationX)
-            {
-                float t_amount = m_cameraRotateSpeed * Time.deltaTime;
-
-                m_currentRotationX += t_amount;
-                mp_movingCircle.localPosition += new Vector3(
-                    0.0f,
-                    t_amount * m_UIMoveAmount,
-                    0.0f
-                );
-            }
-            else
-            {
-                m_currentRotationX = m_angleLimitBottom;
-            }
+            mp_joystick.value.y = -1.0f;
+        }
+        else if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
+        {
+            mp_joystick.value.y = 0.0f;
         }
 
         // 좌, 우 회전
         if (Input.GetKey(KeyCode.A))
         {
-            float t_amount = -m_cameraRotateSpeed * Time.deltaTime;
-
-            m_currentRotationY += t_amount;
-            mp_movingCircle.localPosition += new Vector3(
-                -t_amount * m_UIMoveAmount,
-                0.0f,
-                0.0f
-            );
+            mp_joystick.value.x = -1.0f;
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            float t_amount = m_cameraRotateSpeed * Time.deltaTime;
-
-            m_currentRotationY += t_amount;
-            mp_movingCircle.localPosition += new Vector3(
-                -t_amount * m_UIMoveAmount,
-                0.0f,
-                0.0f
-            );
+            mp_joystick.value.x = 1.0f;
         }
-        #endregion
-        #region 상태 변경
+        else if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
+        {
+            mp_joystick.value.x = 0.0f;
+        }
+
         // Airplane으로 상태 변경
         if (Input.GetKeyDown(KeyCode.V) && m_currentState == E_GuidedMissleStates.BROWSING)
         {
-            ChangeState(E_PlayStates.AIRPLANE);
+            ButtonBack();
         }
 
         // Actor로 상태 변경
         if (Input.GetKeyDown(KeyCode.B) && m_currentState == E_GuidedMissleStates.BROWSING)
         {
-            // 소환 위치 찾는다.
-            RaycastHit t_raycast;
-            Physics.Raycast(
-                transform.localPosition,
-                transform.localRotation * new Vector3(0.0f, 0.0f, 1.0f),
-                out t_raycast,
-                float.MaxValue,
-                1 << LayerMask.NameToLayer("layer_ground")
-            );
-
-            // Actor 소환
-            mp_actor.localPosition = t_raycast.point;
-            mp_actor.localRotation = Quaternion.Euler(0.0f, transform.localRotation.eulerAngles.y, 0.0f);
-            mp_actor.gameObject.SetActive(true);
-
-            // 상태 변경
-            ChangeState(E_PlayStates.ACTOR);
+            ButtonDeployActor();
         }
-        #endregion
-        #region
+
+        // 확대 축소
         if (Input.GetKeyDown(KeyCode.C))
         {
-            switch (Camera.main.fieldOfView)
-            {
-                case 45.0f:
-                    Camera.main.fieldOfView = 15.0f;
-                    break;
-
-                case 15.0f:
-                    Camera.main.fieldOfView = 45.0f;
-                    break;
-            }
+            ButtonZoom();
         }
-        #endregion
 #endif
+        // UI 조이스틱 동작
+        JoystickControl();
 
         // 고도 표시
         mp_altitudeText.text = Mathf.RoundToInt(transform.localPosition.y).ToString();
@@ -282,39 +224,53 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     }
 
 
-
-    /* ========== Private Methods ========== */
-
-    /// <summary>
-    /// Browsing 상태 실행
-    /// </summary>
-    private void StateBrowsingExecute()
+    public void ButtonBack()
     {
-        m_currentState = E_GuidedMissleStates.BROWSING;
-        mp_movingCircle.localPosition = Vector3.zero;
-        mp_centerCircle.gameObject.SetActive(true);
-        mp_movingCircle.gameObject.SetActive(true);
-        mp_noiseMaterial.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        ChangeState(E_PlayStates.AIRPLANE);
     }
 
 
-    /// <summary>
-    /// Launching 상태 실행
-    /// </summary>
-    private void StateLaunchingExecute()
+    public void ButtonDeployActor()
     {
-        m_currentState = E_GuidedMissleStates.LAUNCHING;
-        m_initialVelocity = mp_airplane.GetState(E_FlightStates.HOVER).velocity;
-        m_missleVelocity = 0.0f;
-        mp_centerCircle.gameObject.SetActive(false);
-        mp_movingCircle.gameObject.SetActive(false);
+        // 소환 위치 찾는다.
+        RaycastHit t_raycast;
+        Physics.Raycast(
+            transform.localPosition,
+            transform.localRotation * new Vector3(0.0f, 0.0f, 1.0f),
+            out t_raycast,
+            float.MaxValue,
+            1 << LayerMask.NameToLayer("layer_ground")
+        );
+
+        // Actor 소환
+        mp_actor.localPosition = t_raycast.point;
+        mp_actor.localRotation = Quaternion.Euler(0.0f, transform.localRotation.eulerAngles.y, 0.0f);
+        mp_actor.gameObject.SetActive(true);
+
+        // 상태 변경
+        ChangeState(E_PlayStates.ACTOR);
+    }
+
+
+    public void ButtonZoom()
+    {
+        switch (Camera.main.fieldOfView)
+        {
+            case 45.0f:
+                Camera.main.fieldOfView = 15.0f;
+                break;
+
+            case 15.0f:
+                Camera.main.fieldOfView = 45.0f;
+                break;
+        }
     }
 
 
     /// <summary>
     /// 가이드 미사일 폭발
     /// </summary>
-    private void MissleExplode()
+    public void MissleExplode()
     {
         foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_damageRange))
         {
@@ -332,6 +288,80 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
         t_particle.transform.localPosition = transform.localPosition;
         t_particle.SetActive(true);
         StateBrowsingExecute();
+    }
+
+
+    /// <summary>
+    /// Launching 상태 실행
+    /// </summary>
+    public void StateLaunchingExecute()
+    {
+        m_currentState = E_GuidedMissleStates.LAUNCHING;
+        m_initialVelocity = mp_airplane.GetState(E_FlightStates.HOVER).velocity;
+        m_missleVelocity = 0.0f;
+        EnalbingButtons(false);
+        mp_centerCircle.gameObject.SetActive(false);
+        mp_movingCircle.gameObject.SetActive(false);
+    }
+
+
+
+    /* ========== Private Methods ========== */
+
+    /// <summary>
+    /// Browsing 상태 실행
+    /// </summary>
+    private void StateBrowsingExecute()
+    {
+        m_currentState = E_GuidedMissleStates.BROWSING;
+        mp_movingCircle.localPosition = Vector3.zero;
+        EnalbingButtons(true);
+        mp_centerCircle.gameObject.SetActive(true);
+        mp_movingCircle.gameObject.SetActive(true);
+        mp_noiseMaterial.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+
+    private void JoystickControl()
+    {
+        // 상,하 회전
+        float t_amount = -m_cameraRotateSpeed * mp_joystick.value.y * Time.deltaTime;
+        m_currentRotationX += t_amount;
+        if (m_angleLimitTop > m_currentRotationX)
+        {
+            m_currentRotationX = m_angleLimitTop;
+        }
+        else if (m_angleLimitBottom < m_currentRotationX)
+        {
+            m_currentRotationX = m_angleLimitBottom;
+        }
+        else
+        {
+            mp_movingCircle.localPosition += new Vector3(
+                0.0f,
+                t_amount * m_UIMoveAmount,
+                0.0f
+            );
+        }
+
+        // 좌, 우 회전
+        t_amount = m_cameraRotateSpeed * mp_joystick.value.x * Time.deltaTime;
+        m_currentRotationY += t_amount;
+        mp_movingCircle.localPosition += new Vector3(
+            -t_amount * m_UIMoveAmount,
+            0.0f,
+            0.0f
+        );
+    }
+
+
+    private void EnalbingButtons(bool t_isBrowsing)
+    {
+        foreach (GameObject tp_button in mp_enableOnBrowsing)
+        {
+            tp_button.SetActive(t_isBrowsing);
+        }
+        mp_enableOnLaunching.SetActive(!t_isBrowsing);
     }
 
 

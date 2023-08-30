@@ -10,12 +10,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
     private Animator mp_animator = null;
     private Transform mp_cameraTransform = null;
     private C_EnemyBase mp_enemyBase = null;
-    private Vector3 m_velocity = Vector3.zero;
+    private C_Joystick mp_joystick = null;
     private E_ActorStates m_currentState = E_ActorStates.STANDBY;
-    private float m_velocityScalar = 0.0f;
-    private float m_maxWalkSpeed = 0.0f;
-    private float m_maxRunSpeed = 0.0f;
-    private float m_currentMaxMovingSpeed = 0.0f;
+    private float m_maxSpeed = 0.0f;
     private float m_accelerator = 0.0f;
     private float m_cameraRotateSpeed = 0.0f;
     private float m_dissolveAmount = 1.0f;
@@ -23,11 +20,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
     private float m_maxHitPointMult = 0.0f;
     private float m_conquestSpeed = 0.0f;
     private float m_conquesting = 0.0f;
+    private float m_joystickScalar = 0.0f;
     private short m_currentHitPoint = 0;
-    private byte m_isMoving = 0;
     private byte m_conquestingPhase = 0;
-    private bool m_isRunning = false;
-    private bool m_aniChange = false;
 
 
 
@@ -43,13 +38,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
 
     public void Execute()
     {
-        m_isMoving = 0;
-        m_velocity = Vector3.zero;
-        m_velocityScalar = 0.0f;
-        m_currentMaxMovingSpeed = m_maxWalkSpeed;
         m_conquestingPhase = 0;
-        m_isRunning = false;
-        m_aniChange = false;
         C_CanvasActorHUD.instance.actor = this;
         C_CanvasActorHUD.instance.SetHitPointBar(m_currentHitPoint * m_maxHitPointMult);
         C_CanvasActorHUD.instance.ConquestButtonEnable(false);
@@ -62,167 +51,15 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
 
     public void StateFixedUpdate()
     {
-        // 최대 속력
-        if (m_isRunning)
+        // UI 조이스틱 스칼라 값
+        m_joystickScalar = mp_joystick.value.magnitude;
+
+        // 이동 속도가 0보다 클 때만
+        if (0.0f < m_joystickScalar)
         {
-            if (m_maxRunSpeed > m_currentMaxMovingSpeed)
-            {
-                m_currentMaxMovingSpeed += m_accelerator * Time.deltaTime;
-                if (m_maxRunSpeed < m_currentMaxMovingSpeed)
-                {
-                    m_currentMaxMovingSpeed = m_maxRunSpeed;
-                }
-            }
-        }
-        else
-        {
-            if (m_maxWalkSpeed < m_currentMaxMovingSpeed)
-            {
-                m_currentMaxMovingSpeed -= m_accelerator * Time.deltaTime;
-                if (m_maxWalkSpeed > m_currentMaxMovingSpeed)
-                {
-                    m_currentMaxMovingSpeed = m_maxWalkSpeed;
-                }
-            }
-        }
+            float t_velocityZ = mp_joystick.value.y * m_maxSpeed;
+            float t_velocityX = mp_joystick.value.x * m_maxSpeed;
 
-        // 가속
-        if (0 < m_isMoving && m_currentMaxMovingSpeed >= m_velocityScalar)
-        {
-            // Animator에 값 전달
-            m_aniChange = true;
-
-            #region 전후좌우 움직임
-            // 전방
-            if (0 < (m_isMoving & C_Constants.ACTOR_FORWARD))
-            {
-                if (m_currentMaxMovingSpeed > m_velocity.z)
-                {
-                    m_velocity.z += m_accelerator * Time.fixedDeltaTime;
-                    if (m_currentMaxMovingSpeed < m_velocity.z)
-                    {
-                        m_velocity.z = m_currentMaxMovingSpeed;
-                    }
-                }
-            }
-            else if (0.0f < m_velocity.z)
-            {
-                m_velocity.z -= m_accelerator * Time.fixedDeltaTime;
-                if (0.0f > m_velocity.z)
-                {
-                    m_velocity.z = 0.0f;
-                }
-            }
-
-            // 후방
-            if (0 < (m_isMoving & C_Constants.ACTOR_BACKWARD))
-            {
-                if (-m_currentMaxMovingSpeed < m_velocity.z)
-                {
-                    m_velocity.z -= m_accelerator * Time.fixedDeltaTime;
-                    if (-m_currentMaxMovingSpeed > m_velocity.z)
-                    {
-                        m_velocity.z = -m_currentMaxMovingSpeed;
-                    }
-                }
-            }
-            else if (0.0f > m_velocity.z)
-            {
-                m_velocity.z += m_accelerator * Time.fixedDeltaTime;
-                if (0.0f < m_velocity.z)
-                {
-                    m_velocity.z = 0.0f;
-                }
-            }
-
-            // 좌방
-            if (0 < (m_isMoving & C_Constants.ACTOR_LEFT))
-            {
-                if (-m_currentMaxMovingSpeed < m_velocity.x)
-                {
-                    m_velocity.x -= m_accelerator * Time.fixedDeltaTime;
-                    if (-m_currentMaxMovingSpeed > m_velocity.x)
-                    {
-                        m_velocity.x = -m_currentMaxMovingSpeed;
-                    }
-                }
-            }
-            else if (0.0f > m_velocity.x)
-            {
-                m_velocity.x += m_accelerator * Time.fixedDeltaTime;
-                if (0.0f < m_velocity.x)
-                {
-                    m_velocity.x = 0.0f;
-                }
-            }
-
-            // 우방
-            if (0 < (m_isMoving & C_Constants.ACTOR_RIGHT))
-            {
-                if (m_currentMaxMovingSpeed > m_velocity.x)
-                {
-                    m_velocity.x += m_accelerator * Time.fixedDeltaTime;
-                    if (m_currentMaxMovingSpeed < m_velocity.x)
-                    {
-                        m_velocity.x = m_currentMaxMovingSpeed;
-                    }
-                }
-            }
-            else if (0.0f < m_velocity.x)
-            {
-                m_velocity.x -= m_accelerator * Time.fixedDeltaTime;
-                if (0.0f > m_velocity.x)
-                {
-                    m_velocity.x = 0.0f;
-                }
-            }
-            #endregion
-
-            // 대각선 속력 제한
-            float t_velocity = Mathf.Sqrt(m_velocity.x * m_velocity.x + m_velocity.z * m_velocity.z);
-            if (m_currentMaxMovingSpeed < t_velocity)
-            {
-                // 속력 제한
-                float t_divide = m_currentMaxMovingSpeed / t_velocity;
-                m_velocity.x *= t_divide;
-                m_velocity.z *= t_divide;
-
-                // 총 속력 정규화
-                m_velocityScalar = m_currentMaxMovingSpeed;
-            }
-            else
-            {
-                // 총 속력 정규화
-                m_velocityScalar = t_velocity;
-            }
-        }
-        // 감속
-        else if (0.0f < m_velocityScalar)
-        {
-            // 속력
-            float t_velocity = Mathf.Sqrt(m_velocity.x * m_velocity.x + m_velocity.z * m_velocity.z);
-
-            // 속력 감소
-            float t_reducement = t_velocity - m_accelerator * Time.fixedDeltaTime;
-            if (0.0f < t_reducement)
-            {
-                float t_multiply = t_reducement / t_velocity;
-                m_velocity.x *= t_multiply;
-                m_velocity.z *= t_multiply;
-            }
-            else
-            {
-                m_velocity.x = 0.0f;
-                m_velocity.z = 0.0f;
-            }
-
-            // 총 속력 정규화
-            m_velocityScalar = t_reducement;
-        }
-
-        // 속력이 0 이상이면
-        if (0.0f < m_velocityScalar)
-        {
             // 카메라 방향
             Quaternion t_camRot = Quaternion.Euler(
                 0.0f,
@@ -231,11 +68,15 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
             );
 
             // 이동
-            transform.localPosition += t_camRot * (m_velocity * Time.deltaTime);
+            transform.localPosition += t_camRot * new Vector3(
+                t_velocityX * Time.deltaTime,
+                0.0f,
+                t_velocityZ * Time.deltaTime
+            );
 
             // 회전
-            float t_angle = Mathf.Atan(m_velocity.x / m_velocity.z) * Mathf.Rad2Deg;
-            if (0.0f > m_velocity.z)
+            float t_angle = Mathf.Atan(t_velocityX / t_velocityZ) * Mathf.Rad2Deg;
+            if (0.0f > t_velocityZ)
             {
                 t_angle += 180f;
             }
@@ -244,7 +85,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
             // 카메라 회전
             mp_cameraTransform.localRotation *= Quaternion.Euler(
                 0.0f,
-                m_velocity.x * m_cameraRotateSpeed * Time.fixedDeltaTime,
+                t_velocityX * m_cameraRotateSpeed * Time.fixedDeltaTime,
                 0.0f
             );
         }
@@ -253,20 +94,49 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
 
     public void StateUpdate()
     {
-        // 일반 조작
-        GeneralControl();
-
-        // 이동 시에만 Animator에 값 전달
-        if (m_aniChange)
+#if PLATFORM_STANDALONE_WIN
+        // 이동
+        if (Input.GetKey(KeyCode.W))
         {
-            mp_animator.SetFloat("MovingSpeed", m_velocityScalar);
-            switch (m_velocityScalar)
+            mp_joystick.value.y += m_accelerator * Time.deltaTime;
+            if (1.0f < mp_joystick.value.y)
             {
-                case 0.0f:
-                    m_aniChange = false;
-                    break;
+                mp_joystick.value.y = 1.0f;
             }
         }
+        if (Input.GetKey(KeyCode.S))
+        {
+            mp_joystick.value.y -= m_accelerator * Time.deltaTime;
+            if (-1.0f > mp_joystick.value.y)
+            {
+                mp_joystick.value.y = -1.0f;
+            }
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            mp_joystick.value.x -= m_accelerator * Time.deltaTime;
+            if (-1.0f > mp_joystick.value.x)
+            {
+                mp_joystick.value.x = -1.0f;
+            }
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            mp_joystick.value.x += m_accelerator * Time.deltaTime;
+            if (1.0f < mp_joystick.value.x)
+            {
+                mp_joystick.value.x = 1.0f;
+            }
+        }
+
+        // 상태 변경
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ButtonAeroplane();
+        }
+#endif
+        // Animator에 값 전달
+        mp_animator.SetFloat("MovingSpeed", m_joystickScalar);
 
         // 상태에 따른 동작
         UpdateByActorState();
@@ -306,17 +176,13 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
     public void ActorInitialize(C_ActorSettings tp_settings)
     {
         // 설정 복사
-        m_maxWalkSpeed = tp_settings.m_maxWalkSpeed;
-        m_maxRunSpeed = tp_settings.m_maxRunSpeed;
+        m_maxSpeed = tp_settings.m_maxSpeed;
         m_accelerator = tp_settings.m_accelerator;
         m_cameraRotateSpeed = tp_settings.m_cameraRotateSpeed;
         m_interactRange = tp_settings.m_interactRange;
         m_currentHitPoint = tp_settings.m_hitPoint;
         m_conquestSpeed = tp_settings.m_conquestSpeed;
         m_maxHitPointMult = 1.0f / m_currentHitPoint;
-
-        // 걷기 상태
-        m_currentMaxMovingSpeed = m_maxWalkSpeed;
     }    
 
 
@@ -332,6 +198,15 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
         else
         {
             m_conquestingPhase = 3;
+        }
+    }
+
+
+    public void ButtonAeroplane()
+    {
+        if (E_ActorStates.STANDBY == m_currentState)
+        {
+            m_currentState = E_ActorStates.DISABLING;
         }
     }
 
@@ -437,7 +312,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
                 if (1.0f <= m_dissolveAmount)
                 {
                     m_dissolveAmount = 1.0f;
-                    ChangeState(E_PlayStates.GUIDEDMISSLE);
+                    ChangeState(E_PlayStates.AIRPLANE);
                 }
                 DissolveMaterials(m_dissolveAmount);
                 return;
@@ -454,70 +329,6 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
         {
             t_mtl.SetFloat("_DissolveAmount", t_amount);
         }
-    }
-
-
-    /// <summary>
-    /// 일반 조작
-    /// </summary>
-    private void GeneralControl()
-    {
-#if PLATFORM_STANDALONE_WIN
-        // 전방 이동
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            m_isMoving += C_Constants.ACTOR_FORWARD;
-        }
-        else if (Input.GetKeyUp(KeyCode.W))
-        {
-            m_isMoving ^=  C_Constants.ACTOR_FORWARD;
-        }
-
-        // 후방 이동
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            m_isMoving |= C_Constants.ACTOR_BACKWARD;
-        }
-        else if (Input.GetKeyUp(KeyCode.S))
-        {
-            m_isMoving ^= C_Constants.ACTOR_BACKWARD;
-        }
-
-        // 좌방 이동
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            m_isMoving |= C_Constants.ACTOR_LEFT;
-        }
-        else if (Input.GetKeyUp(KeyCode.A))
-        {
-            m_isMoving ^= C_Constants.ACTOR_LEFT;
-        }
-
-        // 우방 이동
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            m_isMoving |= C_Constants.ACTOR_RIGHT;
-        }
-        else if (Input.GetKeyUp(KeyCode.D))
-        {
-            m_isMoving ^= C_Constants.ACTOR_RIGHT;
-        }
-
-        // 달리기
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            m_isRunning = true;
-        }
-        else if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            m_isRunning = false;
-        }
-        // 상태 변경
-        if (Input.GetKeyDown(KeyCode.B) && E_ActorStates.STANDBY == m_currentState)
-        {
-            m_currentState = E_ActorStates.DISABLING;
-        }
-#endif
     }
 
 
@@ -572,5 +383,6 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
     private void Start()
     {
         mp_cameraTransform = C_CameraMove.instance.transform;
+        mp_joystick = C_CanvasActorHUD.instance.GetUIJoystick();
     }
 }

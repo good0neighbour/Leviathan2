@@ -9,6 +9,7 @@ public class C_CanvasActorHUD : MonoBehaviour
     [SerializeField] private GameObject mp_buttonConquest = null;
     [SerializeField] private Image mp_hitPointBar = null;
     [SerializeField] private Image mp_conquestBar = null;
+    [SerializeField] private C_Joystick mp_joystick = null;
 
     public static C_CanvasActorHUD instance
     {
@@ -59,6 +60,18 @@ public class C_CanvasActorHUD : MonoBehaviour
     public void ButtonConquest(bool t_active)
     {
         actor.ButtonConquest(t_active);
+    }
+
+
+    public void ButtonAeroplane()
+    {
+        actor.ButtonAeroplane();
+    }
+
+
+    public C_Joystick GetUIJoystick()
+    {
+        return mp_joystick;
     }
 
 

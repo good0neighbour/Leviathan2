@@ -12,10 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e92ff64cd6104214dbb7c5ed77f63176, type: 3}
   m_Name: ActorSettings
   m_EditorClassIdentifier: 
-  m_maxWalkSpeed: 2
-  m_maxRunSpeed: 6
-  m_accelerator: 10
+  m_maxSpeed: 6
+  m_accelerator: 8
   m_cameraRotateSpeed: 40
-  m_interactRange: 1.5
+  m_interactRange: 1.8
   m_conquestSpeed: 0.2
   m_hitPoint: 5

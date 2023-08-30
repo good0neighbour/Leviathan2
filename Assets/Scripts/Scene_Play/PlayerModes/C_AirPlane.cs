@@ -8,11 +8,14 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
 
     [Header("HUD 참조")]
     [SerializeField] private GameObject mp_HUDCanvas = null;
+    [SerializeField] private GameObject mp_guidedMissileButton = null;
     [SerializeField] private RectTransform mp_HUDUpDown = null;
     [SerializeField] private RectTransform mp_directionImage = null;
-    [SerializeField] private RectTransform mp_powerImage = null;
     [SerializeField] private TextMeshProUGUI mp_velocityText = null;
     [SerializeField] private TextMeshProUGUI mp_altitudeText = null;
+    [SerializeField] private C_Joystick mp_joystick = null;
+    [SerializeField] private Slider mp_powerSlider = null;
+    [SerializeField] private C_Slider mp_rotationY = null;
     private C_AirPlaneStateBase[] mp_state = null;
     private Material[] mp_materials = new Material[2];
     private E_FlightStates m_currentState = E_FlightStates.HOVER;
@@ -22,12 +25,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
     private float m_maxEnginePower = 0.0f;
     private float m_minEnginePower = 0.0f;
     private float m_powerMovement = 0.0f;
-    private float m_powerImageLength = 0.0f;
     private byte m_stealthActive = 0;
-#if PLATFORM_STANDALONE_WIN
-    private float m_powerImageRaito = 0.0f;
-    private float m_curScreenHeight = 0.0f;
-#endif
 
 
 
@@ -40,6 +38,17 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
     {
         // 상태 변경
         m_currentState = t_state;
+
+        switch (m_currentState)
+        {
+            case E_FlightStates.HOVER:
+                mp_guidedMissileButton.SetActive(true);
+                return;
+
+            case E_FlightStates.FLIGHT:
+                mp_guidedMissileButton.SetActive(false);
+                return;
+        }
     }
 
 
@@ -55,11 +64,13 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
     /// <summary>
     /// 헤드업디스플레이 가져오기
     /// </summary>
-    public void GetHUDs(out RectTransform tp_HUDUpDown, out TextMeshProUGUI tp_velocityText, out RectTransform tp_directionImage)
+    public void GetHUDs(out RectTransform tp_HUDUpDown, out TextMeshProUGUI tp_velocityText, out RectTransform tp_directionImage, out C_Joystick tp_joystick, out C_Slider tp_rotationY)
     {
         tp_HUDUpDown = mp_HUDUpDown;
         tp_velocityText = mp_velocityText;
         tp_directionImage = mp_directionImage;
+        tp_joystick = mp_joystick;
+        tp_rotationY = mp_rotationY;
     }
 
 
@@ -88,34 +99,61 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
     {
 #if PLATFORM_STANDALONE_WIN
 
-        #region HUD 크기 변경
-        // 화면 크기 변경 시
-        if (m_curScreenHeight != Screen.height)
-        {
-            m_curScreenHeight = Screen.height;
-            m_powerImageLength = m_powerImageRaito * m_curScreenHeight;
-            EnginePowerUIUpdate();
-        }
-        #endregion
         #region 조작
         // 엔진 출력 제어
         if (Input.GetKey(KeyCode.LeftShift) && m_maxEnginePower > m_power)
         {
-            m_power += Time.deltaTime * m_powerMovement;
-
-            // 엔진 출력 표시
-            EnginePowerUIUpdate();
+            mp_powerSlider.value += Time.deltaTime * m_powerMovement;
         }
         else if (Input.GetKey(KeyCode.LeftControl) && m_minEnginePower < m_power)
         {
-            m_power -= Time.deltaTime * m_powerMovement;
-
-            // 엔진 출력 표시
-            EnginePowerUIUpdate();
+            mp_powerSlider.value -= Time.deltaTime * m_powerMovement;
         }
 
         // 은폐 (임시)
-        if (Input.GetKeyDown(KeyCode.C) && 0 == (m_stealthActive & 0b10))
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            ButtonStealth();
+        }
+        // 가이드 미사일 화면으로 전환
+        else if (Input.GetKeyDown(KeyCode.V))
+        {
+            ButtonGuidedMissile();
+        }
+        #endregion
+#endif
+        // 엔진 출력 전달
+        m_power = mp_powerSlider.value;
+
+        // 다형성
+        mp_state[(int)m_currentState].StateUpdate();
+
+        // 고도 표시
+        mp_altitudeText.text = Mathf.RoundToInt(transform.localPosition.y).ToString();
+    }
+
+
+    public void StateFixedUpdate()
+    {
+        
+    }
+
+
+    public void ButtonSwitchMode()
+    {
+        mp_state[(int)m_currentState].SwitchMode();
+    }
+
+
+    public void ButtonGuidedMissile()
+    {
+        ChangeState(E_PlayStates.GUIDEDMISSILE);
+    }
+
+
+    public void ButtonStealth()
+    {
+        if (0 == (m_stealthActive & C_Constants.STEALTH_ANIMATION))
         {
             if (1 <= (C_Constants.STEALTH_ENABLE & m_stealthActive))
             {
@@ -128,24 +166,6 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
 
             m_stealthActive |= C_Constants.STEALTH_ANIMATION;
         }
-        // 가이드 미사일 화면으로 전환
-        else if (Input.GetKeyDown(KeyCode.V))
-        {
-            ChangeState(E_PlayStates.GUIDEDMISSLE);
-        }
-        #endregion
-#endif
-        // 다형성
-        mp_state[(int)m_currentState].StateUpdate();
-
-        // 고도 표시
-        mp_altitudeText.text = Mathf.RoundToInt(transform.localPosition.y).ToString();
-    }
-
-
-    public void StateFixedUpdate()
-    {
-        
     }
 
 
@@ -311,15 +331,6 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
 
 
     /// <summary>
-    /// 엔진 출력 표시 업데이트
-    /// </summary>
-    private void EnginePowerUIUpdate()
-    {
-        mp_powerImage.localPosition = new Vector3(mp_powerImage.localPosition.x, m_power / m_maxEnginePower * m_powerImageLength - m_powerImageLength * 0.5f, 0.0f);
-    }
-
-
-    /// <summary>
     /// FixedUpdate 중에서 제일 먼저 동작할 것
     /// </summary>
     private void EarlyFixedUpdate()
@@ -336,11 +347,11 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
         m_maxEnginePower = tp_settings.m_maxEnginePower;
         m_minEnginePower = tp_settings.m_minEnginePower;
         m_powerMovement = tp_settings.m_powerMovement;
-        m_powerImageLength = tp_settings.m_powerImageLength * Screen.height;
-#if PLATFORM_STANDALONE_WIN
-        m_curScreenHeight = Screen.height;
-        m_powerImageRaito = tp_settings.m_powerImageLength;
-#endif
+
+        // 엔진 출력 HUD에 전달
+        mp_powerSlider.minValue = m_minEnginePower;
+        mp_powerSlider.maxValue = m_maxEnginePower;
+        mp_powerSlider.value = m_power;
 
         // 애니메이터 가져온다.
         Animator tp_animator = GetComponent<Animator>();
@@ -380,7 +391,6 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
             tp_settings.m_HUDHorizonWidthMultiply,
             tp_settings.m_HUDTextSize
         );
-        EnginePowerUIUpdate();
     }
 
 

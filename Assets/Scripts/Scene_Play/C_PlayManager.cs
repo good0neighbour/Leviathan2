@@ -151,8 +151,8 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
         C_CameraMove.instance.SetTargetTransform(E_PlayStates.AIRPLANE, ((C_AirPlane)tp_state).transform);
 
         tp_state = FindFirstObjectByType<C_GuidedMissle>(FindObjectsInactive.Include);
-        mp_states[(int)E_PlayStates.GUIDEDMISSLE] = tp_state;
-        C_CameraMove.instance.SetTargetTransform(E_PlayStates.GUIDEDMISSLE, ((C_GuidedMissle)tp_state).transform);
+        mp_states[(int)E_PlayStates.GUIDEDMISSILE] = tp_state;
+        C_CameraMove.instance.SetTargetTransform(E_PlayStates.GUIDEDMISSILE, ((C_GuidedMissle)tp_state).transform);
 
         C_Actor tp_actor = Instantiate(mp_actor).GetComponent<C_Actor>();
         tp_actor.ActorInitialize(tp_actSet);

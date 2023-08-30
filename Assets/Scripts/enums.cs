@@ -8,7 +8,7 @@ public enum E_NodeStatuss
 public enum E_PlayStates
 {
     AIRPLANE,
-    GUIDEDMISSLE,
+    GUIDEDMISSILE,
     ACTOR,
     END
 }

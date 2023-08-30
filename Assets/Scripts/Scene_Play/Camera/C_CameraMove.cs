@@ -81,7 +81,7 @@ public class C_CameraMove : MonoBehaviour, I_StateMachine<E_PlayStates>
                 );
                 return;
 
-            case E_PlayStates.GUIDEDMISSLE:
+            case E_PlayStates.GUIDEDMISSILE:
                 transform.localPosition = tp_target.localPosition;
                 transform.localRotation = tp_target.localRotation;
                 return;

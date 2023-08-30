@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
@@ -8,6 +9,8 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
     protected C_AirPlane mp_machine = null;
     protected Animator mp_animator = null;
     protected Transform mp_transform = null;
+    protected C_Joystick mp_joystick = null;
+    protected C_Slider mp_rotationY = null;
     protected Vector3 m_airResist = Vector3.zero;
     protected float m_HUDUpDownMoveAmount = 0.0f;
     private RectTransform mp_HUDUpDown = null;
@@ -17,6 +20,7 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
     private float m_power = 0.0f;
     private float m_maxEnginePower = 0.0f;
 #if PLATFORM_STANDALONE_WIN
+    private float m_rotateSpeedmult = 0.0f;
     private int m_currentScreenHeight = 0;
 #endif
 
@@ -59,15 +63,101 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
         mp_machine = tp_machine;
         mp_transform = tp_machine.transform;
         mp_rigidbody = tp_machine.GetComponent<Rigidbody>();
-        tp_machine.GetHUDs(out mp_HUDUpDown, out mp_velocityText, out mp_directionImage);
+        tp_machine.GetHUDs(out mp_HUDUpDown, out mp_velocityText, out mp_directionImage, out mp_joystick, out mp_rotationY);
 
         m_airResist = tp_settings.m_airResist;
         m_maxEnginePower = tp_settings.m_maxEnginePower;
 
         // 화면 크기 가져온다.
         m_HUDUpDownMoveAmount = Screen.height / Camera.main.fieldOfView;
+
 #if PLATFORM_STANDALONE_WIN
+        m_rotateSpeedmult = tp_settings.m_hoverRotateSpeedmult;
         m_currentScreenHeight = Screen.height;
+#endif
+    }
+
+
+    public virtual void StateUpdate()
+    {
+#if PLATFORM_STANDALONE_WIN
+        // 전, 후 기울기
+        if (Input.GetKey(KeyCode.W))
+        {
+            if (1.0f < mp_joystick.value.y)
+            {
+                mp_joystick.value.y = 1.0f;
+            }
+            else
+            {
+                mp_joystick.value.y += Time.deltaTime * m_rotateSpeedmult;
+            }
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            if (-1.0f > mp_joystick.value.y)
+            {
+                mp_joystick.value.y = -1.0f;
+            }
+            else
+            {
+                mp_joystick.value.y -= Time.deltaTime * m_rotateSpeedmult;
+            }
+        }
+
+        // 좌, 우 기울기
+        if (Input.GetKey(KeyCode.A))
+        {
+            if (-1.0f > mp_joystick.value.x)
+            {
+                mp_joystick.value.x = -1.0f;
+            }
+            else
+            {
+                mp_joystick.value.x -= Time.deltaTime * m_rotateSpeedmult;
+            }
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            if (1.0f < mp_joystick.value.x)
+            {
+                mp_joystick.value.x = 1.0f;
+            }
+            else
+            {
+                mp_joystick.value.x += Time.deltaTime * m_rotateSpeedmult;
+            }
+        }
+
+        // 기체 회전 속도
+        if (Input.GetKey(KeyCode.E))
+        {
+            if (1.0f < mp_rotationY.value)
+            {
+                mp_rotationY.value = 1.0f;
+            }
+            else
+            {
+                mp_rotationY.value += Time.deltaTime * m_rotateSpeedmult;
+            }
+        }
+        else if (Input.GetKey(KeyCode.Q))
+        {
+            if (-1.0f > mp_rotationY.value)
+            {
+                mp_rotationY.value = -1.0f;
+            }
+            else
+            {
+                mp_rotationY.value -= Time.deltaTime * m_rotateSpeedmult;
+            }
+        }
+
+        // 비행 상태 변경
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            SwitchMode();
+        }
 #endif
     }
 
@@ -78,10 +168,10 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
     public abstract void ChangeState(E_FlightStates t_state);
 
     
-    public abstract void StateUpdate();
-
-    
     public abstract void StateFixedUpdate();
+
+
+    public abstract void SwitchMode();
 
 
 
@@ -145,7 +235,7 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
     /// <summary>
     /// 헤드업디스플레이 업데이트
     /// </summary>
-    protected void HUDUpdate(bool t_fixedPos)
+    protected void HUDUpdate(bool t_dynamicPos)
     {
 #if PLATFORM_STANDALONE_WIN
         // 화면 크기 바뀐 경우 HUD 크기 변경
@@ -213,7 +303,7 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
         mp_HUDUpDown.localRotation = Quaternion.Euler(0.0f, 0.0f, -t_rotation.z);
 
         // 위, 아래 각도 HUD 위치
-        if (t_fixedPos)
+        if (t_dynamicPos)
         {
             mp_HUDUpDown.localPosition = new Vector3(
                 t_degreeX,
