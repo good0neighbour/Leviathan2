@@ -13,6 +13,7 @@ public class C_AttackEnemy : C_Minion
     public override void Die()
     {
         gameObject.SetActive(false);
+        StopAllCoroutines();
         C_ObjectPool.instance.ReturnObject(gameObject, m_enemyType);
     }
 

@@ -27,6 +27,7 @@ public class C_PatrolEnemy : C_Minion
 
     public override void Die()
     {
+        StopAllCoroutines();
         Destroy(gameObject);
     }
 

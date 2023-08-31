@@ -13,6 +13,7 @@ public class C_AllyMinion : C_Minion
     public override void Die()
     {
         gameObject.SetActive(false);
+        StopAllCoroutines();
         C_ObjectPool.instance.ReturnObject(gameObject, E_ObjectPool.ALLYMINION);
     }
 

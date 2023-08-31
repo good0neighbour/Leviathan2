@@ -9,6 +9,7 @@ public class C_PlayerBase : MonoBehaviour, I_Actor
     [SerializeField] private float m_minionSpawnTimer = 10.0f;
     [SerializeField] private Vector2 m_minionSpawnPoint = Vector3.zero;
     [SerializeField] private byte m_maxHitPoint = 100;
+    [SerializeField] private byte m_hitPointRestorePerSpawn = 10;
     private C_MinionSettings mp_settings = null;
     private float m_timer = 0.0f;
     private short m_currentHitPoint = 0;
@@ -74,9 +75,11 @@ public class C_PlayerBase : MonoBehaviour, I_Actor
             tp_ally.SetActive(true);
 
             // 기지 방어력 회복
-            if (m_maxHitPoint > m_currentHitPoint)
+            m_currentHitPoint += m_hitPointRestorePerSpawn;
+            if (m_maxHitPoint < m_currentHitPoint)
             {
-                ++m_currentHitPoint;
+                m_currentHitPoint = m_maxHitPoint;
+                C_CanvasAlwaysShow.instance.SetPlayerBaseHitPointImage((float)m_currentHitPoint / m_maxHitPoint);
             }
         }
     }

@@ -158,10 +158,12 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
             if (1 <= (C_Constants.STEALTH_ENABLE & m_stealthActive))
             {
                 m_stealthActive ^= C_Constants.STEALTH_ENABLE;
+                tag = "tag_player";
             }
             else
             {
                 m_stealthActive |= C_Constants.STEALTH_ENABLE;
+                tag = "Untagged";
             }
 
             m_stealthActive |= C_Constants.STEALTH_ANIMATION;
