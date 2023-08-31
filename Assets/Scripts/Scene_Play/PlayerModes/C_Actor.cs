@@ -5,10 +5,16 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
 {
     /* ========== Fields ========== */
 
+    [SerializeField] private float m_waterDetectRadius = 0.3f;
+    [SerializeField] private float m_swimOffsetY = 1.0f;
+    [SerializeField] private float m_groundDetectRadius = 0.3f;
+    [SerializeField] private float m_groundDetectY = 0.0f;
     private List<Material> mp_materials = new List<Material>();
     private SkinnedMeshRenderer[] mp_renderers = null;
     private Animator mp_animator = null;
+    private Rigidbody mp_rigidbody = null;
     private Transform mp_cameraTransform = null;
+    private Transform mp_waterTransform = null;
     private C_EnemyBase mp_enemyBase = null;
     private C_Joystick mp_joystick = null;
     private E_ActorStates m_currentState = E_ActorStates.STANDBY;
@@ -23,6 +29,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
     private float m_joystickScalar = 0.0f;
     private short m_currentHitPoint = 0;
     private byte m_conquestingPhase = 0;
+    private bool m_waterDetect = false;
 
 
 
@@ -88,6 +95,55 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
                 t_velocityX * m_cameraRotateSpeed * Time.fixedDeltaTime,
                 0.0f
             );
+        }
+
+        if (m_waterDetect)
+        {
+            // 지면 감지
+            foreach (Collider t_col in Physics.OverlapSphere(new Vector3(
+                transform.localPosition.x,
+                transform.localPosition.y + m_groundDetectY,
+                transform.localPosition.z
+            ), m_groundDetectRadius))
+            {
+                if (0 < (LayerMask.GetMask("layer_ground") & (1 << t_col.gameObject.layer)))
+                {
+                    if (m_waterDetect)
+                    {
+                        m_waterDetect = false;
+                        mp_animator.SetBool("WaterDetect", false);
+                        mp_rigidbody.useGravity = true;
+                    }
+                    return;
+                }
+            }
+        }
+
+        // 물 감지
+        foreach (Collider t_col in Physics.OverlapSphere(new Vector3(
+            transform.localPosition.x,
+            transform.localPosition.y + m_swimOffsetY,
+            transform.localPosition.z
+        ), m_waterDetectRadius))
+        {
+            if (0 < (LayerMask.GetMask("layer_water") & (1 << t_col.gameObject.layer)))
+            {
+                if (!m_waterDetect)
+                {
+                    mp_waterTransform = t_col.transform;
+                    m_waterDetect = true;
+                    mp_animator.SetBool("WaterDetect", true);
+                    mp_rigidbody.useGravity = false;
+                }
+
+                // 수면으로 위치 고정
+                transform.localPosition = new Vector3(
+                    transform.localPosition.x,
+                    mp_waterTransform.localPosition.y - m_swimOffsetY,
+                    transform.localPosition.z
+                );
+                return;
+            }
         }
     }
 
@@ -374,6 +430,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
 
         // 참조
         mp_animator = GetComponent<Animator>();
+        mp_rigidbody = GetComponent<Rigidbody>();
 
         // 처음에는 비활성화
         gameObject.SetActive(false);
@@ -385,4 +442,23 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
         mp_cameraTransform = C_CameraMove.instance.transform;
         mp_joystick = C_CanvasActorHUD.instance.GetUIJoystick();
     }
+
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(new Vector3(
+            transform.localPosition.x,
+            transform.localPosition.y + m_swimOffsetY,
+            transform.localPosition.z
+        ), m_waterDetectRadius);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(new Vector3(
+            transform.localPosition.x,
+            transform.localPosition.y + m_groundDetectY,
+            transform.localPosition.z
+        ), m_groundDetectRadius);
+    }
+#endif
 }

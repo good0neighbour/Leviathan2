@@ -7,12 +7,18 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 {
     /* ========== Fields ========== */
 
+    [Header("일반")]
     [SerializeField] private GameObject mp_actor = null;
     [SerializeField] private C_MinionSettings mp_minionSettings = null;
     [SerializeField] private Material mp_playerFlagMaterial = null;
     [SerializeField] private Sprite mp_playerFlagSprite = null;
     [SerializeField] private byte m_numOfLandBase = 6;
     [SerializeField] private byte m_numOfOceanBase = 6;
+    [Header("물")]
+    [SerializeField] private Transform mp_waterTransform = null;
+    [SerializeField] private float m_waterPositionOffset = -2.0f;
+    [SerializeField] private float m_waterWaveScale = 0.5f;
+    [SerializeField] private float m_waterWaveSpeed = 0.5f;
     private Vector3 m_landForceBasePosition = Vector3.zero;
     private Vector3 m_oceanForceBasePosition = Vector3.zero;
     private I_State<E_PlayStates>[] mp_states = new I_State<E_PlayStates>[(int)E_PlayStates.END];
@@ -195,6 +201,13 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 
         // 다형성
         mp_states[(int)currentState].StateFixedUpdate();
+
+        // 수면 움직임
+        mp_waterTransform.localPosition = new Vector3(
+            0.0f,
+            Mathf.Sin(Time.realtimeSinceStartup * m_waterWaveSpeed) * m_waterWaveScale + m_waterPositionOffset,
+            0.0f
+        );
 
         // 늦은 FixedUpdate
         lateFixedUpdate?.Invoke();

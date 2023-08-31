@@ -44,6 +44,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     private float m_damageRange = 0.0f;
     private float m_angleLimitTop = 0.0f;
     private float m_angleLimitBottom = 0.0f;
+    private int m_collisionLayer = 0;
     private byte m_damage = 0;
 #if PLATFORM_STANDALONE_WIN
     private float m_currentScreenHeight = 0.0f;
@@ -242,7 +243,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
             transform.localRotation * new Vector3(0.0f, 0.0f, 1.0f),
             out t_raycast,
             float.MaxValue,
-            (1 << LayerMask.NameToLayer("layer_ground")) + (1 << LayerMask.NameToLayer("layer_stencilWall"))
+            m_collisionLayer
         );
 
         // Actor 소환
@@ -403,6 +404,9 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
         mp_noiseMaterial = new Material(mp_noiseImage.material);
         mp_noiseImage.material = mp_noiseMaterial;
 
+        // 충돌 레이어 합
+        m_collisionLayer = LayerMask.GetMask("layer_ground") + LayerMask.GetMask("layer_stencilWall") + LayerMask.GetMask("layer_water");
+
         // 참조
         mp_targetTransform = mp_airplane.transform;
 
@@ -416,7 +420,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
         switch (m_currentState)
         {
             case E_GuidedMissleStates.LAUNCHING:
-                if (0 < ((LayerMask.GetMask("layer_ground") + LayerMask.GetMask("layer_stencilMask")) & (1 << other.gameObject.layer))
+                if (0 < (m_collisionLayer & (1 << other.gameObject.layer))
                     || other.gameObject.tag.Equals("tag_enemy"))
                 {
                     MissleExplode();
