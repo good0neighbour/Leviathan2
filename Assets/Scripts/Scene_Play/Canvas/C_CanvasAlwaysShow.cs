@@ -33,6 +33,21 @@ public class C_CanvasAlwaysShow : MonoBehaviour
     }
 
 
+    public void ButtonMenu()
+    {
+        switch (Time.timeScale)
+        {
+            case 0:
+                Time.timeScale = 1;
+                return;
+
+            case 1:
+                Time.timeScale = 0;
+                return;
+        }
+    }
+
+
 
     /* ========== Public Methodes ========== */
 

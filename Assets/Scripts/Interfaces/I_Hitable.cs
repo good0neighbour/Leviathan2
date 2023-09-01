@@ -1,4 +1,4 @@
-public interface I_Actor
+public interface I_Hitable
 {
     /// <summary>
     /// ÇÇ°Ý ½Ã

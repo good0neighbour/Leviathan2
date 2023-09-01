@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using TMPro;
 
-public abstract class C_Minion : MonoBehaviour, I_Actor
+public abstract class C_Minion : MonoBehaviour, I_Hitable
 {
     /* ========== Fields ========== */
 
@@ -22,7 +22,7 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
     private Transform mp_canvasTransform = null;
     private Transform mp_cameraTransform = null;
     private Transform mp_target = null;
-    private I_Actor mp_actor = null;
+    private I_Hitable mp_actor = null;
     private float m_sightRange = 0.0f;
     private float m_attackRange = 0.0f;
     private float m_attackTimer = 0.0f;
@@ -156,7 +156,7 @@ public abstract class C_Minion : MonoBehaviour, I_Actor
                                 if (m_targetDistance > t_dis)
                                 {
                                     mp_target = t_tran;
-                                    mp_actor = t_tran.GetComponent<I_Actor>();
+                                    mp_actor = t_tran.GetComponent<I_Hitable>();
                                     m_targetDistance = t_dis;
                                 }
                                 break;

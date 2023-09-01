@@ -96,8 +96,7 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
         // 게임 종료 확인
         if (0 == m_numOfLandBase && 0 == m_numOfOceanBase)
         {
-            C_GameManager.instance.gameWin = true;
-            SceneManager.LoadScene("Scene_End");
+            GameEnd(true);
         }
     }
 
@@ -151,6 +150,13 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
                 return tp_actTrans;
         }
     }
+
+
+    public void GameEnd(bool m_win)
+    {
+        C_GameManager.instance.gameWin = m_win;
+        SceneManager.LoadScene("Scene_End");
+    }    
 
 
 

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E_FlightStates>
+public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E_FlightStates>, I_Hitable
 {
     /* ========== Fields ========== */
 
@@ -25,6 +25,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
     private float m_maxEnginePower = 0.0f;
     private float m_minEnginePower = 0.0f;
     private float m_powerMovement = 0.0f;
+    private short m_hitPoint = 0;
     private byte m_stealthActive = 0;
 
 
@@ -168,6 +169,22 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
 
             m_stealthActive |= C_Constants.STEALTH_ANIMATION;
         }
+    }
+
+
+    public void Hit(byte t_damage)
+    {
+        m_hitPoint -= t_damage;
+        if (0 >= m_hitPoint)
+        {
+            Die();
+        }
+    }
+
+
+    public void Die()
+    {
+        C_PlayManager.instance.GameEnd(false);
     }
 
 
@@ -349,6 +366,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
         m_maxEnginePower = tp_settings.m_maxEnginePower;
         m_minEnginePower = tp_settings.m_minEnginePower;
         m_powerMovement = tp_settings.m_powerMovement;
+        m_hitPoint = tp_settings.m_maxHitPoint;
 
         // 엔진 출력 HUD에 전달
         mp_powerSlider.minValue = m_minEnginePower;

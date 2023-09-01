@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
+public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
 {
     /* ========== Fields ========== */
 
@@ -20,7 +20,6 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
     private C_Joystick mp_joystick = null;
     private E_ActorStates m_currentState = E_ActorStates.STANDBY;
     private float m_maxSpeed = 0.0f;
-    private float m_accelerator = 0.0f;
     private float m_cameraRotateSpeed = 0.0f;
     private float m_dissolveAmount = 1.0f;
     private float m_interactRange = 1.0f;
@@ -32,6 +31,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
     private byte m_conquestingPhase = 0;
     private byte m_actorIndex = 0;
     private bool m_waterDetect = false;
+#if PLATFORM_STANDALONE_WIN
+    private float m_accelerator = 0.0f;
+#endif
 
 
 
@@ -238,17 +240,20 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
         mp_actorInfo = tp_info;
 
         // 설정 복사
-        m_maxSpeed = tp_settings.m_maxSpeed;
-        m_accelerator = tp_settings.m_accelerator;
+        m_maxSpeed = tp_info.m_maxSpeed;
         m_cameraRotateSpeed = tp_settings.m_cameraRotateSpeed;
-        m_interactRange = tp_settings.m_interactRange;
-        m_currentHitPoint = tp_settings.m_hitPoint;
-        m_conquestSpeed = tp_settings.m_conquestSpeed;
+        m_interactRange = tp_info.m_interactRange;
+        m_currentHitPoint = tp_info.m_hitPoint;
+        m_conquestSpeed = tp_info.m_conquestSpeed;
         m_maxHitPointMult = 1.0f / m_currentHitPoint;
 
         // Actor 인덱스
         m_actorIndex = t_index;
-    }    
+
+#if PLATFORM_STANDALONE_WIN
+        m_accelerator = tp_settings.m_accelerator;
+#endif
+    }
 
 
     /// <summary>

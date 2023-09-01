@@ -1,8 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.SceneManagement;
 
-public class C_PlayerBase : MonoBehaviour, I_Actor
+public class C_PlayerBase : MonoBehaviour, I_Hitable
 {
     /* ========== Fields ========== */
 
@@ -31,8 +30,7 @@ public class C_PlayerBase : MonoBehaviour, I_Actor
 
     public void Die()
     {
-        C_GameManager.instance.gameWin = false;
-        SceneManager.LoadScene("Scene_End");
+        C_PlayManager.instance.GameEnd(false);
     }
 
 
