@@ -1,10 +1,24 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class C_CanvasInitialScreen : MonoBehaviour
 {
+    /* ========== Fields ========== */
+
+    [SerializeField] private GameObject mp_startScreen = null;
+
+
+
+    /* ========== Public Methods ========== */
+
     public void ButtonStart()
     {
-        SceneManager.LoadScene("Scene_Play");
+        gameObject.SetActive(false);
+        mp_startScreen.SetActive(true);
+    }
+
+
+    public void ButtonQuite()
+    {
+        Application.Quit();
     }
 }

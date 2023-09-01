@@ -9,6 +9,7 @@ public class C_CanvasActorHUD : MonoBehaviour
     [SerializeField] private GameObject mp_buttonConquest = null;
     [SerializeField] private Image mp_hitPointBar = null;
     [SerializeField] private Image mp_conquestBar = null;
+    [SerializeField] private Image mp_actorPortrait = null;
     [SerializeField] private C_Joystick mp_joystick = null;
 
     public static C_CanvasActorHUD instance
@@ -54,6 +55,20 @@ public class C_CanvasActorHUD : MonoBehaviour
     public void SetConquestBar(float t_amount)
     {
         mp_conquestBar.fillAmount = t_amount;
+    }
+
+
+    /// <summary>
+    /// HUD에 Actor 정보 전달
+    /// </summary>
+    public void SetActor(C_Actor tp_actor, float t_hitPointAmount, Sprite tp_portrait)
+    {
+        actor = tp_actor;
+        mp_hitPointBar.fillAmount = t_hitPointAmount;
+        mp_actorPortrait.sprite = tp_portrait;
+        mp_buttonConquest.SetActive(false);
+        mp_conquestingDisplay.SetActive(false);
+        gameObject.SetActive(true);
     }
 
 

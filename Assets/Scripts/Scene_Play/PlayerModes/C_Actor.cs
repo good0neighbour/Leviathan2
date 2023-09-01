@@ -11,6 +11,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
     [SerializeField] private float m_groundDetectY = 0.0f;
     private List<Material> mp_materials = new List<Material>();
     private SkinnedMeshRenderer[] mp_renderers = null;
+    private C_ActorInfomation.S_Info mp_actorInfo = null;
     private Animator mp_animator = null;
     private Rigidbody mp_rigidbody = null;
     private Transform mp_cameraTransform = null;
@@ -29,6 +30,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
     private float m_joystickScalar = 0.0f;
     private short m_currentHitPoint = 0;
     private byte m_conquestingPhase = 0;
+    private byte m_actorIndex = 0;
     private bool m_waterDetect = false;
 
 
@@ -46,12 +48,12 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
     public void Execute()
     {
         m_conquestingPhase = 0;
-        C_CanvasActorHUD.instance.actor = this;
-        C_CanvasActorHUD.instance.SetHitPointBar(m_currentHitPoint * m_maxHitPointMult);
-        C_CanvasActorHUD.instance.ConquestButtonEnable(false);
-        C_CanvasActorHUD.instance.ConquestDisplayEnable(false);
+        C_CanvasActorHUD.instance.SetActor(
+            this,
+            m_currentHitPoint * m_maxHitPointMult,
+            mp_actorInfo.mp_actorPortrait
+        );
         gameObject.SetActive(true);
-        C_CanvasActorHUD.instance.CanvasEnable(true);
         m_currentState = E_ActorStates.ENABLING;
     }
 
@@ -222,6 +224,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
 
     public void Die()
     {
+        C_GuidedMissle.instance.SetActorDead(m_actorIndex);
         ChangeState(E_PlayStates.AIRPLANE);
     }
 
@@ -229,8 +232,11 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
     /// <summary>
     /// Actor 초기화
     /// </summary>
-    public void ActorInitialize(C_ActorSettings tp_settings)
+    public void ActorInitialize(C_ActorSettings tp_settings, C_ActorInfomation.S_Info tp_info, byte t_index)
     {
+        // Actor 정보
+        mp_actorInfo = tp_info;
+
         // 설정 복사
         m_maxSpeed = tp_settings.m_maxSpeed;
         m_accelerator = tp_settings.m_accelerator;
@@ -239,6 +245,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Actor
         m_currentHitPoint = tp_settings.m_hitPoint;
         m_conquestSpeed = tp_settings.m_conquestSpeed;
         m_maxHitPointMult = 1.0f / m_currentHitPoint;
+
+        // Actor 인덱스
+        m_actorIndex = t_index;
     }    
 
 

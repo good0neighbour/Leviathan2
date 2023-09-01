@@ -27,4 +27,5 @@ public static class C_Constants
 
     // ¿œπ›
     public const float DISTANCE_FADE = 500.0f;
+    public const byte NUM_OF_ACTOR_LIMIT = 3;
 }

@@ -8,7 +8,6 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
     /* ========== Fields ========== */
 
     [Header("일반")]
-    [SerializeField] private GameObject mp_actor = null;
     [SerializeField] private C_MinionSettings mp_minionSettings = null;
     [SerializeField] private Material mp_playerFlagMaterial = null;
     [SerializeField] private Sprite mp_playerFlagSprite = null;
@@ -19,6 +18,7 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
     [SerializeField] private float m_waterPositionOffset = -2.0f;
     [SerializeField] private float m_waterWaveScale = 0.5f;
     [SerializeField] private float m_waterWaveSpeed = 0.5f;
+    private C_Actor[] mp_actors = new C_Actor[C_Constants.NUM_OF_ACTOR_LIMIT];
     private Vector3 m_landForceBasePosition = Vector3.zero;
     private Vector3 m_oceanForceBasePosition = Vector3.zero;
     private I_State<E_PlayStates>[] mp_states = new I_State<E_PlayStates>[(int)E_PlayStates.END];
@@ -138,6 +138,21 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
     }
 
 
+    public  Transform SetCurrentActor(byte t_index)
+    {
+        switch (mp_actors[t_index])
+        {
+            case null:
+                return null;
+            default:
+                mp_states[(int)E_PlayStates.ACTOR] = mp_actors[t_index];
+                Transform tp_actTrans = mp_actors[t_index].transform;
+                C_CameraMove.instance.SetTargetTransform(E_PlayStates.ACTOR, tp_actTrans);
+                return tp_actTrans;
+        }
+    }
+
+
 
     /* ========== Private Methods ========== */
 
@@ -162,20 +177,36 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
         // Actor 설정 가져온다.
         C_ActorSettings tp_actSet = Resources.Load<C_ActorSettings>("ActorSettings");
 
-        // 상태 생성
+        // 비행기 상태 생성
         I_State<E_PlayStates> tp_state = FindFirstObjectByType<C_AirPlane>(FindObjectsInactive.Include);
         mp_states[(int)E_PlayStates.AIRPLANE] = tp_state;
         C_CameraMove.instance.SetTargetTransform(E_PlayStates.AIRPLANE, ((C_AirPlane)tp_state).transform);
 
+        // 가이드미사일 상태 생성
         tp_state = FindFirstObjectByType<C_GuidedMissle>(FindObjectsInactive.Include);
         mp_states[(int)E_PlayStates.GUIDEDMISSILE] = tp_state;
         C_CameraMove.instance.SetTargetTransform(E_PlayStates.GUIDEDMISSILE, ((C_GuidedMissle)tp_state).transform);
 
-        C_Actor tp_actor = Instantiate(mp_actor).GetComponent<C_Actor>();
-        tp_actor.ActorInitialize(tp_actSet);
-        C_GuidedMissle.instance.SetActor(tp_actor.transform);
-        mp_states[(int)E_PlayStates.ACTOR] = tp_actor;
-        C_CameraMove.instance.SetTargetTransform(E_PlayStates.ACTOR, tp_actor.transform);
+        // Actor 상태 생성
+        C_ActorInfomation.S_Info[] tp_actInfoList = C_GameManager.instance.GetActorList();
+        for (byte t_i = 0; t_i < tp_actInfoList.Length; ++t_i)
+        {
+            switch (tp_actInfoList[t_i])
+            {
+                case null:
+                    mp_actors[t_i] = null;
+                    break;
+
+                default:
+                    C_Actor tp_actor = Instantiate(tp_actInfoList[t_i].mp_prefab).GetComponent<C_Actor>();
+                    tp_actor.ActorInitialize(tp_actSet, tp_actInfoList[t_i], t_i);
+                    mp_actors[t_i] = tp_actor;
+                    break;
+            }
+        }
+
+        // 가이드미사일에 Actor 정보 전달
+        C_GuidedMissle.instance.SetActorSlot(tp_actInfoList);
 
         // HUD 업데이트
         C_CanvasAlwaysShow.instance.SetEnemyBaseNum(m_numOfLandBase, m_numOfOceanBase);

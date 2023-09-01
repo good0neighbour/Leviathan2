@@ -74,6 +74,14 @@ Material:
         m_Texture: {fileID: 2800000, guid: 2ca941fa71630d148b4770e1b7fd2149, type: 3}
         m_Scale: {x: 200, y: 200}
         m_Offset: {x: 0, y: 0}
+    - _NormalMap0:
+        m_Texture: {fileID: 2800000, guid: 2ca941fa71630d148b4770e1b7fd2149, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap1:
+        m_Texture: {fileID: 2800000, guid: 9aba2d39be7dbbe43ae040d374c0fa70, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -127,7 +135,7 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _FlowSpeed: 0.2
+    - _FlowSpeed: 0.1
     - _FresnelPower: 2
     - _GlossMapScale: 0
     - _Glossiness: 0

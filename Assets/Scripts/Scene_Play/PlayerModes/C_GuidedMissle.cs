@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
@@ -10,8 +11,11 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     
     [SerializeField] private C_AirPlane mp_airplane = null;
     [Header("HUD 참조")]
+    [SerializeField] private Image[] mp_actorPotraits = new Image[C_Constants.NUM_OF_ACTOR_LIMIT];
+    [SerializeField] private TextMeshProUGUI[] mp_actorNames = new TextMeshProUGUI[C_Constants.NUM_OF_ACTOR_LIMIT];
+    [SerializeField] private GameObject[] mp_deadImages = new GameObject[C_Constants.NUM_OF_ACTOR_LIMIT];
     [SerializeField] private GameObject mp_HUDCanvas = null;
-    [SerializeField] private GameObject[] mp_enableOnBrowsing = null;
+    [SerializeField] private List<GameObject> mp_enableOnBrowsing = new List<GameObject>();
     [SerializeField] private GameObject mp_enableOnLaunching = null;
     [SerializeField] private TextMeshProUGUI mp_altitudeText = null;
     [SerializeField] private Image mp_noiseImage = null;
@@ -24,7 +28,6 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     private ChromaticAberration mp_chromaticAberration = null;
     private Material mp_noiseMaterial = null;
     private Transform mp_targetTransform = null;
-    private Transform mp_actor = null;
     private Vector3 m_attachingOffset = new Vector3(0.0f, -0.2f, 0.0f);
     private Vector3 m_initialVelocity = Vector3.zero;
     private Quaternion m_initialRotation = Quaternion.identity;
@@ -46,6 +49,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     private float m_angleLimitBottom = 0.0f;
     private int m_collisionLayer = 0;
     private byte m_damage = 0;
+    private byte m_actorAvailable = byte.MaxValue;
 #if PLATFORM_STANDALONE_WIN
     private float m_currentScreenHeight = 0.0f;
 #endif
@@ -124,15 +128,21 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
         {
             ButtonBack();
         }
-
         // Actor로 상태 변경
-        if (Input.GetKeyDown(KeyCode.B) && m_currentState == E_GuidedMissleStates.BROWSING)
+        else if (Input.GetKeyDown(KeyCode.Alpha1) && m_currentState == E_GuidedMissleStates.BROWSING)
         {
-            ButtonDeployActor();
+            ButtonDeployActor(0);
         }
-
+        else if (Input.GetKeyDown(KeyCode.Alpha2) && m_currentState == E_GuidedMissleStates.BROWSING)
+        {
+            ButtonDeployActor(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3) && m_currentState == E_GuidedMissleStates.BROWSING)
+        {
+            ButtonDeployActor(2);
+        }
         // 확대 축소
-        if (Input.GetKeyDown(KeyCode.C))
+        else if (Input.GetKeyDown(KeyCode.C))
         {
             ButtonZoom();
         }
@@ -222,20 +232,21 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     }
 
 
-    public void SetActor(Transform tp_actor)
-    {
-        mp_actor = tp_actor;
-    }
-
-
     public void ButtonBack()
     {
         ChangeState(E_PlayStates.AIRPLANE);
     }
 
 
-    public void ButtonDeployActor()
+    public void ButtonDeployActor(int t_index)
     {
+        // Actor 살아있는지 확인
+        switch (m_actorAvailable & (1 << t_index))
+        {
+            case 0:
+                return;
+        }
+
         // 소환 위치 찾는다.
         RaycastHit t_raycast;
         Physics.Raycast(
@@ -246,13 +257,31 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
             m_collisionLayer
         );
 
-        // Actor 소환
-        mp_actor.localPosition = t_raycast.point;
-        mp_actor.localRotation = Quaternion.Euler(0.0f, transform.localRotation.eulerAngles.y, 0.0f);
-        mp_actor.gameObject.SetActive(true);
+        switch (t_raycast.transform)
+        {
+            case null:
+                return;
 
-        // 상태 변경
-        ChangeState(E_PlayStates.ACTOR);
+            default:
+                // 소환할 Actor
+                Transform tp_actTrans = C_PlayManager.instance.SetCurrentActor((byte)t_index);
+
+                switch (tp_actTrans)
+                {
+                    case null:
+                        return;
+
+                    default:
+                        // Actor 소환
+                        tp_actTrans.localPosition = t_raycast.point;
+                        tp_actTrans.localRotation = Quaternion.Euler(0.0f, transform.localRotation.eulerAngles.y, 0.0f);
+                        tp_actTrans.gameObject.SetActive(true);
+
+                        // 상태 변경
+                        ChangeState(E_PlayStates.ACTOR);
+                        return;
+                }
+        }
     }
 
 
@@ -307,6 +336,35 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
         EnalbingButtons(false);
         mp_centerCircle.gameObject.SetActive(false);
         mp_movingCircle.gameObject.SetActive(false);
+    }
+
+
+    public void SetActorSlot(C_ActorInfomation.S_Info[] tp_actInfoList)
+    {
+        for (byte t_i = 0; t_i < C_Constants.NUM_OF_ACTOR_LIMIT; ++t_i)
+        {
+            switch (tp_actInfoList[t_i])
+            {
+                case null:
+                    GameObject t_slot = mp_actorPotraits[t_i].transform.gameObject;
+                    mp_enableOnBrowsing.Remove(t_slot);
+                    Destroy(t_slot);
+                    m_actorAvailable ^= (byte)(1 << t_i);
+                    continue;
+
+                default:
+                    mp_actorPotraits[t_i].sprite = tp_actInfoList[t_i].mp_actorPortrait;
+                    mp_actorNames[t_i].text = tp_actInfoList[t_i].m_name;
+                    continue;
+            }
+        }
+    }
+
+
+    public void SetActorDead(byte t_index)
+    {
+        m_actorAvailable ^= (byte)(1 << t_index);
+        mp_deadImages[t_index].SetActive(true);
     }
 
 
