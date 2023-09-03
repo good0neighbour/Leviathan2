@@ -25,6 +25,8 @@ public class C_AirplaneSettings : ScriptableObject
     public float m_minEnginePower = 0.0f;
     public float m_powerMovement = 10.0f;
     public float m_altitudeLimit = 1000.0f;
+    public float m_minEngineSoundSpeed = 0.7f;
+    public float m_engineSoundSpeedMult = 0.05f;
     public byte m_maxHitPoint = 255;
     [Space(10)]
     [Header("HUDSettings")]

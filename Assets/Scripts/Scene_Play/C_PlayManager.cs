@@ -18,6 +18,10 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
     [SerializeField] private float m_waterPositionOffset = -2.0f;
     [SerializeField] private float m_waterWaveScale = 0.5f;
     [SerializeField] private float m_waterWaveSpeed = 0.5f;
+#if UNITY_EDITOR
+    [Header("디버그 용도")]
+    [SerializeField] private GameObject mp_audioManager = null;
+#endif
     private C_Actor[] mp_actors = new C_Actor[C_Constants.NUM_OF_ACTOR_LIMIT];
     private Vector3 m_landForceBasePosition = Vector3.zero;
     private Vector3 m_oceanForceBasePosition = Vector3.zero;
@@ -164,6 +168,21 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 
     private void Awake()
     {
+#if UNITY_EDITOR
+        // AudioManager 없으면 생성
+        switch (C_AudioManager.instance)
+        {
+            case null:
+                GameObject tp_audMgr = Instantiate(mp_audioManager);
+                DontDestroyOnLoad(tp_audMgr);
+                C_AudioManager.instance = tp_audMgr.GetComponent<C_AudioManager>();
+                break;
+
+            default:
+                break;
+        }
+#endif
+
         // 유니티식 싱글턴패턴
         instance = this;
 
@@ -175,6 +194,15 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 
         // 해양세력 기지 위치
         m_oceanForceBasePosition = transform.Find("OceanForceBase").localPosition;
+
+        // 자동 번역 작동
+        foreach (C_AutoTranslation tp_auTra in FindObjectsOfType<C_AutoTranslation>(true))
+        {
+            tp_auTra.TranslationReady();
+        }
+
+        // 언어 불러온다
+        C_Language.instance.LoadLangeage(C_GameManager.instance.currentLanguage);
     }
 
 
@@ -194,7 +222,8 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
         C_CameraMove.instance.SetTargetTransform(E_PlayStates.GUIDEDMISSILE, ((C_GuidedMissle)tp_state).transform);
 
         // Actor 상태 생성
-        C_ActorInfomation.S_Info[] tp_actInfoList = C_GameManager.instance.GetActorList();
+        byte[] mp_actsLv;
+        C_ActorInfomation.S_Info[] tp_actInfoList = C_GameManager.instance.GetActorList(out mp_actsLv);
         for (byte t_i = 0; t_i < tp_actInfoList.Length; ++t_i)
         {
             switch (tp_actInfoList[t_i])
@@ -205,7 +234,7 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 
                 default:
                     C_Actor tp_actor = Instantiate(tp_actInfoList[t_i].mp_prefab).GetComponent<C_Actor>();
-                    tp_actor.ActorInitialize(tp_actSet, tp_actInfoList[t_i], t_i);
+                    tp_actor.ActorInitialize(tp_actSet, tp_actInfoList[t_i], t_i, mp_actsLv[t_i]);
                     mp_actors[t_i] = tp_actor;
                     break;
             }

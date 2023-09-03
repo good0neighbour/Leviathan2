@@ -44,3 +44,19 @@ public enum E_ObjectPool
     EXPLOSION,
     END
 }
+
+public enum E_LanguageType
+{
+    KOREAN,
+    ENGLISH,
+    END
+}
+
+public enum E_AudioType
+{
+    TOUCH,
+    SELECT,
+    SWITCH_HOVER,
+    SWITCH_FLIGHT,
+    GUIDEDMISSILE_TOUCH,
+}

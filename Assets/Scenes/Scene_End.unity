@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 575538333}
   - component: {fileID: 575538335}
   - component: {fileID: 575538334}
+  - component: {fileID: 575538336}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -258,6 +259,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 575538332}
   m_CullTransparentMesh: 1
+--- !u!114 &575538336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 575538332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b230b444ebdfc754c8283053cef47c3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_onlyChangeFont: 0
+  m_shortenLineGap: 1
 --- !u!1 &591784733
 GameObject:
   m_ObjectHideFlags: 0
@@ -402,6 +417,7 @@ GameObject:
   - component: {fileID: 729005631}
   - component: {fileID: 729005633}
   - component: {fileID: 729005632}
+  - component: {fileID: 729005634}
   m_Layer: 5
   m_Name: TextWin
   m_TagString: Untagged
@@ -526,6 +542,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 729005630}
   m_CullTransparentMesh: 1
+--- !u!114 &729005634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 729005630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b230b444ebdfc754c8283053cef47c3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_onlyChangeFont: 0
+  m_shortenLineGap: 1
 --- !u!1 &1207650730
 GameObject:
   m_ObjectHideFlags: 0
@@ -537,6 +567,7 @@ GameObject:
   - component: {fileID: 1207650731}
   - component: {fileID: 1207650733}
   - component: {fileID: 1207650732}
+  - component: {fileID: 1207650734}
   m_Layer: 5
   m_Name: TextWin_1
   m_TagString: Untagged
@@ -662,6 +693,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1207650730}
   m_CullTransparentMesh: 1
+--- !u!114 &1207650734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1207650730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b230b444ebdfc754c8283053cef47c3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_onlyChangeFont: 0
+  m_shortenLineGap: 1
 --- !u!1 &1473908746
 GameObject:
   m_ObjectHideFlags: 0
@@ -799,6 +844,7 @@ GameObject:
   - component: {fileID: 1550074188}
   - component: {fileID: 1550074190}
   - component: {fileID: 1550074189}
+  - component: {fileID: 1550074191}
   m_Layer: 5
   m_Name: TextLose_1
   m_TagString: Untagged
@@ -924,6 +970,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1550074187}
   m_CullTransparentMesh: 1
+--- !u!114 &1550074191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1550074187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b230b444ebdfc754c8283053cef47c3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_onlyChangeFont: 0
+  m_shortenLineGap: 1
 --- !u!1 &1643290422
 GameObject:
   m_ObjectHideFlags: 0
@@ -1140,6 +1200,7 @@ GameObject:
   - component: {fileID: 1847361948}
   - component: {fileID: 1847361950}
   - component: {fileID: 1847361949}
+  - component: {fileID: 1847361951}
   m_Layer: 5
   m_Name: TextLose
   m_TagString: Untagged
@@ -1264,6 +1325,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1847361947}
   m_CullTransparentMesh: 1
+--- !u!114 &1847361951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1847361947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b230b444ebdfc754c8283053cef47c3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_onlyChangeFont: 0
+  m_shortenLineGap: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -87,6 +87,7 @@ public class C_StateFlight : C_AirPlaneStateBase
     public override void SwitchMode()
     {
         mp_animator.SetBool("FlightMode", false);
+        C_AudioManager.instance.PlayAuido(E_AudioType.SWITCH_HOVER);
         ChangeState(E_FlightStates.HOVER);
     }
 }

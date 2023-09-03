@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ActorInfomation
   m_EditorClassIdentifier: 
   mp_actorInformation:
-  - m_name: Phi
+  - mp_name: Phi
     mp_actorImageFull: {fileID: 21300000, guid: be75cc5fee1093b478d64922ea41da09,
       type: 3}
     mp_actorImageThin: {fileID: 21300000, guid: 5c798a01a31ebd94f8251efea4fd6414,
@@ -21,3 +21,107 @@ MonoBehaviour:
     mp_actorPortrait: {fileID: 21300000, guid: 9b75c62f0c009784abb1f2370ef6ab12, type: 3}
     mp_prefab: {fileID: 2271297959405391925, guid: b9d47fecdd25124459c972de233aaca4,
       type: 3}
+    m_interactRange: 1.5
+    m_conquestSpeed: 0.15
+    m_maxSpeed: 4
+    m_hitPoint: 3
+    m_interactRangeUp: 0.05
+    m_conquestSpeedUp: 0.05
+    m_maxSpeedUp: 0.05
+    m_hitPointUp: 0.5
+  - mp_name: Koyuki
+    mp_actorImageFull: {fileID: 21300000, guid: 3e5cc9d3939238b4893802349c7bbafe,
+      type: 3}
+    mp_actorImageThin: {fileID: 21300000, guid: 21a46de488f3ba44e81ae150e70a40ad,
+      type: 3}
+    mp_actorPortrait: {fileID: 21300000, guid: d1ed71caeeb6df14f965fe72445b30f5, type: 3}
+    mp_prefab: {fileID: 4043820251715568275, guid: 0f44de3243beb894ba63a0c9ac1d4d8f,
+      type: 3}
+    m_interactRange: 1
+    m_conquestSpeed: 0.2
+    m_maxSpeed: 5
+    m_hitPoint: 2
+    m_interactRangeUp: 0.05
+    m_conquestSpeedUp: 0.2
+    m_maxSpeedUp: 0.05
+    m_hitPointUp: 0.1
+  - mp_name: DeltaFlair
+    mp_actorImageFull: {fileID: 21300000, guid: 410df0f74e3f45940ab00b07a6620152,
+      type: 3}
+    mp_actorImageThin: {fileID: 21300000, guid: 8a3a9036e6bc16e448a13c94958b73a0,
+      type: 3}
+    mp_actorPortrait: {fileID: 21300000, guid: 18acbf4228040034faaa51f0700b5939, type: 3}
+    mp_prefab: {fileID: 2182756173865640671, guid: 9fabd7348c9a64a43bbe56f33e450156,
+      type: 3}
+    m_interactRange: 1.2
+    m_conquestSpeed: 0.15
+    m_maxSpeed: 5
+    m_hitPoint: 3
+    m_interactRangeUp: 0.05
+    m_conquestSpeedUp: 0.05
+    m_maxSpeedUp: 0.05
+    m_hitPointUp: 0.5
+  - mp_name: Kokoa
+    mp_actorImageFull: {fileID: 21300000, guid: c60085a34f96cfb44ba8767c8af32617,
+      type: 3}
+    mp_actorImageThin: {fileID: 21300000, guid: 849ba07d46cc14547a6ef84eec276ff6,
+      type: 3}
+    mp_actorPortrait: {fileID: 21300000, guid: 7272c4c37657855458e9670fc7f56c40, type: 3}
+    mp_prefab: {fileID: 4342899511719250804, guid: 2d2c4e04c6acdfb4eb486373e755bb90,
+      type: 3}
+    m_interactRange: 1
+    m_conquestSpeed: 0.15
+    m_maxSpeed: 6
+    m_hitPoint: 2
+    m_interactRangeUp: 0.05
+    m_conquestSpeedUp: 0.05
+    m_maxSpeedUp: 0.2
+    m_hitPointUp: 0.1
+  - mp_name: Wolferia
+    mp_actorImageFull: {fileID: 21300000, guid: 08316df2758a8324fb2a2e22de12de08,
+      type: 3}
+    mp_actorImageThin: {fileID: 21300000, guid: c3690e9c74aeccc4dac1d63a1402087b,
+      type: 3}
+    mp_actorPortrait: {fileID: 21300000, guid: 509699b51a1f1904a8781600b24e2bfd, type: 3}
+    mp_prefab: {fileID: 8929887183060122390, guid: 360988d9d504c82499aee523dbbbe71f,
+      type: 3}
+    m_interactRange: 0.9
+    m_conquestSpeed: 0.1
+    m_maxSpeed: 3
+    m_hitPoint: 2
+    m_interactRangeUp: 0.1
+    m_conquestSpeedUp: 0.1
+    m_maxSpeedUp: 0.05
+    m_hitPointUp: 0.25
+  - mp_name: Homura
+    mp_actorImageFull: {fileID: 21300000, guid: 6e0385f3b6d725049808306b955b22e0,
+      type: 3}
+    mp_actorImageThin: {fileID: 21300000, guid: 95837953d3209f24ba9532c6d9d54a83,
+      type: 3}
+    mp_actorPortrait: {fileID: 21300000, guid: c184bd1c7a0fd3d40b6754d68d5b1159, type: 3}
+    mp_prefab: {fileID: 1182682363075715163, guid: c9493d411fd5a7243ac6c38d67d9edec,
+      type: 3}
+    m_interactRange: 2
+    m_conquestSpeed: 0.35
+    m_maxSpeed: 5
+    m_hitPoint: 4
+    m_interactRangeUp: 0.025
+    m_conquestSpeedUp: 0.025
+    m_maxSpeedUp: 0.025
+    m_hitPointUp: 0.1
+  - mp_name: Sophina
+    mp_actorImageFull: {fileID: 21300000, guid: a47b7c8648b44844b85dc54bc3b5bda4,
+      type: 3}
+    mp_actorImageThin: {fileID: 21300000, guid: a6a2fdba04df2dc40b7f17b2413051db,
+      type: 3}
+    mp_actorPortrait: {fileID: 21300000, guid: 31cf8cbab075fc34480edeec40ff38e6, type: 3}
+    mp_prefab: {fileID: 4156095363739459618, guid: a1b5d7308874bfb4f99e49eafa43e8a6,
+      type: 3}
+    m_interactRange: 3
+    m_conquestSpeed: 0.1
+    m_maxSpeed: 4
+    m_hitPoint: 2
+    m_interactRangeUp: 0.2
+    m_conquestSpeedUp: 0.05
+    m_maxSpeedUp: 0.05
+    m_hitPointUp: 0.05

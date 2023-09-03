@@ -113,6 +113,7 @@ public class C_StateHover : C_AirPlaneStateBase
     public override void SwitchMode()
     {
         m_stateChangePhase = C_Constants.HOVER_ACTIVATE;
+        C_AudioManager.instance.PlayAuido(E_AudioType.SWITCH_FLIGHT);
     }
 
 

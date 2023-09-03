@@ -17,6 +17,7 @@ public class C_SceneEnd : MonoBehaviour
     public void ButtonReturn()
     {
         SceneManager.LoadScene("Scene_Menu");
+        C_GameManager.instance.SaveGameData();
     }
 
 
@@ -57,10 +58,12 @@ public class C_SceneEnd : MonoBehaviour
     {
         if (C_GameManager.instance.gameWin)
         {
+            C_GameManager.instance.faith += 5;
             StartCoroutine(EndTextAnimation(mp_winTexts));
         }
         else
         {
+            C_GameManager.instance.faith += 1;
             StartCoroutine(EndTextAnimation(mp_loseTexts));
         }
     }

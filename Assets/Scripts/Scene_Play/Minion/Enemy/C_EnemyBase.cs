@@ -26,6 +26,21 @@ public class C_EnemyBase : MonoBehaviour
     private float m_timer = 0.0f;
 
 
+#if UNITY_EDITOR
+    public Vector2 attackEnemySpawnPosint
+    {
+        get
+        {
+            return m_attackEnemySpawnPosint;
+        }
+        set
+        {
+            m_attackEnemySpawnPosint = value;
+        }
+    }
+#endif
+
+
 
     /* ========== Private Methodes ========== */
 
@@ -41,14 +56,6 @@ public class C_EnemyBase : MonoBehaviour
 
 
     /* ========== Private Methodes ========== */
-
-    private void Awake()
-    {
-        // 공격용 적 생성 위치 계산
-        m_attackEnemySpawnPosint.x += transform.localPosition.x;
-        m_attackEnemySpawnPosint.y += transform.localPosition.z;
-    }
-
 
     private void Start()
     {
@@ -122,22 +129,11 @@ public class C_EnemyBase : MonoBehaviour
         Gizmos.DrawWireSphere(transform.localPosition, m_areaRadius);
 
         Gizmos.color = Color.red;
-        if (Application.isPlaying)
-        {
-            Gizmos.DrawSphere(new Vector3(
-                m_attackEnemySpawnPosint.x,
-                0.0f,
-                m_attackEnemySpawnPosint.y
-            ), 1.0f);
-        }
-        else
-        {
-            Gizmos.DrawSphere(new Vector3(
-                transform.localPosition.x + m_attackEnemySpawnPosint.x,
-                0.0f,
-                transform.localPosition.z + m_attackEnemySpawnPosint.y
-            ), 1.0f);
-        }
+        Gizmos.DrawSphere(new Vector3(
+            m_attackEnemySpawnPosint.x,
+            0.0f,
+            m_attackEnemySpawnPosint.y
+        ), 1.0f);
     }
 #endif
 }

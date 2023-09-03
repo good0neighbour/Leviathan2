@@ -16,6 +16,10 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
     [SerializeField] private C_Joystick mp_joystick = null;
     [SerializeField] private Slider mp_powerSlider = null;
     [SerializeField] private C_Slider mp_rotationY = null;
+    [Header("Audio")]
+    [SerializeField] private AudioSource mp_engineAudioSource = null;
+    [SerializeField] private AudioClip mp_hoverEngine = null;
+    [SerializeField] private AudioClip mp_flightEngine = null;
     private C_AirPlaneStateBase[] mp_state = null;
     private Material[] mp_materials = new Material[2];
     private E_FlightStates m_currentState = E_FlightStates.HOVER;
@@ -25,6 +29,8 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
     private float m_maxEnginePower = 0.0f;
     private float m_minEnginePower = 0.0f;
     private float m_powerMovement = 0.0f;
+    private float m_minEngineSoundSpeed = 0.0f;
+    private float m_engineSoundSpeedMult = 0.0f;
     private short m_hitPoint = 0;
     private byte m_stealthActive = 0;
 
@@ -44,12 +50,15 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
         {
             case E_FlightStates.HOVER:
                 mp_guidedMissileButton.SetActive(true);
-                return;
+                mp_engineAudioSource.clip = mp_hoverEngine;
+                break;
 
             case E_FlightStates.FLIGHT:
                 mp_guidedMissileButton.SetActive(false);
-                return;
+                mp_engineAudioSource.clip = mp_flightEngine;
+                break;
         }
+        mp_engineAudioSource.Play();
     }
 
 
@@ -125,6 +134,8 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
 #endif
         // 엔진 출력 전달
         m_power = mp_powerSlider.value;
+
+        mp_engineAudioSource.pitch = m_minEngineSoundSpeed + m_power * m_engineSoundSpeedMult;
 
         // 다형성
         mp_state[(int)m_currentState].StateUpdate();
@@ -367,6 +378,8 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
         m_minEnginePower = tp_settings.m_minEnginePower;
         m_powerMovement = tp_settings.m_powerMovement;
         m_hitPoint = tp_settings.m_maxHitPoint;
+        m_minEngineSoundSpeed = tp_settings.m_minEngineSoundSpeed;
+        m_engineSoundSpeedMult = tp_settings.m_engineSoundSpeedMult;
 
         // 엔진 출력 HUD에 전달
         mp_powerSlider.minValue = m_minEnginePower;
@@ -380,6 +393,9 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
         mp_state = new C_AirPlaneStateBase[(int)E_FlightStates.END];
         mp_state[(int)E_FlightStates.HOVER] = new C_StateHover(this, tp_settings, tp_animator);
         mp_state[(int)E_FlightStates.FLIGHT] = new C_StateFlight(this, tp_settings, tp_animator);
+
+        // 상태 실행
+        SetState(E_FlightStates.HOVER);
 
         // 항공기 메타리얼 복사, 인덱스 0은 외곽선 메타리얼, 인덱스 1은 주 메타리얼
         MeshRenderer[] tp_renderers = GetComponentsInChildren<MeshRenderer>();

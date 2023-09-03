@@ -24,6 +24,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     [SerializeField] private RectTransform mp_noise = null;
     [SerializeField] private Volume mp_volume = null;
     [SerializeField] private C_Joystick mp_joystick = null;
+    [SerializeField] private AudioSource mp_fireAudio = null;
     private ColorAdjustments mp_colourAdjustment = null;
     private ChromaticAberration mp_chromaticAberration = null;
     private Material mp_noiseMaterial = null;
@@ -47,12 +48,10 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     private float m_damageRange = 0.0f;
     private float m_angleLimitTop = 0.0f;
     private float m_angleLimitBottom = 0.0f;
+    private float m_currentScreenHeight = 0.0f;
     private int m_collisionLayer = 0;
     private byte m_damage = 0;
     private byte m_actorAvailable = byte.MaxValue;
-#if PLATFORM_STANDALONE_WIN
-    private float m_currentScreenHeight = 0.0f;
-#endif
 
     public static C_GuidedMissle instance
     {
@@ -66,8 +65,14 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
 
     public void Execute()
     {
+        // 소리 재생
+        C_AudioManager.instance.PlayAuido(E_AudioType.GUIDEDMISSILE_TOUCH);
+
+        // 후처리 조정
         mp_colourAdjustment.saturation.Override(m_saturation);
         mp_chromaticAberration.intensity.Override(m_CAIntensity);
+
+        // 상태 실행
         StateBrowsingExecute();
         gameObject.SetActive(true);
         mp_HUDCanvas.SetActive(true);
@@ -76,8 +81,11 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
 
     public void ChangeState(E_PlayStates t_state)
     {
+        // 후처리 조정
         mp_colourAdjustment.saturation.Override(0.0f);
         mp_chromaticAberration.intensity.Override(0.0f);
+
+        // 상태 변경
         mp_HUDCanvas.SetActive(false);
         gameObject.SetActive(false);
         Camera.main.fieldOfView = 45.0f;
@@ -234,6 +242,9 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
 
     public void ButtonBack()
     {
+        // 소리 재생
+        C_AudioManager.instance.PlayAuido(E_AudioType.GUIDEDMISSILE_TOUCH);
+
         ChangeState(E_PlayStates.AIRPLANE);
     }
 
@@ -287,6 +298,9 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
 
     public void ButtonZoom()
     {
+        // 소리 재생
+        C_AudioManager.instance.PlayAuido(E_AudioType.GUIDEDMISSILE_TOUCH);
+
         switch (Camera.main.fieldOfView)
         {
             case 45.0f:
@@ -305,6 +319,13 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     /// </summary>
     public void MissleExplode()
     {
+        // 소리 정지
+        mp_fireAudio.Stop();
+
+        // 이전 상태로 변경
+        StateBrowsingExecute();
+
+        // 범위 피해
         foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_damageRange))
         {
             if (t_col.tag.Equals("tag_landForce") || t_col.tag.Equals("tag_oceanForce"))
@@ -320,7 +341,6 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
         GameObject t_particle = C_ObjectPool.instance.GetObject(E_ObjectPool.EXPLOSION);
         t_particle.transform.localPosition = transform.localPosition;
         t_particle.SetActive(true);
-        StateBrowsingExecute();
     }
 
 
@@ -329,10 +349,18 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     /// </summary>
     public void StateLaunchingExecute()
     {
+        // 소리 재생
+        mp_fireAudio.Play();
+
+        // 상태 변경
         m_currentState = E_GuidedMissleStates.LAUNCHING;
+
+        // 초기 속력, 회전
         m_initialVelocity = mp_airplane.GetState(E_FlightStates.HOVER).velocity;
         m_initialRotation = mp_targetTransform.localRotation;
         m_missleVelocity = 0.0f;
+
+        // 화면 변경
         EnalbingButtons(false);
         mp_centerCircle.gameObject.SetActive(false);
         mp_movingCircle.gameObject.SetActive(false);
@@ -354,7 +382,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
 
                 default:
                     mp_actorPotraits[t_i].sprite = tp_actInfoList[t_i].mp_actorPortrait;
-                    mp_actorNames[t_i].text = tp_actInfoList[t_i].m_name;
+                    mp_actorNames[t_i].text = tp_actInfoList[t_i].mp_name;
                     continue;
             }
         }
@@ -363,8 +391,22 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
 
     public void SetActorDead(byte t_index)
     {
+        // 사망 처리
         m_actorAvailable ^= (byte)(1 << t_index);
         mp_deadImages[t_index].SetActive(true);
+
+        // 전원 사망인지 확인
+        for (byte t_i = 0; t_i < C_Constants.NUM_OF_ACTOR_LIMIT; ++t_i)
+        {
+            if (0 < (m_actorAvailable & (1 << t_i)))
+            {
+                // 한 명이라도 생존이면 반환
+                return;
+            }
+        }
+
+        // 전원 사망 시 패배
+        C_PlayManager.instance.GameEnd(false);
     }
 
 
@@ -450,9 +492,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
 
         // 1픽셀 당 각도
         m_UIMoveAmount = Screen.height / Camera.main.fieldOfView;
-#if PLATFORM_STANDALONE_WIN
         m_currentScreenHeight = Screen.height;
-#endif
 
         // 후처리 요소
         mp_volume.profile.TryGet(out mp_colourAdjustment);

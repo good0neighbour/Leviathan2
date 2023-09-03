@@ -27,7 +27,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     private float m_conquestSpeed = 0.0f;
     private float m_conquesting = 0.0f;
     private float m_joystickScalar = 0.0f;
-    private short m_currentHitPoint = 0;
+    private float m_currentHitPoint = 0.0f;
     private byte m_conquestingPhase = 0;
     private byte m_actorIndex = 0;
     private bool m_waterDetect = false;
@@ -50,6 +50,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     public void Execute()
     {
         m_conquestingPhase = 0;
+        mp_rigidbody.useGravity = true;
+        m_waterDetect = false;
+        mp_animator.SetBool("WaterDetect", false);
         C_CanvasActorHUD.instance.SetActor(
             this,
             m_currentHitPoint * m_maxHitPointMult,
@@ -211,7 +214,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
             case E_ActorStates.NEARDEVICE:
                 m_currentHitPoint -= t_damage;
                 C_CanvasActorHUD.instance.SetHitPointBar(m_currentHitPoint * m_maxHitPointMult);
-                if (0 >= m_currentHitPoint)
+                if (0.0f >= m_currentHitPoint)
                 {
                     Die();
                 }
@@ -234,21 +237,21 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     /// <summary>
     /// Actor 초기화
     /// </summary>
-    public void ActorInitialize(C_ActorSettings tp_settings, C_ActorInfomation.S_Info tp_info, byte t_index)
+    public void ActorInitialize(C_ActorSettings tp_settings, C_ActorInfomation.S_Info tp_info, byte t_slotIndex, byte t_actorLevel)
     {
         // Actor 정보
         mp_actorInfo = tp_info;
 
         // 설정 복사
-        m_maxSpeed = tp_info.m_maxSpeed;
         m_cameraRotateSpeed = tp_settings.m_cameraRotateSpeed;
-        m_interactRange = tp_info.m_interactRange;
-        m_currentHitPoint = tp_info.m_hitPoint;
-        m_conquestSpeed = tp_info.m_conquestSpeed;
+        m_maxSpeed = tp_info.m_maxSpeed + tp_info.m_maxSpeedUp * t_actorLevel;
+        m_interactRange = tp_info.m_interactRange + tp_info.m_interactRangeUp * t_actorLevel;
+        m_currentHitPoint = tp_info.m_hitPoint + tp_info.m_hitPointUp * t_actorLevel;
+        m_conquestSpeed = tp_info.m_conquestSpeed + tp_info.m_conquestSpeedUp * t_actorLevel;
         m_maxHitPointMult = 1.0f / m_currentHitPoint;
 
         // Actor 인덱스
-        m_actorIndex = t_index;
+        m_actorIndex = t_slotIndex;
 
 #if PLATFORM_STANDALONE_WIN
         m_accelerator = tp_settings.m_accelerator;
@@ -274,9 +277,15 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
 
     public void ButtonAeroplane()
     {
-        if (E_ActorStates.STANDBY == m_currentState)
+        switch (m_currentState)
         {
-            m_currentState = E_ActorStates.DISABLING;
+            case E_ActorStates.STANDBY:
+            case E_ActorStates.NEARDEVICE:
+                m_currentState = E_ActorStates.DISABLING;
+                return;
+
+            default:
+                return;
         }
     }
 

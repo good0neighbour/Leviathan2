@@ -12,7 +12,7 @@ public class C_ActorInfomation : ScriptableObject
     public class S_Info
     {
         [Header("일반")]
-        public string m_name = null;
+        public string mp_name = null;
         public Sprite mp_actorImageFull = null;
         public Sprite mp_actorImageThin = null;
         public Sprite mp_actorPortrait = null;
@@ -20,6 +20,11 @@ public class C_ActorInfomation : ScriptableObject
         public float m_interactRange = 1.2f;
         public float m_conquestSpeed = 0.2f;
         public float m_maxSpeed = 4.0f;
-        public short m_hitPoint = 5;
+        public float m_hitPoint = 5.0f;
+        [Header("증가율")]
+        public float m_interactRangeUp = 0.1f;
+        public float m_conquestSpeedUp = 0.05f;
+        public float m_maxSpeedUp = 0.1f;
+        public float m_hitPointUp = 0.5f;
     }
 }
