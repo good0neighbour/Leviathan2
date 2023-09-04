@@ -270,9 +270,9 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 
         // 수면 움직임
         mp_waterTransform.localPosition = new Vector3(
-            2000.0f,
+            1000.0f,
             Mathf.Sin(Time.realtimeSinceStartup * m_waterWaveSpeed) * m_waterWaveScale + m_waterPositionOffset,
-            1500.0f
+            750.0f
         );
 
         // 늦은 FixedUpdate

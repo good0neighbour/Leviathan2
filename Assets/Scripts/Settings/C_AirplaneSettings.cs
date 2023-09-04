@@ -5,7 +5,7 @@ public class C_AirplaneSettings : ScriptableObject
 {
     [Header("HoverMode")]
 #if PLATFORM_STANDALONE_WIN
-    public float m_hoverRotateSpeedmult = 4.0f;
+    public float m_hoverRotateSpeedmult = 8.0f;
 #endif
     public float m_hoverRotatePower = 20.0f;
     public float m_hoverRotateRestorePower = 0.5f;
@@ -14,7 +14,7 @@ public class C_AirplaneSettings : ScriptableObject
     public Vector3 m_flightRotatePower = new Vector3(0.5f, 0.1f, 0.2f);
     public float m_flightPowerMultiply = 5.0f;
 #if PLATFORM_STANDALONE_WIN
-    public float m_flightRotateSpeed = 4.0f;
+    public float m_flightRotateSpeed = 8.0f;
 #endif
     public float m_flightFalldownForce = 10.0f;
     public float m_liftPower = 0.005f;

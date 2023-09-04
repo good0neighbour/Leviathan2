@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8cc0e4aa1f15954eb36a02049a7b636, type: 3}
   m_Name: AirplaneSettings
   m_EditorClassIdentifier: 
+  m_hoverRotateSpeedmult: 8
   m_hoverRotatePower: 15
   m_hoverRotateRestorePower: 0.5
   m_flightRotatePower: {x: 0.35, y: 0.125, z: 1}
   m_flightPowerMultiply: 2.5
+  m_flightRotateSpeed: 8
   m_flightFalldownForce: 15
   m_liftPower: 0.01
   m_airResist: {x: 0.003, y: 0.005, z: 0.0001}
