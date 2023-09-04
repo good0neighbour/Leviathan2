@@ -9,6 +9,9 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
     [SerializeField] private Vector2 m_minionSpawnPoint = Vector3.zero;
     [SerializeField] private byte m_maxHitPoint = 100;
     [SerializeField] private byte m_hitPointRestorePerSpawn = 10;
+    [Header("미니맵")]
+    [SerializeField] private Transform mp_canvasTransform = null;
+    private Transform mp_minimapCameraTransform = null;
     private C_MinionSettings mp_settings = null;
     private float m_timer = 0.0f;
     private short m_currentHitPoint = 0;
@@ -52,6 +55,9 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
     {
         // 설정 가져온다.
         mp_settings = C_PlayManager.instance.GetEnemySettings();
+
+        // 참조
+        mp_minimapCameraTransform = C_MinimapCameraMove.instance.transform;
     }
 
 
@@ -80,6 +86,13 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
                 C_CanvasAlwaysShow.instance.SetPlayerBaseHitPointImage((float)m_currentHitPoint / m_maxHitPoint);
             }
         }
+
+        // 미니맵 아이콘 표시
+        mp_canvasTransform.rotation = Quaternion.Euler(
+            90.0f,
+            mp_minimapCameraTransform.localEulerAngles.y,
+            0.0f
+        );
     }
 
 

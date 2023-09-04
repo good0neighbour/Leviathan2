@@ -31,6 +31,14 @@ public class C_AudioManager : MonoBehaviour
     [SerializeField] private AudioClip mp_GMTouchClip = null;
     [SerializeField] private float m_GMTouchVolume = 1.0f;
 
+    [Header("FootStep")]
+    [SerializeField] private AudioClip mp_footStepClip = null;
+    [SerializeField] private float m_footStepVolume = 1.0f;
+
+    [Header("SwimWater")]
+    [SerializeField] private AudioClip mp_swimWaterClip = null;
+    [SerializeField] private float m_swimWaterVolume = 1.0f;
+
     [Header("ÂüÁ¶")]
     [SerializeField] private AudioSource _audioSource = null;
 
@@ -91,6 +99,14 @@ public class C_AudioManager : MonoBehaviour
 
             case E_AudioType.GUIDEDMISSILE_TOUCH:
                 UseChannel(mp_GMTouchClip, m_GMTouchVolume);
+                return;
+
+            case E_AudioType.FOOT_STEP:
+                UseChannel(mp_footStepClip, m_footStepVolume);
+                return;
+
+            case E_AudioType.SWIM_WATER:
+                UseChannel(mp_swimWaterClip, m_swimWaterVolume);
                 return;
         }
     }

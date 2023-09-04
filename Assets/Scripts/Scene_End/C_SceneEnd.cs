@@ -56,6 +56,16 @@ public class C_SceneEnd : MonoBehaviour
 
     private void Awake()
     {
+        // 자동 번역 작동
+        foreach (C_AutoTranslation tp_auTra in FindObjectsOfType<C_AutoTranslation>(true))
+        {
+            tp_auTra.TranslationReady();
+        }
+
+        // 언어 불러온다
+        C_Language.instance.LoadLangeage(C_GameManager.instance.currentLanguage);
+
+        // 승, 패 결정
         if (C_GameManager.instance.gameWin)
         {
             C_GameManager.instance.faith += 5;

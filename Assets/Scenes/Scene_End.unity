@@ -183,8 +183,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC8FC\uBA54\uB274"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 190c077aace887045ac8bf5dcf731126, type: 2}
-  m_sharedMaterial: {fileID: -2370707602531241383, guid: 190c077aace887045ac8bf5dcf731126,
+  m_fontAsset: {fileID: 11400000, guid: fabb3d556e5138d4ebe7eab0184d6a05, type: 2}
+  m_sharedMaterial: {fileID: -2370707602531241383, guid: fabb3d556e5138d4ebe7eab0184d6a05,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -209,7 +209,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 39
+  m_fontSize: 54.1
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -271,8 +271,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b230b444ebdfc754c8283053cef47c3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_onlyChangeFont: 0
-  m_shortenLineGap: 1
 --- !u!1 &591784733
 GameObject:
   m_ObjectHideFlags: 0
@@ -307,7 +305,7 @@ RectTransform:
   - {fileID: 575538333}
   m_Father: {fileID: 1473908750}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.4, y: 0.1}
+  m_AnchorMin: {x: 0.4, y: 0.2}
   m_AnchorMax: {x: 0.6, y: 0.3}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
@@ -439,8 +437,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1473908750}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.4, y: 0.5}
-  m_AnchorMax: {x: 0.6, y: 1}
+  m_AnchorMin: {x: 0.4, y: 0.7}
+  m_AnchorMax: {x: 0.6, y: 0.9}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -492,7 +490,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 74
+  m_fontSize: 100
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -554,8 +552,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b230b444ebdfc754c8283053cef47c3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_onlyChangeFont: 0
-  m_shortenLineGap: 1
 --- !u!1 &1207650730
 GameObject:
   m_ObjectHideFlags: 0
@@ -589,8 +585,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1473908750}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.1, y: 0.3}
-  m_AnchorMax: {x: 0.9, y: 0.5}
+  m_AnchorMin: {x: 0.1, y: 0.5}
+  m_AnchorMax: {x: 0.9, y: 0.6}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -643,7 +639,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.05
+  m_fontSize: 50.3
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -705,8 +701,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b230b444ebdfc754c8283053cef47c3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_onlyChangeFont: 0
-  m_shortenLineGap: 1
 --- !u!1 &1473908746
 GameObject:
   m_ObjectHideFlags: 0
@@ -866,8 +860,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1473908750}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.1, y: 0.3}
-  m_AnchorMax: {x: 0.9, y: 0.5}
+  m_AnchorMin: {x: 0.1, y: 0.5}
+  m_AnchorMax: {x: 0.9, y: 0.6}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -920,7 +914,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.05
+  m_fontSize: 50.3
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -982,8 +976,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b230b444ebdfc754c8283053cef47c3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_onlyChangeFont: 0
-  m_shortenLineGap: 1
 --- !u!1 &1643290422
 GameObject:
   m_ObjectHideFlags: 0
@@ -1222,8 +1214,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1473908750}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.4, y: 0.5}
-  m_AnchorMax: {x: 0.6, y: 1}
+  m_AnchorMin: {x: 0.4, y: 0.7}
+  m_AnchorMax: {x: 0.6, y: 0.9}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1275,7 +1267,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 74
+  m_fontSize: 100
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1337,8 +1329,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b230b444ebdfc754c8283053cef47c3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_onlyChangeFont: 0
-  m_shortenLineGap: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

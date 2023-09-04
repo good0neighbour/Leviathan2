@@ -290,6 +290,12 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     }
 
 
+    public void PlayAudioForAnimationEvent(E_AudioType t_audioType)
+    {
+        C_AudioManager.instance.PlayAuido(t_audioType);
+    }
+
+
 
     /* ========== Private Methods ========== */
 

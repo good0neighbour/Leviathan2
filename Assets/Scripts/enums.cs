@@ -59,4 +59,6 @@ public enum E_AudioType
     SWITCH_HOVER,
     SWITCH_FLIGHT,
     GUIDEDMISSILE_TOUCH,
+    FOOT_STEP,
+    SWIM_WATER,
 }
