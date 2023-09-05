@@ -15,6 +15,7 @@
         "Player base defence",
         "Land force",
         "Ocean force",
+        "Occupying",
         "Menu",
         "Resume",
         "Faith",
@@ -22,6 +23,6 @@
         "Moving speed",
         "Occupation speed",
         "Scope of interaction",
-        "When enforce"
+        "Increased amount when strengthened"
     ]
 }

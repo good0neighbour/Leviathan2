@@ -4,8 +4,8 @@ public class C_MinimapCameraMove : MonoBehaviour
 {
     /* ========== Fields ========== */
 
-    [SerializeField] private float m_yPosition = 500.0f;
     private Transform mp_mainCameraTransform = null;
+    private float m_yPosition = 500.0f;
 
     public static C_MinimapCameraMove instance
     {
@@ -34,6 +34,9 @@ public class C_MinimapCameraMove : MonoBehaviour
     {
         //유니티식 싱글턴패턴
         instance = this;
+
+        // 카메라 높이 고정
+        m_yPosition = transform.localPosition.y;
     }
 
 

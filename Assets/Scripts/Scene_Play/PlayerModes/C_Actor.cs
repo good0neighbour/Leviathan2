@@ -9,11 +9,15 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     [SerializeField] private float m_swimOffsetY = 1.0f;
     [SerializeField] private float m_groundDetectRadius = 0.3f;
     [SerializeField] private float m_groundDetectY = 0.0f;
+    [Header("소리")]
+    [SerializeField] private AudioClip mp_footStep = null;
+    [SerializeField] private AudioClip mp_swimWater = null;
     private List<Material> mp_materials = new List<Material>();
     private SkinnedMeshRenderer[] mp_renderers = null;
     private C_ActorInfomation.S_Info mp_actorInfo = null;
     private Animator mp_animator = null;
     private Rigidbody mp_rigidbody = null;
+    private AudioSource mp_audioSource = null;
     private Transform mp_cameraTransform = null;
     private Transform mp_waterTransform = null;
     private C_EnemyBase mp_enemyBase = null;
@@ -49,6 +53,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
 
     public void Execute()
     {
+        C_AudioManager.instance.PlayAuido(E_AudioType.ACTOR_SUMMON);
         m_conquestingPhase = 0;
         mp_rigidbody.useGravity = true;
         m_waterDetect = false;
@@ -117,9 +122,11 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
                 {
                     if (m_waterDetect)
                     {
+                        // 걷기 상태로 전환
                         m_waterDetect = false;
                         mp_animator.SetBool("WaterDetect", false);
                         mp_rigidbody.useGravity = true;
+                        mp_audioSource.clip = mp_footStep;
                     }
                     return;
                 }
@@ -137,10 +144,13 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
             {
                 if (!m_waterDetect)
                 {
+                    // 수영 상태로 전환
                     mp_waterTransform = t_col.transform;
                     m_waterDetect = true;
                     mp_animator.SetBool("WaterDetect", true);
                     mp_rigidbody.useGravity = false;
+                    mp_audioSource.clip = mp_swimWater;
+                    C_AudioManager.instance.PlayAuido(E_AudioType.DIVE);
                 }
 
                 // 수면으로 위치 고정
@@ -281,6 +291,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
         {
             case E_ActorStates.STANDBY:
             case E_ActorStates.NEARDEVICE:
+                C_AudioManager.instance.PlayAuido(E_AudioType.ACTOR_SUMMON);
                 m_currentState = E_ActorStates.DISABLING;
                 return;
 
@@ -290,9 +301,10 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     }
 
 
-    public void PlayAudioForAnimationEvent(E_AudioType t_audioType)
+    public void PlayAudioForAnimationEvent()
     {
-        C_AudioManager.instance.PlayAuido(t_audioType);
+        mp_audioSource.pitch = m_joystickScalar / m_maxSpeed * 0.7f + 0.3f;
+        mp_audioSource.Play();
     }
 
 
@@ -460,6 +472,8 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
         // 참조
         mp_animator = GetComponent<Animator>();
         mp_rigidbody = GetComponent<Rigidbody>();
+        mp_audioSource = GetComponent<AudioSource>();
+        mp_audioSource.clip = mp_footStep;
 
         // 처음에는 비활성화
         gameObject.SetActive(false);

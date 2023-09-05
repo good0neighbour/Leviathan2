@@ -31,13 +31,21 @@ public class C_AudioManager : MonoBehaviour
     [SerializeField] private AudioClip mp_GMTouchClip = null;
     [SerializeField] private float m_GMTouchVolume = 1.0f;
 
-    [Header("FootStep")]
-    [SerializeField] private AudioClip mp_footStepClip = null;
-    [SerializeField] private float m_footStepVolume = 1.0f;
+    [Header("Dive")]
+    [SerializeField] private AudioClip mp_diveClip = null;
+    [SerializeField] private float m_diveVolume = 1.0f;
 
-    [Header("SwimWater")]
-    [SerializeField] private AudioClip mp_swimWaterClip = null;
-    [SerializeField] private float m_swimWaterVolume = 1.0f;
+    [Header("StealthEnable")]
+    [SerializeField] private AudioClip mp_stealthEnableClip = null;
+    [SerializeField] private float m_stealthEnableVolume = 1.0f;
+
+    [Header("StealthDisable")]
+    [SerializeField] private AudioClip mp_stealthDisableClip = null;
+    [SerializeField] private float m_stealthDisableVolume = 1.0f;
+
+    [Header("Summon")]
+    [SerializeField] private AudioClip mp_summonClip = null;
+    [SerializeField] private float m_summonVolume = 1.0f;
 
     [Header("참조")]
     [SerializeField] private AudioSource _audioSource = null;
@@ -101,13 +109,27 @@ public class C_AudioManager : MonoBehaviour
                 UseChannel(mp_GMTouchClip, m_GMTouchVolume);
                 return;
 
-            case E_AudioType.FOOT_STEP:
-                UseChannel(mp_footStepClip, m_footStepVolume);
+            case E_AudioType.DIVE:
+                UseChannel(mp_diveClip, m_diveVolume);
                 return;
 
-            case E_AudioType.SWIM_WATER:
-                UseChannel(mp_swimWaterClip, m_swimWaterVolume);
+            case E_AudioType.STEALTH_ENABLE:
+                UseChannel(mp_stealthEnableClip, m_stealthEnableVolume);
                 return;
+
+            case E_AudioType.STEALTH_DISABLE:
+                UseChannel(mp_stealthDisableClip, m_stealthDisableVolume);
+                return;
+
+            case E_AudioType.ACTOR_SUMMON:
+                UseChannel(mp_summonClip, m_summonVolume);
+                return;
+
+#if UNITY_EDITOR
+            default:
+                Debug.Log("C_AudioManager : 잘못된 AudioType");
+                return;
+#endif
         }
     }
 

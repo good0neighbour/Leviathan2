@@ -171,11 +171,13 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
             {
                 m_stealthActive ^= C_Constants.STEALTH_ENABLE;
                 tag = "tag_player";
+                C_AudioManager.instance.PlayAuido(E_AudioType.STEALTH_DISABLE);
             }
             else
             {
                 m_stealthActive |= C_Constants.STEALTH_ENABLE;
                 tag = "Untagged";
+                C_AudioManager.instance.PlayAuido(E_AudioType.STEALTH_ENABLE);
             }
 
             m_stealthActive |= C_Constants.STEALTH_ANIMATION;

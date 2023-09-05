@@ -13,6 +13,7 @@ Instructions for operation;
 Player base defence;
 Land force;
 Ocean force;
+Occupying;
 Menu;
 Resume;
 Faith;

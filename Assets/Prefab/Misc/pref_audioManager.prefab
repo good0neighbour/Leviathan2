@@ -184,6 +184,14 @@ MonoBehaviour:
   m_flightModeVolume: 0.3
   mp_GMTouchClip: {fileID: 8300000, guid: 9128944a8f6add942838cc7abb1ee694, type: 3}
   m_GMTouchVolume: 0.25
-  mp_GMFireClip: {fileID: 8300000, guid: 66527ea21bed89d4fa045c632c1055ec, type: 3}
-  m_GMFireVolume: 0.5
+  mp_diveClip: {fileID: 8300000, guid: ad0f8dce5eea70d42a005e28dc91b4e3, type: 3}
+  m_diveVolume: 1
+  mp_stealthEnableClip: {fileID: 8300000, guid: 5255f007c66cfd5419679d6d63416bb0,
+    type: 3}
+  m_stealthEnableVolume: 1
+  mp_stealthDisableClip: {fileID: 8300000, guid: ede39c5111c19dd4190a57e13a4693de,
+    type: 3}
+  m_stealthDisableVolume: 1
+  mp_summonClip: {fileID: 8300000, guid: 8e2f73c93bd365c4096f7b1c394bb7a8, type: 3}
+  m_summonVolume: 1
   _audioSource: {fileID: 6133776124759997533}
