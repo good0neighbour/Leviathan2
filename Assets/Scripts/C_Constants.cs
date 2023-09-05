@@ -25,6 +25,11 @@ public static class C_Constants
     public const byte ENEMY_HEAD_TO_ENEMY = 1;
     public const byte ENEMY_ATTACK = 2;
 
+    // C_Message 전용
+    public const float MESSAGEBOX_DELAY = 2.0f;
+    public const float MESSAGEBOX_APPEARING_TIME = 0.5f;
+    public const float MESSAGEBOX_SCALEMULT_Y = 1.0f / MESSAGEBOX_APPEARING_TIME;
+
     // 일반
     public const float DISTANCE_FADE = 500.0f;
     public const byte NUM_OF_ACTOR_LIMIT = 3;

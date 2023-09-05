@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: mtl_water
+  m_Name: mtl_water_window
   m_Shader: {fileID: -6465566751694194690, guid: 5206678e53183a54ca4ae4bd5b647d30,
     type: 3}
   m_Parent: {fileID: 0}
@@ -136,7 +136,7 @@ Material:
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
     - _FlowSpeed: 0.1
-    - _FresnelPower: 8
+    - _FresnelPower: 2
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
@@ -148,7 +148,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _RefractionAmount: 1
+    - _RefractionAmount: 2
     - _Smoothness: 1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
