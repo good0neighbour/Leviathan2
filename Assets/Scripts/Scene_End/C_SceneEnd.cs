@@ -16,6 +16,9 @@ public class C_SceneEnd : MonoBehaviour
 
     public void ButtonReturn()
     {
+        // 소리 재생
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
+
         SceneManager.LoadScene("Scene_Menu");
         C_GameManager.instance.SaveGameData();
     }

@@ -61,6 +61,7 @@ public class C_CanvasInitialScreen : MonoBehaviour
         Application.targetFrameRate = t_frameRate;
         C_GameManager.instance.targetFrameRate = (byte)t_frameRate;
         mp_frameText.text = $"Target frame rate {t_frameRate.ToString()}";
+        C_GameManager.instance.SaveGameData();
     }
 
 

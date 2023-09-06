@@ -212,7 +212,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
 
             case E_GuidedMissleStates.LAUNCHING:
                 // 회전
-                transform.localRotation = m_initialRotation * Quaternion.Euler(m_currentRotationX, m_currentRotationY, 0.0f);
+                transform.localRotation = m_initialRotation * Quaternion.Euler(m_currentRotationX, 0.0f, 0.0f) * Quaternion.Euler(0.0f, m_currentRotationY, 0.0f);
                 // 위치
                 m_initialVelocity.x -= m_initialVelocity.x * Time.fixedDeltaTime;
                 m_initialVelocity.y -= m_initialVelocity.y * Time.fixedDeltaTime;
