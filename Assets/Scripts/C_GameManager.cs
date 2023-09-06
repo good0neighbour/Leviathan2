@@ -38,6 +38,18 @@ public class C_GameManager
         }
     }
 
+    public byte targetFrameRate
+    {
+        get
+        {
+            return mp_data.m_targetFrameRate;
+        }
+        set
+        {
+            mp_data.m_targetFrameRate = value;
+        }
+    }
+
     public E_LanguageType currentLanguage
     {
         get
@@ -140,6 +152,7 @@ public class C_GameManager
     public class C_JsonData
     {
         public byte m_language = 0;
+        public byte m_targetFrameRate = 60;
         public uint m_faith = 0;
         // ³Ë³ËÇÏ°Ô »ý¼º
         public byte[] mp_actorsLevel = new byte[16];

@@ -33,6 +33,9 @@ public class C_CanvasStartScreen : MonoBehaviour
             return;
         }
 
+        // 소리 재생
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
+
         // Actor 인덱스
         byte actInx = byte.Parse(EventSystem.current.currentSelectedGameObject.name);
 
@@ -78,6 +81,9 @@ public class C_CanvasStartScreen : MonoBehaviour
             return;
         }
 
+        // 소리 재생
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
+
         // 선택 해제
         mp_currentActorList[t_index] = null;
         mp_selectedActors[t_index].sprite = mp_unselectedImage;
@@ -90,6 +96,9 @@ public class C_CanvasStartScreen : MonoBehaviour
         {
             return;
         }
+
+        // 소리 재생
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
 
         // 다음 화면
         C_GameManager.instance.SetActorList(mp_currentActorList, mp_currentActorIndexs);
@@ -104,6 +113,9 @@ public class C_CanvasStartScreen : MonoBehaviour
         {
             return;
         }
+
+        // 소리 재생
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
 
         // 화면 전환
         gameObject.SetActive(false);

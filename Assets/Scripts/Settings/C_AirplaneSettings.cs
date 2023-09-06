@@ -23,7 +23,9 @@ public class C_AirplaneSettings : ScriptableObject
     public Vector3 m_airResist = new Vector3(0.5f, 0.1f, 1.0f);
     public float m_maxEnginePower = 20.0f;
     public float m_minEnginePower = 0.0f;
-    public float m_powerMovement = 10.0f;
+#if PLATFORM_STANDALONE_WIN
+    public float m_powerMovement = 5.0f;
+#endif
     public float m_altitudeLimit = 1000.0f;
     public float m_minEngineSoundSpeed = 0.7f;
     public float m_engineSoundSpeedMult = 0.05f;

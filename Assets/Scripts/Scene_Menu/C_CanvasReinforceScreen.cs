@@ -27,6 +27,9 @@ public class C_CanvasReinforceScreen : MonoBehaviour
 
     public void ButtonActorList()
     {
+        // 소리 재생
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
+
         // 선택한 Actor 인덱스
         m_currentIndex = byte.Parse(EventSystem.current.currentSelectedGameObject.name);
 
@@ -53,6 +56,9 @@ public class C_CanvasReinforceScreen : MonoBehaviour
 
     public void ButtonReinforce()
     {
+        // 소리 재생
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
+
         // 강화
         C_GameManager.instance.IncreaseActorLevel(m_currentIndex);
 
@@ -75,6 +81,9 @@ public class C_CanvasReinforceScreen : MonoBehaviour
 
     public void ButtonBack()
     {
+        // 소리 재생
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
+
         m_isDisabled = true;
         mp_actorFullImage.gameObject.SetActive(false);
         mp_reinforceButton.gameObject.SetActive(false);

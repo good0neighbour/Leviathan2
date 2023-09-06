@@ -11,6 +11,12 @@ public static class C_Constants
     public const byte ACTOR_LEFT = 0b00100;
     public const byte ACTOR_RIGHT = 0b01000;
 
+    // C_Actor 전용, 점령 상태
+    public const byte CONQUEST_STANDBY = 0;
+    public const byte CONQUEST_START = 1;
+    public const byte CONQUEST_PROGRESSING = 2;
+    public const byte CONQUEST_CANCEL = 3;
+
     // C_Airplane 전용, 은폐 활성화
     public const byte STEALTH_ENABLE = 0b01;
     public const byte STEALTH_ANIMATION = 0b10;
@@ -25,10 +31,20 @@ public static class C_Constants
     public const byte ENEMY_HEAD_TO_ENEMY = 1;
     public const byte ENEMY_ATTACK = 2;
 
-    // C_Message 전용
+    // C_PlayerBase 전용, 메세지 상태
+    public const byte PLAYER_HIT = 0B001;
+    public const byte PLAYER_HALFHITPOINT = 0B010;
+    public const byte PLAYER_LOWHITPOINT = 0B100;
+
+    // C_Message 전용, 메세지 상자
     public const float MESSAGEBOX_DELAY = 2.0f;
     public const float MESSAGEBOX_APPEARING_TIME = 0.5f;
     public const float MESSAGEBOX_SCALEMULT_Y = 1.0f / MESSAGEBOX_APPEARING_TIME;
+
+    // C_Message 전용, 메세지 상태
+    public const byte MESSAGE_STANDBY = 0;
+    public const byte MESSAGE_SHOWING = 1;
+    public const byte MESSAGE_DONE = 1;
 
     // 일반
     public const float DISTANCE_FADE = 500.0f;

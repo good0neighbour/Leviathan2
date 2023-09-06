@@ -155,26 +155,14 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
             ButtonZoom();
         }
 #endif
+        // 노이즈 애니메이션
+        NoiseAnimation();
+
         // UI 조이스틱 동작
         JoystickControl();
 
         // 고도 표시
         mp_altitudeText.text = Mathf.RoundToInt(transform.localPosition.y).ToString();
-
-        // 노이즈 애니메이션
-        mp_noise.localPosition += new Vector3(0.0f, m_noiseSpeed, 0.0f);
-        if (m_currentScreenHeight * 0.5f < mp_noise.localPosition.y)
-        {
-            mp_noise.localPosition -= new Vector3(0.0f, m_currentScreenHeight, 0.0f);
-        }
-
-        // 노이즈 어두워지기
-        mp_noiseMaterial.color = new Color(
-            1.0f,
-            1.0f,
-            1.0f,
-            mp_noiseMaterial.color.a + (m_minNoiseAlpha - mp_noiseMaterial.color.a) * Time.deltaTime * m_noiseAlphaSpeed
-        );
 
         // 상태에 따른 Update 동작
         switch (m_currentState)
@@ -217,7 +205,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
         {
             case E_GuidedMissleStates.BROWSING:
                 // 회전
-                transform.localRotation = mp_targetTransform.localRotation * Quaternion.Euler(m_currentRotationX, m_currentRotationY, 0.0f);
+                transform.localRotation = mp_targetTransform.localRotation * Quaternion.Euler(m_currentRotationX, 0.0f, 0.0f) * Quaternion.Euler(0.0f, m_currentRotationY, 0.0f);
                 // 위치
                 transform.localPosition = mp_targetTransform.localPosition + m_attachingOffset;
                 return;
@@ -276,22 +264,8 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
             default:
                 // 소환할 Actor
                 Transform tp_actTrans = C_PlayManager.instance.SetCurrentActor((byte)t_index);
-
-                switch (tp_actTrans)
-                {
-                    case null:
-                        return;
-
-                    default:
-                        // Actor 소환
-                        tp_actTrans.localPosition = t_raycast.point;
-                        tp_actTrans.localRotation = Quaternion.Euler(0.0f, transform.localRotation.eulerAngles.y, 0.0f);
-                        tp_actTrans.gameObject.SetActive(true);
-
-                        // 상태 변경
-                        ChangeState(E_PlayStates.ACTOR);
-                        return;
-                }
+                SummonActor(tp_actTrans, t_raycast);
+                return;
         }
     }
 
@@ -452,14 +426,28 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
         // 좌, 우 회전
         t_amount = m_cameraRotateSpeed * mp_joystick.value.x * Time.deltaTime;
         m_currentRotationY += t_amount;
-        mp_movingCircle.localPosition += new Vector3(
-            -t_amount * m_UIMoveAmount,
-            0.0f,
-            0.0f
-        );
+        if (-70.0f > m_currentRotationY)
+        {
+            m_currentRotationY = -70.0f;
+        }
+        else if (70.0f < m_currentRotationY)
+        {
+            m_currentRotationY = 70.0f;
+        }
+        else
+        {
+            mp_movingCircle.localPosition += new Vector3(
+                -t_amount * m_UIMoveAmount,
+                0.0f,
+                0.0f
+            );
+        }
     }
 
 
+    /// <summary>
+    /// Launching, Browsing 버튼 전환
+    /// </summary>
     private void EnalbingButtons(bool t_isBrowsing)
     {
         foreach (GameObject tp_button in mp_enableOnBrowsing)
@@ -467,6 +455,45 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
             tp_button.SetActive(t_isBrowsing);
         }
         mp_enableOnLaunching.SetActive(!t_isBrowsing);
+    }
+
+
+    private void SummonActor(Transform tp_actTrans, RaycastHit t_raycast)
+    {
+        switch (tp_actTrans)
+        {
+            case null:
+                return;
+
+            default:
+                // Actor 소환
+                tp_actTrans.localPosition = t_raycast.point;
+                tp_actTrans.localRotation = Quaternion.Euler(0.0f, transform.localRotation.eulerAngles.y, 0.0f);
+                tp_actTrans.gameObject.SetActive(true);
+
+                // 상태 변경
+                ChangeState(E_PlayStates.ACTOR);
+                return;
+        }
+    }
+
+
+    private void NoiseAnimation()
+    {
+        // 노이즈 무한 스크롤
+        mp_noise.localPosition += new Vector3(0.0f, m_noiseSpeed, 0.0f);
+        if (m_currentScreenHeight * 0.5f < mp_noise.localPosition.y)
+        {
+            mp_noise.localPosition -= new Vector3(0.0f, m_currentScreenHeight, 0.0f);
+        }
+
+        // 노이즈 어두워지기
+        mp_noiseMaterial.color = new Color(
+            1.0f,
+            1.0f,
+            1.0f,
+            mp_noiseMaterial.color.a + (m_minNoiseAlpha - mp_noiseMaterial.color.a) * Time.deltaTime * m_noiseAlphaSpeed
+        );
     }
 
 

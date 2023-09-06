@@ -12,6 +12,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     [Header("소리")]
     [SerializeField] private AudioClip mp_footStep = null;
     [SerializeField] private AudioClip mp_swimWater = null;
+    private D_PlayDelegate[] mp_updateByActorStatus = new D_PlayDelegate[(int)E_ActorStates.END];
     private List<Material> mp_materials = new List<Material>();
     private SkinnedMeshRenderer[] mp_renderers = null;
     private C_ActorInfomation.S_Info mp_actorInfo = null;
@@ -35,6 +36,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     private byte m_conquestingPhase = 0;
     private byte m_actorIndex = 0;
     private bool m_waterDetect = false;
+    private bool m_hitMessage = true;
 #if PLATFORM_STANDALONE_WIN
     private float m_accelerator = 0.0f;
 #endif
@@ -57,6 +59,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
         m_conquestingPhase = 0;
         mp_rigidbody.useGravity = true;
         m_waterDetect = false;
+        m_hitMessage = true;
         mp_animator.SetBool("WaterDetect", false);
         C_CanvasActorHUD.instance.SetActor(
             this,
@@ -212,7 +215,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
         mp_animator.SetFloat("MovingSpeed", m_joystickScalar);
 
         // 상태에 따른 동작
-        UpdateByActorState();
+        mp_updateByActorStatus[(int)m_currentState].Invoke();
     }
 
 
@@ -228,6 +231,11 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
                 {
                     Die();
                 }
+                else if (m_hitMessage)
+                {
+                    C_CanvasAlwaysShow.instance.DisplayMessage("요원이 공격받고 있습니다. 피하십시오.");
+                    m_hitMessage = false;
+                }
                 return;
 
             default:
@@ -239,6 +247,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
 
     public void Die()
     {
+        C_CanvasAlwaysShow.instance.DisplayMessage("요원이 사망했습니다.");
         C_GuidedMissle.instance.SetActorDead(m_actorIndex);
         ChangeState(E_PlayStates.AIRPLANE);
     }
@@ -276,11 +285,11 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     {
         if (t_active)
         {
-            m_conquestingPhase = 1;
+            m_conquestingPhase = C_Constants.CONQUEST_START;
         }
         else
         {
-            m_conquestingPhase = 3;
+            m_conquestingPhase = C_Constants.CONQUEST_CANCEL;
         }
     }
 
@@ -312,112 +321,6 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     /* ========== Private Methods ========== */
 
     /// <summary>
-    /// 상태에 따른 동작
-    /// </summary>
-    private void UpdateByActorState()
-    {
-        switch (m_currentState)
-        {
-            // 생겨난다.
-            case E_ActorStates.ENABLING:
-                m_dissolveAmount -= Time.deltaTime;
-                if (0.0f >= m_dissolveAmount)
-                {
-                    m_dissolveAmount = 0.0f;
-                    m_currentState = E_ActorStates.STANDBY;
-                }
-                DissolveMaterials(m_dissolveAmount);
-                return;
-
-            // 상호작용 범위
-            case E_ActorStates.STANDBY:
-                foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_interactRange))
-                {
-                    if (t_col.tag.Equals("tag_enemyDevice"))
-                    {
-                        m_currentState = E_ActorStates.NEARDEVICE;
-                        mp_enemyBase = t_col.GetComponentInParent<C_EnemyBase>();
-                        C_CanvasActorHUD.instance.ConquestButtonEnable(true);
-                        return;
-                    }
-                }
-                return;
-
-            //상호작용
-            case E_ActorStates.NEARDEVICE:
-#if PLATFORM_STANDALONE_WIN
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    m_conquestingPhase = 1;
-                }
-                else if (Input.GetKeyUp(KeyCode.E))
-                {
-                    m_conquestingPhase = 3;
-                }
-#endif
-                // 적 기지 점령 동작
-                switch (m_conquestingPhase)
-                {
-                    // 대기
-                    case 0:
-                        break;
-
-                    // 점령 시작
-                    case 1:
-                        C_CanvasActorHUD.instance.ConquestDisplayEnable(true);
-                        m_conquesting = 0.0f;
-                        m_conquestingPhase = 2;
-                        break;
-
-                    // 점령 중
-                    case 2:
-                        m_conquesting += m_conquestSpeed * Time.deltaTime;
-                        if (1.0f <= m_conquesting)
-                        {
-                            m_conquesting = 1.0f;
-                            mp_enemyBase.BaseConquested();
-                            C_CanvasActorHUD.instance.ConquestDisplayEnable(false);
-                            C_CanvasActorHUD.instance.ConquestButtonEnable(false);
-                            m_currentState = E_ActorStates.STANDBY;
-                            m_conquestingPhase = 0;
-                            return;
-                        }
-                        C_CanvasActorHUD.instance.SetConquestBar(m_conquesting);
-                        break;
-
-                    // 점령 취소
-                    case 3:
-                        C_CanvasActorHUD.instance.ConquestDisplayEnable(false);
-                        m_conquestingPhase = 0;
-                        break;
-                }
-                // 아직도 주위에 적 기지 장치가 있는지 확인
-                foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_interactRange))
-                {
-                    if (t_col.tag.Equals("tag_enemyDevice"))
-                    {
-                        return;
-                    }
-                }
-                m_currentState = E_ActorStates.STANDBY;
-                C_CanvasActorHUD.instance.ConquestButtonEnable(false);
-                return;
-
-            // 사라진다.
-            case E_ActorStates.DISABLING:
-                m_dissolveAmount += Time.deltaTime;
-                if (1.0f <= m_dissolveAmount)
-                {
-                    m_dissolveAmount = 1.0f;
-                    ChangeState(E_PlayStates.AIRPLANE);
-                }
-                DissolveMaterials(m_dissolveAmount);
-                return;
-        }
-    }
-
-
-    /// <summary>
     /// 메타리얼의 DissolveAmount 값 전달
     /// </summary>
     private void DissolveMaterials(float t_amount)
@@ -429,9 +332,11 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     }
 
 
-    private void Awake()
+    /// <summary>
+    /// Actor 메타리얼 복사
+    /// </summary>
+    private void DuplicateMaterials()
     {
-        // 메타리얼 복사
         List<string> tp_nameList = new List<string>();
         mp_renderers = GetComponentsInChildren<SkinnedMeshRenderer>();
         foreach (Renderer t_ren in mp_renderers)
@@ -468,6 +373,136 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
             // 메타리얼 배열 전달
             t_ren.materials = tp_materials;
         }
+    }
+
+
+    /// <summary>
+    /// 적 기지 점령 동작 설정
+    /// </summary>
+    private void SetConquestingFunction()
+    {
+        switch (m_conquestingPhase)
+        {
+            // 대기
+            case C_Constants.CONQUEST_STANDBY:
+                break;
+
+            // 점령 시작
+            case C_Constants.CONQUEST_START:
+                C_CanvasActorHUD.instance.ConquestDisplayEnable(true);
+                m_conquesting = 0.0f;
+                m_conquestingPhase = 2;
+                break;
+
+            // 점령 중
+            case C_Constants.CONQUEST_PROGRESSING:
+                m_conquesting += m_conquestSpeed * Time.deltaTime;
+                if (1.0f <= m_conquesting)
+                {
+                    m_conquesting = 1.0f;
+                    mp_enemyBase.BaseConquested();
+                    C_CanvasActorHUD.instance.ConquestDisplayEnable(false);
+                    C_CanvasActorHUD.instance.ConquestButtonEnable(false);
+                    m_currentState = E_ActorStates.STANDBY;
+                    m_conquestingPhase = 0;
+                    C_CanvasAlwaysShow.instance.DisplayMessage("적 거점을 점령했습니다.");
+                    return;
+                }
+                C_CanvasActorHUD.instance.SetConquestBar(m_conquesting);
+                break;
+
+            // 점령 취소
+            case C_Constants.CONQUEST_CANCEL:
+                C_CanvasActorHUD.instance.ConquestDisplayEnable(false);
+                m_conquestingPhase = 0;
+                break;
+        }
+    }
+
+
+    /// <summary>
+    /// 상태에 따른 동작 설정
+    /// </summary>
+    private void SetUpdateByActorStatus()
+    {
+        // Actor 소환 중
+        mp_updateByActorStatus[(int)E_ActorStates.ENABLING] = () =>
+        {
+            m_dissolveAmount -= Time.deltaTime;
+            if (0.0f >= m_dissolveAmount)
+            {
+                m_dissolveAmount = 0.0f;
+                m_currentState = E_ActorStates.STANDBY;
+            }
+            DissolveMaterials(m_dissolveAmount);
+        };
+
+        // Actor 대기 상태
+        mp_updateByActorStatus[(int)E_ActorStates.STANDBY] = () =>
+        {
+            // 주위에 적 기지 장치 있는지 확인
+            foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_interactRange))
+            {
+                if (t_col.tag.Equals("tag_enemyDevice"))
+                {
+                    m_currentState = E_ActorStates.NEARDEVICE;
+                    mp_enemyBase = t_col.GetComponentInParent<C_EnemyBase>();
+                    C_CanvasActorHUD.instance.ConquestButtonEnable(true);
+                    return;
+                }
+            }
+        };
+
+        // 근처에 적 기지 장치 존재
+        mp_updateByActorStatus[(int)E_ActorStates.NEARDEVICE] = () =>
+        {
+#if PLATFORM_STANDALONE_WIN
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    m_conquestingPhase = 1;
+                }
+                else if (Input.GetKeyUp(KeyCode.E))
+                {
+                    m_conquestingPhase = 3;
+                }
+#endif
+            // 적 기지 점령 동작 설정
+            SetConquestingFunction();
+            // 아직도 주위에 적 기지 장치가 있는지 확인
+            foreach (Collider t_col in Physics.OverlapSphere(transform.localPosition, m_interactRange))
+            {
+                if (t_col.tag.Equals("tag_enemyDevice"))
+                {
+                    // 있으면 바로 반환
+                    return;
+                }
+            }
+            // 없으면 대기 상태로 전환
+            m_currentState = E_ActorStates.STANDBY;
+            C_CanvasActorHUD.instance.ConquestButtonEnable(false);
+        };
+
+        // Actor 소멸 중
+        mp_updateByActorStatus[(int)E_ActorStates.DISABLING] = () =>
+        {
+            m_dissolveAmount += Time.deltaTime;
+            if (1.0f <= m_dissolveAmount)
+            {
+                m_dissolveAmount = 1.0f;
+                ChangeState(E_PlayStates.AIRPLANE);
+            }
+            DissolveMaterials(m_dissolveAmount);
+        };
+    }
+
+
+    private void Awake()
+    {
+        // Actor 메타리얼 복사
+        DuplicateMaterials();
+
+        // 상태에 따른 동작 설정
+        SetUpdateByActorStatus();
 
         // 참조
         mp_animator = GetComponent<Animator>();

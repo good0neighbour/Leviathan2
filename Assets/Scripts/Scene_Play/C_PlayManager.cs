@@ -109,10 +109,12 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
     {
         if (0 == m_numOfLandBase)
         {
+            C_CanvasAlwaysShow.instance.DisplayMessage("대륙세력의 모든 거점을 점령했습니다.");
             return m_oceanForceBasePosition;
         }
         else if (0 == m_numOfOceanBase)
         {
+            C_CanvasAlwaysShow.instance.DisplayMessage("해양세력의 모든 거점을 점령했습니다.");
             return m_landForceBasePosition;
         }
         else
@@ -147,6 +149,7 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
         {
             case null:
                 return null;
+
             default:
                 mp_states[(int)E_PlayStates.ACTOR] = mp_actors[t_index];
                 Transform tp_actTrans = mp_actors[t_index].transform;

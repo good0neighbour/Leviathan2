@@ -5,6 +5,7 @@ public class C_CanvasMenu : MonoBehaviour
 {
     public void ButtonMainMenu()
     {
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
         Time.timeScale = 1;
         SceneManager.LoadScene("Scene_Menu");
     }
@@ -12,6 +13,7 @@ public class C_CanvasMenu : MonoBehaviour
 
     public void ButtonBack()
     {
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
         Time.timeScale = 1;
         gameObject.SetActive(false);
     }
@@ -19,6 +21,7 @@ public class C_CanvasMenu : MonoBehaviour
 
     public void ButtonQuit()
     {
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
         Application.Quit();
     }
 

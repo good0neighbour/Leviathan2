@@ -28,11 +28,14 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
     private float m_curPower = 0.0f;
     private float m_maxEnginePower = 0.0f;
     private float m_minEnginePower = 0.0f;
-    private float m_powerMovement = 0.0f;
     private float m_minEngineSoundSpeed = 0.0f;
     private float m_engineSoundSpeedMult = 0.0f;
     private short m_hitPoint = 0;
     private byte m_stealthActive = 0;
+    private bool m_hitMessage = true;
+#if PLATFORM_STANDALONE_WIN
+    private float m_powerMovement = 0.0f;
+#endif
 
 
 
@@ -86,6 +89,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
 
     public void Execute()
     {
+        m_hitMessage = false;
         mp_HUDCanvas.SetActive(true);
     }
 
@@ -165,22 +169,25 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
 
     public void ButtonStealth()
     {
-        if (0 == (m_stealthActive & C_Constants.STEALTH_ANIMATION))
+        switch (m_stealthActive & C_Constants.STEALTH_ANIMATION)
         {
-            if (1 <= (C_Constants.STEALTH_ENABLE & m_stealthActive))
-            {
-                m_stealthActive ^= C_Constants.STEALTH_ENABLE;
-                tag = "tag_player";
-                C_AudioManager.instance.PlayAuido(E_AudioType.STEALTH_DISABLE);
-            }
-            else
-            {
-                m_stealthActive |= C_Constants.STEALTH_ENABLE;
-                tag = "Untagged";
-                C_AudioManager.instance.PlayAuido(E_AudioType.STEALTH_ENABLE);
-            }
+            case 0:
+                C_AudioManager.instance.PlayAuido(E_AudioType.STEALTH);
+                if (1 <= (C_Constants.STEALTH_ENABLE & m_stealthActive))
+                {
+                    m_stealthActive ^= C_Constants.STEALTH_ENABLE;
+                    tag = "tag_player";
+                }
+                else
+                {
+                    m_stealthActive |= C_Constants.STEALTH_ENABLE;
+                    tag = "Untagged";
+                }
+                m_stealthActive |= C_Constants.STEALTH_ANIMATION;
+                return;
 
-            m_stealthActive |= C_Constants.STEALTH_ANIMATION;
+            default:
+                return;
         }
     }
 
@@ -191,6 +198,11 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
         if (0 >= m_hitPoint)
         {
             Die();
+        }
+        else if (m_hitMessage)
+        {
+            C_CanvasAlwaysShow.instance.DisplayMessage("기체가 공격받고 있습니다.");
+            m_hitMessage = false;
         }
     }
 
@@ -378,10 +390,12 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
         C_AirplaneSettings tp_settings = Resources.Load<C_AirplaneSettings>("AirplaneSettings");
         m_maxEnginePower = tp_settings.m_maxEnginePower;
         m_minEnginePower = tp_settings.m_minEnginePower;
-        m_powerMovement = tp_settings.m_powerMovement;
         m_hitPoint = tp_settings.m_maxHitPoint;
         m_minEngineSoundSpeed = tp_settings.m_minEngineSoundSpeed;
         m_engineSoundSpeedMult = tp_settings.m_engineSoundSpeedMult;
+#if PLATFORM_STANDALONE_WIN
+        m_powerMovement = tp_settings.m_powerMovement;
+#endif
 
         // 엔진 출력 HUD에 전달
         mp_powerSlider.minValue = m_minEnginePower;

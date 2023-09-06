@@ -15,6 +15,7 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
     private C_MinionSettings mp_settings = null;
     private float m_timer = 0.0f;
     private short m_currentHitPoint = 0;
+    private byte m_messageState = byte.MaxValue;
 
 
 
@@ -28,6 +29,25 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
             Die();
         }
         C_CanvasAlwaysShow.instance.SetPlayerBaseHitPointImage((float)m_currentHitPoint / m_maxHitPoint);
+
+        // 메세지 표시
+        if (0 < (m_messageState & C_Constants.PLAYER_HIT))
+        {
+            C_CanvasAlwaysShow.instance.DisplayMessage("기지가 공격받고 있습니다.");
+            m_messageState ^= C_Constants.PLAYER_HIT;
+        }
+        if (m_maxHitPoint > m_currentHitPoint * 2
+            && 0 < (m_messageState & C_Constants.PLAYER_HALFHITPOINT))
+        {
+            C_CanvasAlwaysShow.instance.DisplayMessage("기지의 방어력이 절반 이하입니다.");
+            m_messageState ^= C_Constants.PLAYER_HALFHITPOINT;
+        }
+        if (m_maxHitPoint > m_currentHitPoint * 10
+            && 0 < (m_messageState & C_Constants.PLAYER_LOWHITPOINT))
+        {
+            C_CanvasAlwaysShow.instance.DisplayMessage("기지가 파괴되기 직전입니다.");
+            m_messageState ^= C_Constants.PLAYER_LOWHITPOINT;
+        }
     }
 
 
@@ -39,6 +59,36 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
 
 
     /* ========== Private Methodes ========== */
+
+    /// <summary>
+    /// 아군 생성
+    /// </summary>
+    private void SummonAllyMinion()
+    {
+        // 아군 생성
+        m_timer -= m_minionSpawnTimer;
+        GameObject tp_ally = C_ObjectPool.instance.GetObject(E_ObjectPool.ALLYMINION);
+        tp_ally.transform.localPosition = new Vector3(
+            m_minionSpawnPoint.x,
+            0.0f,
+            m_minionSpawnPoint.y
+        );
+        tp_ally.GetComponent<C_AllyMinion>().MinionInitialize(mp_settings);
+        tp_ally.GetComponent<NavMeshAgent>().enabled = true;
+        tp_ally.SetActive(true);
+
+        // 기지 방어력 회복
+        m_currentHitPoint += m_hitPointRestorePerSpawn;
+        if (m_maxHitPoint < m_currentHitPoint)
+        {
+            m_currentHitPoint = m_maxHitPoint;
+            C_CanvasAlwaysShow.instance.SetPlayerBaseHitPointImage((float)m_currentHitPoint / m_maxHitPoint);
+        }
+
+        // 공격받음 메세지 사용 가능
+        m_messageState ^= C_Constants.PLAYER_HIT;
+    }
+
 
     private void Awake()
     {
@@ -67,24 +117,7 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
         if (m_minionSpawnTimer <= m_timer)
         {
             // 아군 생성
-            m_timer -= m_minionSpawnTimer;
-            GameObject tp_ally = C_ObjectPool.instance.GetObject(E_ObjectPool.ALLYMINION);
-            tp_ally.transform.localPosition = new Vector3(
-                m_minionSpawnPoint.x,
-                0.0f,
-                m_minionSpawnPoint.y
-            );
-            tp_ally.GetComponent<C_AllyMinion>().MinionInitialize(mp_settings);
-            tp_ally.GetComponent<NavMeshAgent>().enabled = true;
-            tp_ally.SetActive(true);
-
-            // 기지 방어력 회복
-            m_currentHitPoint += m_hitPointRestorePerSpawn;
-            if (m_maxHitPoint < m_currentHitPoint)
-            {
-                m_currentHitPoint = m_maxHitPoint;
-                C_CanvasAlwaysShow.instance.SetPlayerBaseHitPointImage((float)m_currentHitPoint / m_maxHitPoint);
-            }
+            SummonAllyMinion();
         }
 
         // 미니맵 아이콘 표시

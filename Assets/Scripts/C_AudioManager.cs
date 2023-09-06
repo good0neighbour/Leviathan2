@@ -15,9 +15,9 @@ public class C_AudioManager : MonoBehaviour
     [SerializeField] private AudioClip mp_touchClip = null;
     [SerializeField] private float m_touchVolume = 1.0f;
 
-    [Header("Select")]
-    [SerializeField] private AudioClip mp_selectClip = null;
-    [SerializeField] private float m_selectVolume = 1.0f;
+    [Header("Alert")]
+    [SerializeField] private AudioClip mp_alertClip = null;
+    [SerializeField] private float m_alertVolume = 1.0f;
 
     [Header("HoverMode")]
     [SerializeField] private AudioClip mp_hoverModeClip = null;
@@ -35,13 +35,9 @@ public class C_AudioManager : MonoBehaviour
     [SerializeField] private AudioClip mp_diveClip = null;
     [SerializeField] private float m_diveVolume = 1.0f;
 
-    [Header("StealthEnable")]
-    [SerializeField] private AudioClip mp_stealthEnableClip = null;
-    [SerializeField] private float m_stealthEnableVolume = 1.0f;
-
-    [Header("StealthDisable")]
-    [SerializeField] private AudioClip mp_stealthDisableClip = null;
-    [SerializeField] private float m_stealthDisableVolume = 1.0f;
+    [Header("Stealth")]
+    [SerializeField] private AudioClip mp_stealthClip = null;
+    [SerializeField] private float m_stealthVolume = 1.0f;
 
     [Header("Summon")]
     [SerializeField] private AudioClip mp_summonClip = null;
@@ -93,8 +89,8 @@ public class C_AudioManager : MonoBehaviour
                 UseChannel(mp_touchClip, m_touchVolume);
                 return;
 
-            case E_AudioType.SELECT:
-                UseChannel(mp_selectClip, m_selectVolume);
+            case E_AudioType.ALERT:
+                UseChannel(mp_alertClip, m_alertVolume);
                 return;
 
             case E_AudioType.SWITCH_HOVER:
@@ -113,12 +109,8 @@ public class C_AudioManager : MonoBehaviour
                 UseChannel(mp_diveClip, m_diveVolume);
                 return;
 
-            case E_AudioType.STEALTH_ENABLE:
-                UseChannel(mp_stealthEnableClip, m_stealthEnableVolume);
-                return;
-
-            case E_AudioType.STEALTH_DISABLE:
-                UseChannel(mp_stealthDisableClip, m_stealthDisableVolume);
+            case E_AudioType.STEALTH:
+                UseChannel(mp_stealthClip, m_stealthVolume);
                 return;
 
             case E_AudioType.ACTOR_SUMMON:

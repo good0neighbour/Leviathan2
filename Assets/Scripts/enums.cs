@@ -55,12 +55,11 @@ public enum E_LanguageType
 public enum E_AudioType
 {
     TOUCH,
-    SELECT,
+    ALERT,
     SWITCH_HOVER,
     SWITCH_FLIGHT,
     GUIDEDMISSILE_TOUCH,
     DIVE,
-    STEALTH_ENABLE,
-    STEALTH_DISABLE,
+    STEALTH,
     ACTOR_SUMMON,
 }

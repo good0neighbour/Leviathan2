@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class C_CanvasInitialScreen : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class C_CanvasInitialScreen : MonoBehaviour
     [SerializeField] private GameObject mp_startScreen = null;
     [SerializeField] private GameObject mp_reinforceScreen = null;
     [SerializeField] private GameObject mp_audioManager = null;
+    [SerializeField] private TextMeshProUGUI mp_frameText = null;
 
 
 
@@ -14,6 +16,9 @@ public class C_CanvasInitialScreen : MonoBehaviour
 
     public void ButtonStart()
     {
+        // 家府 犁积
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
+
         gameObject.SetActive(false);
         mp_startScreen.SetActive(true);
     }
@@ -21,6 +26,9 @@ public class C_CanvasInitialScreen : MonoBehaviour
 
     public void ButtonReinforce()
     {
+        // 家府 犁积
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
+
         gameObject.SetActive(false);
         mp_reinforceScreen.SetActive(true);
     }
@@ -28,14 +36,31 @@ public class C_CanvasInitialScreen : MonoBehaviour
 
     public void ButtonQuite()
     {
+        // 家府 犁积
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
+
         Application.Quit();
     }
 
 
     public void ButtonLanguage(int t_index)
     {
+        // 家府 犁积
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
+
         C_Language.instance.LoadLangeage((E_LanguageType)t_index);
         C_GameManager.instance.SaveGameData();
+    }
+
+
+    public void ButtonTargetFrame(int t_frameRate)
+    {
+        // 家府 犁积
+        C_AudioManager.instance.PlayAuido(E_AudioType.TOUCH);
+
+        Application.targetFrameRate = t_frameRate;
+        C_GameManager.instance.targetFrameRate = (byte)t_frameRate;
+        mp_frameText.text = $"Target frame rate {t_frameRate.ToString()}";
     }
 
 
@@ -44,6 +69,10 @@ public class C_CanvasInitialScreen : MonoBehaviour
 
     private void Awake()
     {
+        // 檬寸 橇饭烙 荐 炼沥
+        Application.targetFrameRate = C_GameManager.instance.targetFrameRate;
+        mp_frameText.text = $"Target frame rate {C_GameManager.instance.targetFrameRate.ToString()}";
+
         // AudioManager 绝栏搁 积己
         switch (C_AudioManager.instance)
         {
