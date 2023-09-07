@@ -11,6 +11,14 @@ public class C_CanvasActorHUD : MonoBehaviour
     [SerializeField] private Image mp_conquestBar = null;
     [SerializeField] private Image mp_actorPortrait = null;
     [SerializeField] private C_Joystick mp_joystick = null;
+    [SerializeField] private RectTransform mp_enemyPointer = null;
+    private GameObject mp_enemyPointerObject = null;
+    private float m_pixelPerRotation = Screen.height / (Mathf.PI* 0.25f);
+    private float m_enemyPointerLimit = Screen.height * Screen.height * 0.25f;
+    private bool m_enemyPointerEnabled = false;
+#if PLATFORM_STANDALONE_WIN
+    private float m_currentHeight = Screen.height;
+#endif
 
     public static C_CanvasActorHUD instance
     {
@@ -90,6 +98,31 @@ public class C_CanvasActorHUD : MonoBehaviour
     }
 
 
+    public void DisableEnemyPointer()
+    {
+        mp_enemyPointerObject.SetActive(false);
+        m_enemyPointerEnabled = false;
+    }
+
+
+    public void SetEnemyPointerPosition(Vector2 t_pos)
+    {
+        t_pos *= m_pixelPerRotation;
+        if (m_enemyPointerLimit < t_pos.x * t_pos.x + t_pos.y * t_pos.y)
+        {
+            DisableEnemyPointer();
+            return;
+        }
+
+        mp_enemyPointer.localPosition = t_pos;
+        if (m_enemyPointerEnabled)
+        {
+            return;
+        }
+        mp_enemyPointerObject.SetActive(true);
+    }
+
+
 
     /* ========== Private Methods ========== */
 
@@ -98,7 +131,23 @@ public class C_CanvasActorHUD : MonoBehaviour
         // 유니티식 싱글턴패턴
         instance = this;
 
+        // 참조
+        mp_enemyPointerObject = mp_enemyPointer.gameObject;
+
         // 비활성화로 시작
         gameObject.SetActive(false);
     }
+
+
+    #if PLATFORM_STANDALONE_WIN
+    private void Update()
+    {
+        if (Screen.height != m_currentHeight)
+        {
+            m_currentHeight = Screen.height;
+            m_pixelPerRotation = m_currentHeight / (Mathf.PI * 0.25f);
+            m_enemyPointerLimit = m_currentHeight * m_currentHeight * 0.25f;
+        }
+    }
+    #endif
 }

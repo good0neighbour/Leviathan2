@@ -214,6 +214,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
         // Animator에 값 전달
         mp_animator.SetFloat("MovingSpeed", m_joystickScalar);
 
+        // 근처 적에 대한 행동
+        EnemyInSight();
+        
         // 상태에 따른 동작
         mp_updateByActorStatus[(int)m_currentState].Invoke();
     }
@@ -421,6 +424,52 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
 
 
     /// <summary>
+    /// 근처 적에 대한 행동
+    /// </summary>
+    private void EnemyInSight()
+    {
+        Vector3 t_pos = Vector3.zero;
+        float t_angDis = float.MaxValue;
+
+        // 범위 내 적
+        foreach (Collider tp_col in Physics.OverlapSphere(transform.localPosition, 70.0f))
+        {
+            if (tp_col.tag.Equals("tag_landForce") || tp_col.tag.Equals("tag_oceanForce"))
+            {
+                //화면 상 위치
+                Vector3 t_ScreenPos = Quaternion.Inverse(mp_cameraTransform.localRotation)
+                    * (tp_col.transform.localPosition - mp_cameraTransform.localPosition);
+
+                // 화면 상 거리, 제곱근 불필요
+                float t_dis = t_ScreenPos.x * t_ScreenPos.x + t_ScreenPos.y * t_ScreenPos.y;
+
+                // 화면 중앙으로부터 제일 가까운지 확인
+                if (t_ScreenPos.z > 0.0f && t_angDis > t_dis)
+                {
+                    t_angDis = t_dis;
+                    t_pos = t_ScreenPos;
+                }
+            }
+        }
+
+        // 적 위치 표시
+        switch (t_angDis)
+        {
+            case float.MaxValue:
+                C_CanvasActorHUD.instance.DisableEnemyPointer();
+                return;
+
+            default:
+                C_CanvasActorHUD.instance.SetEnemyPointerPosition(new Vector2(
+                    Mathf.Atan(t_pos.x / t_pos.z),
+                    Mathf.Atan(t_pos.y / t_pos.z)
+                ));
+                return;
+        }
+    }
+
+
+    /// <summary>
     /// 상태에 따른 동작 설정
     /// </summary>
     private void SetUpdateByActorStatus()
@@ -509,9 +558,6 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
         mp_rigidbody = GetComponent<Rigidbody>();
         mp_audioSource = GetComponent<AudioSource>();
         mp_audioSource.clip = mp_footStep;
-
-        // 처음에는 비활성화
-        gameObject.SetActive(false);
     }
 
 
@@ -519,6 +565,9 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     {
         mp_cameraTransform = C_CameraMove.instance.transform;
         mp_joystick = C_CanvasActorHUD.instance.GetUIJoystick();
+
+        // 처음에는 비활성화
+        gameObject.SetActive(false);
     }
 
 

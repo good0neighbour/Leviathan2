@@ -16,6 +16,7 @@
         "Land force",
         "Ocean force",
         "Occupying",
+        "aide",
         "Menu",
         "Resume",
         "Faith",
@@ -23,6 +24,15 @@
         "Moving speed",
         "Occupation speed",
         "Scope of interaction",
-        "Increased amount when strengthened"
+        "Increased amount when strengthened",
+        "Occupied the enemy base.",
+        "The base is under attack.",
+        "The base's defence power is less than half.",
+        "The base is on the verge of destruction",
+        "The agent is under attack. Avoid",
+        "The agent is dead.",
+        "The aircraft is under attack.",
+        "Occupied all bases of land force.",
+        "Occupied all bases of ocean force."
     ]
 }
