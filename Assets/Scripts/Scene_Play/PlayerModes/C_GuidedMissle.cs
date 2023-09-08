@@ -31,6 +31,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     private Transform mp_targetTransform = null;
     private Vector3 m_attachingOffset = new Vector3(0.0f, -0.2f, 0.0f);
     private Vector3 m_initialVelocity = Vector3.zero;
+    private Color m_colourFilter = Color.white;
     private Quaternion m_initialRotation = Quaternion.identity;
     private E_GuidedMissleStates m_currentState = E_GuidedMissleStates.BROWSING;
     private float m_currentRotationX = 45.0f;
@@ -70,6 +71,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
 
         // 후처리 조정
         mp_colourAdjustment.saturation.Override(m_saturation);
+        mp_colourAdjustment.colorFilter.Override(m_colourFilter);
         mp_chromaticAberration.intensity.Override(m_CAIntensity);
 
         // 상태 실행
@@ -83,6 +85,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
     {
         // 후처리 조정
         mp_colourAdjustment.saturation.Override(0.0f);
+        mp_colourAdjustment.colorFilter.Override(Color.white);
         mp_chromaticAberration.intensity.Override(0.0f);
 
         // 상태 변경
@@ -510,6 +513,7 @@ public class C_GuidedMissle : MonoBehaviour, I_State<E_PlayStates>
         m_noiseSpeed = tp_settings.m_noiseSpeedmult;
         m_minNoiseAlpha = tp_settings.m_minNoiseAlpha;
         m_noiseAlphaSpeed = tp_settings.m_noiseAlphaSpeed;
+        m_colourFilter = tp_settings.m_colourFilter;
         m_saturation = tp_settings.m_saturation;
         m_CAIntensity = tp_settings.m_CAIntensity;
         m_damageRange = tp_settings.m_damageRange;

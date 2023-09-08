@@ -8,9 +8,11 @@ public class C_ObjectPool : MonoBehaviour
     [SerializeField] private GameObject mp_landForceattackEnemyPrefab = null;
     [SerializeField] private GameObject mp_oceanForceattackEnemyPrefab = null;
     [SerializeField] private GameObject mp_allyPrefab = null;
+    [SerializeField] private GameObject mp_actorBulletPrefab = null;
     [SerializeField] private GameObject mp_explosionPrefab = null;
     private Stack<GameObject>[] mp_objectStacks = new Stack<GameObject>[(int)E_ObjectPool.END]
     {
+        new Stack<GameObject>(),
         new Stack<GameObject>(),
         new Stack<GameObject>(),
         new Stack<GameObject>(),
@@ -42,6 +44,9 @@ public class C_ObjectPool : MonoBehaviour
 
                     case E_ObjectPool.ALLYMINION:
                         return Instantiate(mp_allyPrefab);
+
+                    case E_ObjectPool.ACTORBULLET:
+                        return Instantiate(mp_actorBulletPrefab);
 
                     case E_ObjectPool.EXPLOSION:
                         return Instantiate(mp_explosionPrefab);

@@ -7,6 +7,7 @@ public class C_CanvasActorHUD : MonoBehaviour
 
     [SerializeField] private GameObject mp_conquestingDisplay = null;
     [SerializeField] private GameObject mp_buttonConquest = null;
+    [SerializeField] private GameObject mp_buttonAttack = null;
     [SerializeField] private Image mp_hitPointBar = null;
     [SerializeField] private Image mp_conquestBar = null;
     [SerializeField] private Image mp_actorPortrait = null;
@@ -86,6 +87,26 @@ public class C_CanvasActorHUD : MonoBehaviour
     }
 
 
+    public void ButtonAttack()
+    {
+        // 처음 위치, 나중 위치
+        Vector3 t_start;
+        Vector3 t_goal;
+        actor.GetTargetEnemy(out t_start, out t_goal);
+
+        // 투척 물건
+        GameObject tp_bullet = C_ObjectPool.instance.GetObject(E_ObjectPool.ACTORBULLET);
+
+        // 값 전달
+        C_ActorBullet tp_actBull = tp_bullet.GetComponent<C_ActorBullet>();
+        tp_actBull.startPosition = t_start;
+        tp_actBull.goalPosition = t_goal;
+
+        // 활성화
+        tp_bullet.SetActive(true);
+    }
+
+
     public void ButtonAeroplane()
     {
         actor.ButtonAeroplane();
@@ -101,6 +122,7 @@ public class C_CanvasActorHUD : MonoBehaviour
     public void DisableEnemyPointer()
     {
         mp_enemyPointerObject.SetActive(false);
+        mp_buttonAttack.SetActive(false);
         m_enemyPointerEnabled = false;
     }
 
@@ -120,6 +142,7 @@ public class C_CanvasActorHUD : MonoBehaviour
             return;
         }
         mp_enemyPointerObject.SetActive(true);
+        mp_buttonAttack.SetActive(true);
     }
 
 

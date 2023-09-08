@@ -23,6 +23,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     private Transform mp_waterTransform = null;
     private C_EnemyBase mp_enemyBase = null;
     private C_Joystick mp_joystick = null;
+    private Vector3 m_targetPosition = Vector3.zero;
     private E_ActorStates m_currentState = E_ActorStates.STANDBY;
     private float m_maxSpeed = 0.0f;
     private float m_cameraRotateSpeed = 0.0f;
@@ -320,6 +321,13 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
     }
 
 
+    public void GetTargetEnemy(out Vector3 t_actorPos, out Vector3 t_targetPos)
+    {
+        t_actorPos = transform.localPosition + new Vector3(0.0f, 1.0f, 0.0f);
+        t_targetPos = m_targetPosition;
+    }
+
+
 
     /* ========== Private Methods ========== */
 
@@ -436,9 +444,12 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
         {
             if (tp_col.tag.Equals("tag_landForce") || tp_col.tag.Equals("tag_oceanForce"))
             {
+                // 대상 위치
+                Vector3 t_enemyPos = tp_col.transform.localPosition;
+
                 //화면 상 위치
                 Vector3 t_ScreenPos = Quaternion.Inverse(mp_cameraTransform.localRotation)
-                    * (tp_col.transform.localPosition - mp_cameraTransform.localPosition);
+                    * (t_enemyPos - mp_cameraTransform.localPosition);
 
                 // 화면 상 거리, 제곱근 불필요
                 float t_dis = t_ScreenPos.x * t_ScreenPos.x + t_ScreenPos.y * t_ScreenPos.y;
@@ -446,6 +457,7 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
                 // 화면 중앙으로부터 제일 가까운지 확인
                 if (t_ScreenPos.z > 0.0f && t_angDis > t_dis)
                 {
+                    m_targetPosition = t_enemyPos;
                     t_angDis = t_dis;
                     t_pos = t_ScreenPos;
                 }

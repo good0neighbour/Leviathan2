@@ -21,5 +21,6 @@ MonoBehaviour:
   m_minNoiseAlpha: 0.1
   m_noiseAlphaSpeed: 4
   m_angleLimit: 20
+  m_colourFilter: {r: 0.5882353, g: 0.5882353, b: 0.5882353, a: 1}
   m_saturation: -60
   m_CAIntensity: 0.75

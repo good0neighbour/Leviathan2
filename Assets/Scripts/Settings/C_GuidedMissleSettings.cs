@@ -19,6 +19,7 @@ public class C_GuidedMissleSettings : ScriptableObject
     public float m_angleLimit = 20.0f;
     [Space(10.0f)]
     [Header("PostProcess")]
+    public Color m_colourFilter = Color.white;
     public float m_saturation = -50.0f;
     public float m_CAIntensity = 0.5f;
 }
