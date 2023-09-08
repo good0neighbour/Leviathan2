@@ -1584,7 +1584,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 250}
-  m_SizeDelta: {x: 700, y: 350}
+  m_SizeDelta: {x: 800, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &150730263
 MonoBehaviour:
@@ -17546,6 +17546,8 @@ MonoBehaviour:
   mp_conquestingDisplay: {fileID: 1334719533}
   mp_buttonConquest: {fileID: 432727508}
   mp_buttonAttack: {fileID: 8051361}
+  mp_actorBulletPrefab: {fileID: 4966012706831592722, guid: c145fd4ad8e3f114ca9cf6b104dcefa2,
+    type: 3}
   mp_hitPointBar: {fileID: 909767691}
   mp_conquestBar: {fileID: 843892575}
   mp_actorPortrait: {fileID: 1031888184}
@@ -21732,11 +21734,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38325d25eeb9d2d4bbf38b7777737d44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_minionSpawnTimer: 25
+  m_minionSpawnTimer: 30
   m_minionSpawnPoint: {x: 0, y: 10}
   m_maxHitPoint: 255
-  m_hitPointRestorePerSpawn: 5
+  m_hitPointRestorePerSpawn: 3
   mp_canvasTransform: {fileID: 150730262}
+  m_maxDistanceSquare: 710000
 --- !u!1 &1728021864
 GameObject:
   m_ObjectHideFlags: 0

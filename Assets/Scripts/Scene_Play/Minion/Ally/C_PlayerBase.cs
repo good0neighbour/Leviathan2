@@ -11,6 +11,7 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
     [SerializeField] private byte m_hitPointRestorePerSpawn = 10;
     [Header("미니맵")]
     [SerializeField] private Transform mp_canvasTransform = null;
+    [SerializeField] private float m_maxDistanceSquare = 250000.0f;
     private Transform mp_minimapCameraTransform = null;
     private C_MinionSettings mp_settings = null;
     private float m_timer = 0.0f;
@@ -120,12 +121,27 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
             SummonAllyMinion();
         }
 
-        // 미니맵 아이콘 표시
+        // 미니맵 아이콘 카메라 방향으로 회전
         mp_canvasTransform.rotation = Quaternion.Euler(
             90.0f,
             mp_minimapCameraTransform.localEulerAngles.y,
             0.0f
         );
+
+        // 미니맵 아이콘 카메라 범위 안으로 유지
+        Vector3 t_camPos = mp_minimapCameraTransform.localPosition;
+        float t_disX = transform.localPosition.x - t_camPos.x;
+        float t_disZ = transform.localPosition.z - t_camPos.z;
+        float t_disSquare = t_disX * t_disX + t_disZ * t_disZ;
+        if (m_maxDistanceSquare < t_disSquare)
+        {
+            float t_ratio = Mathf.Sqrt(m_maxDistanceSquare / t_disSquare);
+            mp_canvasTransform.position = new Vector3(
+                t_camPos.x + t_disX * t_ratio,
+                mp_canvasTransform.position.y,
+                t_camPos.z + t_disZ * t_ratio
+            );
+        }
     }
 
 

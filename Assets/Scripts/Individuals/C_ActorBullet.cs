@@ -8,7 +8,6 @@ public class C_ActorBullet : MonoBehaviour
     [SerializeField] private float m_velocityMult = -4.9f;
     [SerializeField] private float m_disableHeight = -2.0f;
     [SerializeField] private byte m_damage = 1;
-    private TrailRenderer mp_trailRenderer = null;
     private float m_a = 0.0f;
     private float m_b = 0.0f;
     private float m_velocityXZ = 0.0f;
@@ -17,17 +16,17 @@ public class C_ActorBullet : MonoBehaviour
     private float m_current = 0.0f;
     private uint m_targetLayer = 0;
 
-    public Vector3 startPosition
-    {
-        get;
-        set;
-    }
+    [SerializeField] public Vector3 startPosition;
+    //{
+    //    get;
+    //    set;
+    //}
 
-    public Vector3 goalPosition
-    {
-        get;
-        set;
-    }
+    [SerializeField] public Vector3 goalPosition;
+    //{
+    //    get;
+    //    set;
+    //}
 
 
 
@@ -36,7 +35,8 @@ public class C_ActorBullet : MonoBehaviour
     private void DisableThis()
     {
         gameObject.SetActive(false);
-        C_ObjectPool.instance.ReturnObject(gameObject, E_ObjectPool.ACTORBULLET);
+        //C_ObjectPool.instance.ReturnObject(gameObject, E_ObjectPool.ACTORBULLET);
+        //Destroy(gameObject);
     }
 
 
@@ -46,9 +46,6 @@ public class C_ActorBullet : MonoBehaviour
         m_targetLayer = (uint)(LayerMask.GetMask("layer_ground")
             + LayerMask.GetMask("layer_stencilWall")
             + LayerMask.GetMask("layer_water"));
-
-        // 참조
-        mp_trailRenderer = GetComponent<TrailRenderer>();
     }
 
 
@@ -76,9 +73,6 @@ public class C_ActorBullet : MonoBehaviour
 
         // 처음위치
         m_current = 0.0f;
-
-        // 꼬리 초기화
-        mp_trailRenderer.Clear();
     }
 
 

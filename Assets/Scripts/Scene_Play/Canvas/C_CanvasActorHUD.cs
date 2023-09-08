@@ -8,6 +8,7 @@ public class C_CanvasActorHUD : MonoBehaviour
     [SerializeField] private GameObject mp_conquestingDisplay = null;
     [SerializeField] private GameObject mp_buttonConquest = null;
     [SerializeField] private GameObject mp_buttonAttack = null;
+    [SerializeField] private GameObject mp_actorBulletPrefab = null;
     [SerializeField] private Image mp_hitPointBar = null;
     [SerializeField] private Image mp_conquestBar = null;
     [SerializeField] private Image mp_actorPortrait = null;
@@ -95,7 +96,8 @@ public class C_CanvasActorHUD : MonoBehaviour
         actor.GetTargetEnemy(out t_start, out t_goal);
 
         // 투척 물건
-        GameObject tp_bullet = C_ObjectPool.instance.GetObject(E_ObjectPool.ACTORBULLET);
+        //GameObject tp_bullet = C_ObjectPool.instance.GetObject(E_ObjectPool.ACTORBULLET);
+        GameObject tp_bullet = Instantiate(mp_actorBulletPrefab, t_start, Quaternion.identity);
 
         // 값 전달
         C_ActorBullet tp_actBull = tp_bullet.GetComponent<C_ActorBullet>();
