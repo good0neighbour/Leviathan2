@@ -8,14 +8,21 @@ public class C_CanvasAlwaysShow : MonoBehaviour
 {
     /* ========== Fields ========== */
 
+    [Header("상단")]
     [SerializeField] private Image mp_playerBaseHitPointImage = null;
     [SerializeField] private TextMeshProUGUI mp_landForceNum = null;
     [SerializeField] private TextMeshProUGUI mp_oceanForceNum = null;
     [SerializeField] private GameObject mp_canvasMenu = null;
     [Header("메세지 상자")]
     [SerializeField] private RectTransform mp_messageBox = null;
+    [SerializeField] private Image mp_portrait = null;
+    [SerializeField] private TextMeshProUGUI mp_name = null;
     [SerializeField] private TextMeshProUGUI mp_text = null;
-    private Queue<string> mp_messageQueue = new Queue<string>();
+    [Header("발표자 초상화")]
+    [SerializeField] private Sprite mp_aidePortrait = null;
+    [SerializeField] private Sprite mp_landForcePortrait = null;
+    [SerializeField] private Sprite mp_oceanForcePortrait = null;
+    private Queue<S_MessageContent> mp_messageQueue = new Queue<S_MessageContent>();
     private GameObject mp_messageBoxObject = null;
     private byte m_messageBoxStatus = 0;
 
@@ -53,19 +60,52 @@ public class C_CanvasAlwaysShow : MonoBehaviour
     /// <summary>
     /// 한국어 키를 인수로 전달하면 C_Langiage에서 번역된 문자열을 메세지로 표시
     /// </summary>
-    public void DisplayMessage(string tp_message)
+    public void DisplayMessage(string tp_message, C_ActorInfomation.S_Info t_actorInfo)
     {
-        switch (m_messageBoxStatus)
-        {
-            case C_Constants.MESSAGE_STANDBY:
-                mp_messageBoxObject.SetActive(true);
-                StartCoroutine(MessageBoxAnimation(C_Language.instance[tp_message]));
-                m_messageBoxStatus = C_Constants.MESSAGE_SHOWING;
-                return;
+        DisplayMessage(new S_MessageContent(
+            t_actorInfo.mp_actorPortrait,
+            t_actorInfo.mp_name,
+            C_Language.instance[tp_message]
+        ));
+    }
 
-            case C_Constants.MESSAGE_SHOWING:
-                mp_messageQueue.Enqueue(C_Language.instance[tp_message]);
-                return;
+
+    /// <summary>
+    /// 한국어 키를 인수로 전달하면 C_Langiage에서 번역된 문자열을 메세지로 표시
+    /// </summary>
+    public void DisplayMessage(string tp_message, E_MessageAnnouncer t_announcer)
+    {
+        switch (t_announcer)
+        {
+            case E_MessageAnnouncer.AIDE:
+                DisplayMessage(new S_MessageContent(
+                    mp_aidePortrait,
+                    C_Language.instance["부관"],
+                    C_Language.instance[tp_message]
+                ));
+                break;
+
+            case E_MessageAnnouncer.LANDFORCE:
+                DisplayMessage(new S_MessageContent(
+                    mp_landForcePortrait,
+                    C_Language.instance["대륙세력"],
+                    C_Language.instance[tp_message]
+                ));
+                break;
+
+            case E_MessageAnnouncer.OCEANFORCE:
+                DisplayMessage(new S_MessageContent(
+                    mp_oceanForcePortrait,
+                    C_Language.instance["해양세력"],
+                    C_Language.instance[tp_message]
+                ));
+                break;
+
+#if UNITY_EDITOR
+            default:
+                Debug.LogError("C_CanvasAlwaysShow.DisplayMessage : 잘못된 발표자");
+                break;
+#endif
         }
     }
 
@@ -73,14 +113,32 @@ public class C_CanvasAlwaysShow : MonoBehaviour
 
     /* ========== Private Methodes ========== */
 
+    private void DisplayMessage(S_MessageContent t_content)
+    {
+        switch (m_messageBoxStatus)
+        {
+            case C_Constants.MESSAGE_STANDBY:
+                StartCoroutine(MessageBoxAnimation(t_content));
+                m_messageBoxStatus = C_Constants.MESSAGE_SHOWING;
+                return;
+
+            default:
+                mp_messageQueue.Enqueue(t_content);
+                return;
+        }
+    }
+
+
     /// <summary>
     /// 메세지 박스 애니메이션
     /// </summary>
-    private IEnumerator MessageBoxAnimation(string tp_message)
+    private IEnumerator MessageBoxAnimation(S_MessageContent t_content)
     {
         C_AudioManager.instance.PlayAuido(E_AudioType.ALERT);
         float t_timer = 0.0f;
-        mp_text.text = tp_message;
+        mp_portrait.sprite = t_content.mp_portrait;
+        mp_name.text = t_content.mp_name;
+        mp_text.text = t_content.mp_text;
         mp_messageBoxObject.SetActive(true);
 
         // 메세지 박스 점점 커진다.
@@ -141,6 +199,27 @@ public class C_CanvasAlwaysShow : MonoBehaviour
                     m_messageBoxStatus = C_Constants.MESSAGE_STANDBY;
                 }
                 return;
+
+            default:
+                return;
+        }
+    }
+
+
+
+    /* ========== Structure ========== */
+
+    private struct S_MessageContent
+    {
+        public Sprite mp_portrait;
+        public string mp_name;
+        public string mp_text;
+
+        public S_MessageContent(Sprite tp_portrait, string tp_name, string tp_text)
+        {
+            mp_portrait = tp_portrait;
+            mp_name = tp_name;
+            mp_text = tp_text;
         }
     }
 }

@@ -201,7 +201,7 @@ public class C_AirPlane : MonoBehaviour, I_State<E_PlayStates>, I_StateMachine<E
         }
         else if (m_hitMessage)
         {
-            C_CanvasAlwaysShow.instance.DisplayMessage("기체가 공격받고 있습니다.");
+            C_CanvasAlwaysShow.instance.DisplayMessage("기체가 공격받고 있습니다.", E_MessageAnnouncer.AIDE);
             m_hitMessage = false;
         }
     }

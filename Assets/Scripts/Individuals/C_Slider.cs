@@ -9,8 +9,11 @@ public class C_Slider : MonoBehaviour
     private float m_range = 0.0f;
     private float m_initialMousePosition = 0.0f;
     private bool m_pressed = false;
-#if PLATFORM_STANDALONE_WIN
+#if UNITY_EDITOR
+#elif PLATFORM_STANDALONE_WIN
     private int m_currentwidth = 0;
+#elif PLATFORM_ANDROID
+    private byte m_currentMouse = 0;
 #endif
 
     public float value
@@ -28,7 +31,14 @@ public class C_Slider : MonoBehaviour
         m_pressed = t_active;
         if (m_pressed)
         {
+#if UNITY_EDITOR
             m_initialMousePosition = Input.mousePosition.x;
+#elif PLATFORM_STANDALONE_WIN
+            m_initialMousePosition = Input.mousePosition.x;
+#elif PLATFORM_ANDROID
+            m_currentMouse = (byte)(Input.touchCount - 1);
+            m_initialMousePosition = Input.GetTouch(m_currentMouse).position.x;
+#endif
         }
     }
 
@@ -63,7 +73,13 @@ public class C_Slider : MonoBehaviour
         if (m_pressed)
         {
             // 마우스 이동량
+#if UNITY_EDITOR
             float t_mousePos = Input.mousePosition.x - m_initialMousePosition;
+#elif PLATFORM_STANDALONE_WIN
+            float t_mousePos = Input.mousePosition.x - m_initialMousePosition;
+#elif PLATFORM_ANDROID
+            float t_mousePos = Input.GetTouch(m_currentMouse).position.x - m_initialMousePosition;
+#endif
 
             // 가장자리 제한
             if (m_range < t_mousePos)

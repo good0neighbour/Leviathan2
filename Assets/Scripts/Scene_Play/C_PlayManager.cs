@@ -88,9 +88,20 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
         {
             case E_ObjectPool.ATTACKENEMY_LANDFORCE:
                 --m_numOfLandBase;
+                if (0 == m_numOfLandBase)
+                {
+                    C_CanvasAlwaysShow.instance.DisplayMessage("대륙세력의 모든 거점을 점령했습니다.", E_MessageAnnouncer.AIDE);
+                    //C_CanvasAlwaysShow.instance.DisplayMessage("대륙세력의 모든 거점을 점령했습니다.", E_MessageAnnouncer.LANDFORCE);
+                }
                 break;
+
             case E_ObjectPool.ATTACKENEMY_OCEANFORCE:
                 --m_numOfOceanBase;
+                if (0 == m_numOfOceanBase)
+                {
+                    C_CanvasAlwaysShow.instance.DisplayMessage("해양세력의 모든 거점을 점령했습니다.", E_MessageAnnouncer.AIDE);
+                    //C_CanvasAlwaysShow.instance.DisplayMessage("해양세력의 모든 거점을 점령했습니다.", E_MessageAnnouncer.OCEANFORCE);
+                }
                 break;
         }
 
@@ -109,12 +120,10 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
     {
         if (0 == m_numOfLandBase)
         {
-            C_CanvasAlwaysShow.instance.DisplayMessage("대륙세력의 모든 거점을 점령했습니다.");
             return m_oceanForceBasePosition;
         }
         else if (0 == m_numOfOceanBase)
         {
-            C_CanvasAlwaysShow.instance.DisplayMessage("해양세력의 모든 거점을 점령했습니다.");
             return m_landForceBasePosition;
         }
         else

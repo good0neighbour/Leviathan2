@@ -1228,7 +1228,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -1238,12 +1238,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: -2004
+      value: -1959.6
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 536.02686
+      value: 531.41547
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -1584,7 +1584,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 250}
-  m_SizeDelta: {x: 800, y: 400}
+  m_SizeDelta: {x: 500, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &150730263
 MonoBehaviour:
@@ -1647,7 +1647,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_TargetDisplay: 0
 --- !u!1 &181523138
 GameObject:
@@ -3465,7 +3465,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -3475,12 +3475,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: 2039
+      value: 1943
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 407.25815
+      value: 487.01166
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -14814,7 +14814,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.45
+  m_fontSize: 18.9
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -15727,7 +15727,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -15737,12 +15737,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: -25
+      value: 39.12227
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 630.1691
+      value: 542
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -16053,6 +16053,127 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 997668373}
   m_CullTransparentMesh: 1
+--- !u!1 &1012548243
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1012548244}
+  - component: {fileID: 1012548246}
+  - component: {fileID: 1012548245}
+  - component: {fileID: 1012548247}
+  m_Layer: 5
+  m_Name: UI_TouchScreen
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1012548244
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012548243}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1148992485}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1012548245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012548243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1012548246
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012548243}
+  m_CullTransparentMesh: 1
+--- !u!114 &1012548247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012548243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1148992486}
+          m_TargetAssemblyTypeName: C_CanvasActorHUD, Assembly-CSharp
+          m_MethodName: ButtonCameraRotate
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+  - eventID: 3
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1148992486}
+          m_TargetAssemblyTypeName: C_CanvasActorHUD, Assembly-CSharp
+          m_MethodName: ButtonCameraRotate
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1031888182
 GameObject:
   m_ObjectHideFlags: 0
@@ -16866,7 +16987,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -16876,12 +16997,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: 965
+      value: 924
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 152.336
+      value: 232.81694
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -17382,7 +17503,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -17392,12 +17513,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: 239.1
+      value: 274.74594
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 1603.7429
+      value: 1536.5
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -17520,6 +17641,7 @@ RectTransform:
   - {fileID: 909767690}
   - {fileID: 300797389}
   - {fileID: 1334719534}
+  - {fileID: 1012548244}
   - {fileID: 358951398}
   - {fileID: 1236497021}
   - {fileID: 8051362}
@@ -17553,6 +17675,7 @@ MonoBehaviour:
   mp_actorPortrait: {fileID: 1031888184}
   mp_joystick: {fileID: 358951399}
   mp_enemyPointer: {fileID: 230663073}
+  m_cameraRotateSpeed: 0.1
 --- !u!1 &1150204821
 GameObject:
   m_ObjectHideFlags: 0
@@ -17922,7 +18045,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.65
+  m_fontSize: 21.05
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -18110,7 +18233,14 @@ MonoBehaviour:
   mp_oceanForceNum: {fileID: 1728021866}
   mp_canvasMenu: {fileID: 43435050}
   mp_messageBox: {fileID: 745188670}
+  mp_portrait: {fileID: 886790835}
+  mp_name: {fileID: 1598918451}
   mp_text: {fileID: 32927086}
+  mp_aidePortrait: {fileID: 21300000, guid: dfc150c93733cfc4ea71da7e6426c490, type: 3}
+  mp_landForcePortrait: {fileID: 21300000, guid: 26ff04a614e3316478725e17520956ee,
+    type: 3}
+  mp_oceanForcePortrait: {fileID: 21300000, guid: ce6086ca47fd5194687fb04c27be84c8,
+    type: 3}
 --- !u!1001 &1185529722
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18224,7 +18354,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -18234,12 +18364,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: 1220.06
+      value: 1263.984
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 984.36536
+      value: 936
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -18730,7 +18860,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.65
+  m_fontSize: 21.05
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -18866,7 +18996,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.65
+  m_fontSize: 21.05
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -19783,7 +19913,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -19793,12 +19923,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: -1473.5111
+      value: -1480
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 329
+      value: 275.90646
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -19939,7 +20069,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -19949,12 +20079,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: 1862.4
+      value: 1733
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 1386.4443
+      value: 1404.831
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -20073,7 +20203,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -20083,12 +20213,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: -888.8
+      value: -945
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 221.70251
+      value: 263.73044
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -21734,12 +21864,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38325d25eeb9d2d4bbf38b7777737d44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_minionSpawnTimer: 30
+  m_minionSpawnTimer: 12
   m_minionSpawnPoint: {x: 0, y: 10}
-  m_maxHitPoint: 255
-  m_hitPointRestorePerSpawn: 3
+  m_maxHitPoint: 1000
+  m_hitPointRestorePerSpawn: 25
   mp_canvasTransform: {fileID: 150730262}
-  m_maxDistanceSquare: 710000
+  m_maxDistanceSquare: 750000
 --- !u!1 &1728021864
 GameObject:
   m_ObjectHideFlags: 0
@@ -21825,7 +21955,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.65
+  m_fontSize: 21.05
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -22044,7 +22174,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 59811f36411be194b8bff9185afda9f9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ed5776ed6d559f445bccce74f9c95184, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -27586,7 +27716,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -27596,12 +27726,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: 1420
+      value: 1510
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 380.06354
+      value: 404.5531
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -28071,7 +28201,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.65
+  m_fontSize: 21.05
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -28489,7 +28619,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -28499,12 +28629,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: -610.6
+      value: -586.78845
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 1329.474
+      value: 1247.9
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -28584,7 +28714,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b01fe93af20c656458cb82091862a698, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 28ce1f8e45da34248a81c1dc8fa81545, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -34575,7 +34705,7 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemyTimer
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
@@ -34585,12 +34715,12 @@ PrefabInstance:
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.x
-      value: -2074
+      value: -2010.05
       objectReference: {fileID: 0}
     - target: {fileID: 5997264371704076258, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}
       propertyPath: m_attackEnemySpawnPosint.y
-      value: 1554.5083
+      value: 1540.5581
       objectReference: {fileID: 0}
     - target: {fileID: 6788138226775371728, guid: 9cdd80dbbbb683343aa786ad4e3575b3,
         type: 3}

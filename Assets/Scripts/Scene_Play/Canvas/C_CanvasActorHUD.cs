@@ -14,12 +14,18 @@ public class C_CanvasActorHUD : MonoBehaviour
     [SerializeField] private Image mp_actorPortrait = null;
     [SerializeField] private C_Joystick mp_joystick = null;
     [SerializeField] private RectTransform mp_enemyPointer = null;
+    [SerializeField] private float m_cameraRotateSpeed = 0.1f;
     private GameObject mp_enemyPointerObject = null;
     private float m_pixelPerRotation = Screen.height / (Mathf.PI* 0.25f);
     private float m_enemyPointerLimit = Screen.height * Screen.height * 0.25f;
+    private float m_previousMousePosition = 0.0f;
     private bool m_enemyPointerEnabled = false;
-#if PLATFORM_STANDALONE_WIN
+    private bool m_cameraRotateTouch = false;
+#if UNITY_EDITOR
+#elif PLATFORM_STANDALONE_WIN
     private float m_currentHeight = Screen.height;
+#elif PLATFORM_ANDROID
+    private byte m_currentMouse = 0;
 #endif
 
     public static C_CanvasActorHUD instance
@@ -40,7 +46,15 @@ public class C_CanvasActorHUD : MonoBehaviour
 
     public void CanvasEnable(bool t_enable)
     {
-        gameObject.SetActive(t_enable);
+        if (t_enable)
+        {
+            gameObject.SetActive(true);
+        }
+        else
+        {
+            gameObject.SetActive(false);
+            m_cameraRotateTouch = false;
+        }
     }
 
 
@@ -115,6 +129,27 @@ public class C_CanvasActorHUD : MonoBehaviour
     }
 
 
+    public void ButtonCameraRotate(bool t_active)
+    {
+        if (t_active)
+        {
+#if UNITY_EDITOR
+            m_previousMousePosition = Input.mousePosition.x;
+#elif PLATFORM_STANDALONE_WIN
+            m_previousMousePosition = Input.mousePosition.x;
+#elif PLATFORM_ANDROID
+            m_currentMouse = (byte)(Input.touchCount - 1);
+            m_previousMousePosition = Input.GetTouch(m_currentMouse).position.x;
+#endif
+            m_cameraRotateTouch = true;
+        }
+        else
+        {
+            m_cameraRotateTouch = false;
+        }
+    }
+
+
     public C_Joystick GetUIJoystick()
     {
         return mp_joystick;
@@ -151,6 +186,29 @@ public class C_CanvasActorHUD : MonoBehaviour
 
     /* ========== Private Methods ========== */
 
+    private void EarlyFixedUpdate()
+    {
+        if (m_cameraRotateTouch)
+        {
+#if UNITY_EDITOR
+            float t_MouseX = Input.mousePosition.x;
+#elif PLATFORM_STANDALONE_WIN
+            float t_MouseX = Input.mousePosition.x;
+#elif PLATFORM_ANDROID
+            float t_MouseX = Input.GetTouch(m_currentMouse).position.x;
+#endif
+            // 카메라 회전을 반대로 하기 위해 반대로 뺄셈
+            float t_rotate = m_previousMousePosition - t_MouseX;
+            C_CameraMove.instance.transform.localRotation *= Quaternion.Euler(
+                0.0f,
+                t_rotate * m_cameraRotateSpeed,
+                0.0f
+            );
+            m_previousMousePosition = t_MouseX;
+        }
+    }
+
+
     private void Awake()
     {
         // 유니티식 싱글턴패턴
@@ -159,12 +217,15 @@ public class C_CanvasActorHUD : MonoBehaviour
         // 참조
         mp_enemyPointerObject = mp_enemyPointer.gameObject;
 
+        // 대리자 등록
+        C_PlayManager.instance.earlyFixedUpdate += EarlyFixedUpdate;
+
         // 비활성화로 시작
         gameObject.SetActive(false);
     }
 
 
-    #if PLATFORM_STANDALONE_WIN
+#if PLATFORM_STANDALONE_WIN
     private void Update()
     {
         if (Screen.height != m_currentHeight)
@@ -173,6 +234,12 @@ public class C_CanvasActorHUD : MonoBehaviour
             m_pixelPerRotation = m_currentHeight / (Mathf.PI * 0.25f);
             m_enemyPointerLimit = m_currentHeight * m_currentHeight * 0.25f;
         }
+
+        // 공격 단축키
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            ButtonAttack();
+        }
     }
-    #endif
+#endif
 }

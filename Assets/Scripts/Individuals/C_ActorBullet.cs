@@ -4,11 +4,10 @@ public class C_ActorBullet : MonoBehaviour
 {
     /* ========== Fields ========== */
 
-    [SerializeField] private float m_angle = -0.1f;
+    [SerializeField] private float m_a = -0.1f;
     [SerializeField] private float m_velocityMult = -4.9f;
     [SerializeField] private float m_disableHeight = -2.0f;
     [SerializeField] private byte m_damage = 1;
-    private float m_a = 0.0f;
     private float m_b = 0.0f;
     private float m_velocityXZ = 0.0f;
     private float m_sin = 0.0f;
@@ -16,17 +15,17 @@ public class C_ActorBullet : MonoBehaviour
     private float m_current = 0.0f;
     private uint m_targetLayer = 0;
 
-    [SerializeField] public Vector3 startPosition;
-    //{
-    //    get;
-    //    set;
-    //}
+    public Vector3 startPosition
+    {
+        get;
+        set;
+    }
 
-    [SerializeField] public Vector3 goalPosition;
-    //{
-    //    get;
-    //    set;
-    //}
+    public Vector3 goalPosition
+    {
+        get;
+        set;
+    }
 
 
 
@@ -34,9 +33,9 @@ public class C_ActorBullet : MonoBehaviour
 
     private void DisableThis()
     {
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
         //C_ObjectPool.instance.ReturnObject(gameObject, E_ObjectPool.ACTORBULLET);
-        //Destroy(gameObject);
+        Destroy(gameObject);
     }
 
 
@@ -57,9 +56,7 @@ public class C_ActorBullet : MonoBehaviour
         float t_distanceXZ = Mathf.Sqrt(t_distanceX * t_distanceX + t_distanceZ * t_distanceZ);
 
         // 상수 값
-        float t_temp = t_distanceXZ + (startPosition.y - goalPosition.y) / (m_angle * t_distanceXZ);
-        m_b = startPosition.y - m_angle * 0.25f * t_temp * t_temp;
-        m_a = -Mathf.Sqrt((startPosition.y - m_b) / m_angle);
+        m_b = -(m_a * t_distanceXZ + (startPosition.y - goalPosition.y) / t_distanceXZ);
 
         // 계산 단축
         float m_radian = Mathf.Atan(t_distanceX / t_distanceZ);
@@ -69,7 +66,7 @@ public class C_ActorBullet : MonoBehaviour
         }
         m_sin = Mathf.Sin(m_radian);
         m_cos = Mathf.Cos(m_radian);
-        m_velocityXZ = m_velocityMult / m_angle;
+        m_velocityXZ = m_velocityMult / m_a;
 
         // 처음위치
         m_current = 0.0f;
@@ -79,10 +76,9 @@ public class C_ActorBullet : MonoBehaviour
     private void FixedUpdate()
     {
         // 이차함수 그래프를 따라 이동
-        float t_temp = m_current + m_a;
         transform.localPosition = new Vector3(
             startPosition.x + m_sin * m_current,
-            m_angle * t_temp * t_temp + m_b,
+            m_a * m_current * m_current + m_b * m_current + startPosition.y,
             startPosition.z + m_cos * m_current
         );
 

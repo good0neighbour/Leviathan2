@@ -25,7 +25,6 @@ public class C_EnemyBase : MonoBehaviour
     private float m_maxPatrolUpdateTime = 0.0f;
     private float m_timer = 0.0f;
 
-
 #if UNITY_EDITOR
     public Vector2 attackEnemySpawnPosint
     {
@@ -97,32 +96,57 @@ public class C_EnemyBase : MonoBehaviour
 
     private void Update()
     {
-        // Minion 생성
-        m_timer += Time.deltaTime;
-        if (m_attackEnemyTimer <= m_timer)
-        {
-            m_timer -= m_attackEnemyTimer;
-            GameObject tp_minion = C_ObjectPool.instance.GetObject(m_enemyType);
-            tp_minion.transform.localPosition = new Vector3(
-                m_attackEnemySpawnPosint.x,
-                0.0f,
-                m_attackEnemySpawnPosint.y
-            );
-            tp_minion.GetComponent<C_Minion>().MinionInitialize(mp_settings);
-            tp_minion.GetComponent<NavMeshAgent>().enabled = true;
-            tp_minion.SetActive(true);
-        }
-
         // 미니맵 아이콘 표시
         mp_canvasTransform.rotation = Quaternion.Euler(
             90.0f,
             mp_minimapCameraTransform.localEulerAngles.y,
             0.0f
         );
+
+        // Minion 생성
+        m_timer += Time.deltaTime;
+        if (m_attackEnemyTimer <= m_timer)
+        {
+            m_timer -= m_attackEnemyTimer;
+            GameObject tp_minion = C_ObjectPool.instance.GetObject(m_enemyType);
+            switch (tp_minion)
+            {
+                case null:
+                    return;
+
+                default:
+                    tp_minion.transform.localPosition = new Vector3(
+                        m_attackEnemySpawnPosint.x,
+                        0.0f,
+                        m_attackEnemySpawnPosint.y
+                    );
+                    tp_minion.GetComponent<C_Minion>().MinionInitialize(mp_settings);
+                    tp_minion.GetComponent<NavMeshAgent>().enabled = true;
+                    tp_minion.SetActive(true);
+                    return;
+            }
+        }
     }
 
 
 #if UNITY_EDITOR
+
+    private void Awake()
+    {
+        switch (m_enemyType)
+        {
+            case E_ObjectPool.ATTACKENEMY_LANDFORCE:
+            case E_ObjectPool.ATTACKENEMY_OCEANFORCE:
+                return;
+
+            default:
+                Debug.LogError($"{name} C_EnemyBase : 잘못된 세력 설정");
+                gameObject.SetActive(false);
+                return;
+        }
+    }
+
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;

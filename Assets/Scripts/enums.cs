@@ -63,4 +63,13 @@ public enum E_AudioType
     DIVE,
     STEALTH,
     ACTOR_SUMMON,
+    END
+}
+
+public enum E_MessageAnnouncer
+{
+    AIDE,
+    LANDFORCE,
+    OCEANFORCE,
+    END
 }

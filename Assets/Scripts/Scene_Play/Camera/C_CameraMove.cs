@@ -90,11 +90,11 @@ public class C_CameraMove : MonoBehaviour, I_StateMachine<E_PlayStates>
                 transform.localPosition = tp_target.localPosition + transform.localRotation * m_actorCameraPosition;
                 return;
 
-            default:
 #if UNITY_EDITOR
+            default:
                 Debug.LogError("잘못된 카메라 상태");
-#endif
                 return;
+#endif
         }
     }
 

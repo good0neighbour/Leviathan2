@@ -18,6 +18,9 @@ public class C_ObjectPool : MonoBehaviour
         new Stack<GameObject>(),
         new Stack<GameObject>()
     };
+    private byte m_landForceNum = 0;
+    private byte m_oceanForceNum = 0;
+    private byte m_allyNum = 0;
 
     public static C_ObjectPool instance
     {
@@ -31,30 +34,47 @@ public class C_ObjectPool : MonoBehaviour
 
     public GameObject GetObject(E_ObjectPool t_objectType)
     {
-        switch (mp_objectStacks[(int)t_objectType].Count)
+        if (0 == mp_objectStacks[(int)t_objectType].Count)
         {
-            case 0:
-                switch (t_objectType)
-                {
-                    case E_ObjectPool.ATTACKENEMY_LANDFORCE:
-                        return Instantiate(mp_landForceattackEnemyPrefab);
-                        
-                    case E_ObjectPool.ATTACKENEMY_OCEANFORCE:
-                        return Instantiate(mp_oceanForceattackEnemyPrefab);
+            switch (t_objectType)
+            {
+                case E_ObjectPool.ATTACKENEMY_LANDFORCE:
+                    if (C_Constants.LANDFORCELIMIT < m_landForceNum)
+                    {
+                        return null;
+                    }
+                    ++m_landForceNum;
+                    return Instantiate(mp_landForceattackEnemyPrefab);
 
-                    case E_ObjectPool.ALLYMINION:
-                        return Instantiate(mp_allyPrefab);
+                case E_ObjectPool.ATTACKENEMY_OCEANFORCE:
+                    if (C_Constants.OCEANFORCELIMIT < m_oceanForceNum)
+                    {
+                        return null;
+                    }
+                    ++m_oceanForceNum;
+                    return Instantiate(mp_oceanForceattackEnemyPrefab);
 
-                    case E_ObjectPool.ACTORBULLET:
-                        return Instantiate(mp_actorBulletPrefab);
+                case E_ObjectPool.ALLYMINION:
+                    if (C_Constants.ALLYLIMIT < m_allyNum)
+                    {
+                        return null;
+                    }
+                    ++m_allyNum;
+                    return Instantiate(mp_allyPrefab);
 
-                    case E_ObjectPool.EXPLOSION:
-                        return Instantiate(mp_explosionPrefab);
-                }
-                return null;
+                case E_ObjectPool.ACTORBULLET:
+                    return Instantiate(mp_actorBulletPrefab);
 
-            default:
-                return mp_objectStacks[(int)t_objectType].Pop();
+                case E_ObjectPool.EXPLOSION:
+                    return Instantiate(mp_explosionPrefab);
+
+                default:
+                    return null;
+            }
+        }
+        else
+        {
+            return mp_objectStacks[(int)t_objectType].Pop();
         }
     }
 

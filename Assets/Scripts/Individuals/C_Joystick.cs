@@ -8,9 +8,13 @@ public class C_Joystick : MonoBehaviour
     [SerializeField] private float m_restoreSpeed = 4.0f;
     [SerializeField] private ushort m_pointingRadius = 50;
     public Vector2 value = Vector2.zero;
-    private Vector3 m_initialMousePosition = Vector2.zero;
+    private Vector2 m_initialMousePosition = Vector2.zero;
     private ushort m_radiusPower = 0;
     private bool m_pressed = false;
+#if UNITY_EDITOR
+#elif PLATFORM_ANDROID
+    private byte m_currentMouse = 0;
+#endif
 
 
 
@@ -21,7 +25,14 @@ public class C_Joystick : MonoBehaviour
         m_pressed = t_active;
         if (m_pressed)
         {
+#if UNITY_EDITOR
             m_initialMousePosition = Input.mousePosition;
+#elif PLATFORM_STANDALONE_WIN
+            m_initialMousePosition = Input.mousePosition;
+#elif PLATFORM_ANDROID
+            m_currentMouse = (byte)(Input.touchCount - 1);
+            m_initialMousePosition = Input.GetTouch(m_currentMouse).position;
+#endif
         }
     }
 
@@ -46,7 +57,13 @@ public class C_Joystick : MonoBehaviour
         if (m_pressed)
         {
             // 마우스 이동량
-            Vector2 t_mousePos = (Vector2)(Input.mousePosition - m_initialMousePosition);
+#if UNITY_EDITOR
+            Vector2 t_mousePos = (Vector2)Input.mousePosition - m_initialMousePosition;
+#elif PLATFORM_STANDALONE_WIN
+            Vector2 t_mousePos = (Vector2)Input.mousePosition - m_initialMousePosition;
+#elif PLATFORM_ANDROID
+            Vector2 t_mousePos = Input.GetTouch(m_currentMouse).position - m_initialMousePosition;
+#endif
 
             // 가장자리 제한
             float t_dis = t_mousePos.x * t_mousePos.x + t_mousePos.y * t_mousePos.y;

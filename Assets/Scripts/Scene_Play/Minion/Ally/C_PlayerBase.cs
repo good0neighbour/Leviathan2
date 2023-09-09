@@ -7,7 +7,7 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
 
     [SerializeField] private float m_minionSpawnTimer = 10.0f;
     [SerializeField] private Vector2 m_minionSpawnPoint = Vector3.zero;
-    [SerializeField] private byte m_maxHitPoint = 100;
+    [SerializeField] private short m_maxHitPoint = 1000;
     [SerializeField] private byte m_hitPointRestorePerSpawn = 10;
     [Header("미니맵")]
     [SerializeField] private Transform mp_canvasTransform = null;
@@ -15,6 +15,7 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
     private Transform mp_minimapCameraTransform = null;
     private C_MinionSettings mp_settings = null;
     private float m_timer = 0.0f;
+    private float m_messageTimer = 0.0f;
     private short m_currentHitPoint = 0;
     private byte m_messageState = byte.MaxValue;
 
@@ -32,23 +33,29 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
         C_CanvasAlwaysShow.instance.SetPlayerBaseHitPointImage((float)m_currentHitPoint / m_maxHitPoint);
 
         // 메세지 표시
-        if (0 < (m_messageState & C_Constants.PLAYER_HIT))
+        if (C_Constants.MESSAGETIME < m_messageTimer)
         {
-            C_CanvasAlwaysShow.instance.DisplayMessage("기지가 공격받고 있습니다.");
-            m_messageState ^= C_Constants.PLAYER_HIT;
+            if (0 < (m_messageState & C_Constants.PLAYER_HIT))
+            {
+                C_CanvasAlwaysShow.instance.DisplayMessage("기지가 공격받고 있습니다.", E_MessageAnnouncer.AIDE);
+                m_messageState ^= C_Constants.PLAYER_HIT;
+            }
+            if (m_maxHitPoint > m_currentHitPoint * 2
+                && 0 < (m_messageState & C_Constants.PLAYER_HALFHITPOINT))
+            {
+                C_CanvasAlwaysShow.instance.DisplayMessage("기지의 방어력이 절반 이하입니다.", E_MessageAnnouncer.AIDE);
+                m_messageState ^= C_Constants.PLAYER_HALFHITPOINT;
+            }
+            else if (m_maxHitPoint > m_currentHitPoint * 10
+                && 0 < (m_messageState & C_Constants.PLAYER_LOWHITPOINT))
+            {
+                C_CanvasAlwaysShow.instance.DisplayMessage("기지가 파괴되기 직전입니다.", E_MessageAnnouncer.AIDE);
+                m_messageState ^= C_Constants.PLAYER_LOWHITPOINT;
+            }
         }
-        if (m_maxHitPoint > m_currentHitPoint * 2
-            && 0 < (m_messageState & C_Constants.PLAYER_HALFHITPOINT))
-        {
-            C_CanvasAlwaysShow.instance.DisplayMessage("기지의 방어력이 절반 이하입니다.");
-            m_messageState ^= C_Constants.PLAYER_HALFHITPOINT;
-        }
-        if (m_maxHitPoint > m_currentHitPoint * 10
-            && 0 < (m_messageState & C_Constants.PLAYER_LOWHITPOINT))
-        {
-            C_CanvasAlwaysShow.instance.DisplayMessage("기지가 파괴되기 직전입니다.");
-            m_messageState ^= C_Constants.PLAYER_LOWHITPOINT;
-        }
+
+        // 메세지용 타이머 초기화
+        m_messageTimer = 0.0f;
     }
 
 
@@ -69,6 +76,12 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
         // 아군 생성
         m_timer -= m_minionSpawnTimer;
         GameObject tp_ally = C_ObjectPool.instance.GetObject(E_ObjectPool.ALLYMINION);
+        if (null == tp_ally)
+        {
+            return;
+        }
+
+        // 배치
         tp_ally.transform.localPosition = new Vector3(
             m_minionSpawnPoint.x,
             0.0f,
@@ -115,6 +128,7 @@ public class C_PlayerBase : MonoBehaviour, I_Hitable
     private void Update()
     {
         m_timer += Time.deltaTime;
+        m_messageTimer += Time.deltaTime;
         if (m_minionSpawnTimer <= m_timer)
         {
             // 아군 생성

@@ -32,9 +32,15 @@ public static class C_Constants
     public const byte ENEMY_ATTACK = 2;
 
     // C_PlayerBase 전용, 메세지 상태
+    public const float MESSAGETIME = 5.0f;
     public const byte PLAYER_HIT = 0B001;
     public const byte PLAYER_HALFHITPOINT = 0B010;
     public const byte PLAYER_LOWHITPOINT = 0B100;
+
+    // C_ObjectPool 전용, 개수 제한
+    public const byte LANDFORCELIMIT = 16;
+    public const byte OCEANFORCELIMIT = 16;
+    public const byte ALLYLIMIT = 16;
 
     // C_Message 전용, 메세지 상자
     public const float MESSAGEBOX_DELAY = 2.0f;
@@ -44,7 +50,7 @@ public static class C_Constants
     // C_Message 전용, 메세지 상태
     public const byte MESSAGE_STANDBY = 0;
     public const byte MESSAGE_SHOWING = 1;
-    public const byte MESSAGE_DONE = 1;
+    public const byte MESSAGE_DONE = 2;
 
     // 일반
     public const float DISTANCE_FADE = 500.0f;
