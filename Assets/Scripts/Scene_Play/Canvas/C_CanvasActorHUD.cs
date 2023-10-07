@@ -21,9 +21,9 @@ public class C_CanvasActorHUD : MonoBehaviour
     private float m_previousMousePosition = 0.0f;
     private bool m_enemyPointerEnabled = false;
     private bool m_cameraRotateTouch = false;
-#if UNITY_EDITOR
-#elif PLATFORM_STANDALONE_WIN
+#if PLATFORM_STANDALONE_WIN
     private float m_currentHeight = Screen.height;
+#elif UNITY_EDITOR
 #elif PLATFORM_ANDROID
     private byte m_currentMouse = 0;
 #endif

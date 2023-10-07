@@ -101,12 +101,6 @@ public class C_BehaviourTree
 
 
 
-    /* ========== Enum ========== */
-
-    
-
-
-
     /* ========== Classes ========== */
 
     private abstract class C_Node

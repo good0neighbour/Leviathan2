@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
@@ -193,9 +192,9 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
 
             // 공기저항
             * new Vector3(
-                t_velocity.x * (1.0f - m_airResist.x * Mathf.Abs(t_velocity.x)),
-                t_velocity.y * (1.0f - m_airResist.y * Mathf.Abs(t_velocity.y)),
-                t_velocity.z * (1.0f - m_airResist.z * Mathf.Abs(t_velocity.z))
+                t_velocity.x - t_velocity.x * m_airResist.x * Mathf.Abs(t_velocity.x),
+                t_velocity.y - t_velocity.y * m_airResist.y * Mathf.Abs(t_velocity.y),
+                t_velocity.z - t_velocity.z * m_airResist.z * Mathf.Abs(t_velocity.z)
             )
 
             // 중력가속도
@@ -222,9 +221,9 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
 
             // 공기저항
             * new Vector3(
-                t_velocity.x * (1.0f - m_airResist.x * Mathf.Abs(t_velocity.x)),
-                t_velocity.y * (1.0f - m_airResist.y * Mathf.Abs(t_velocity.y)),
-                t_velocity.z * (1.0f - m_airResist.z * Mathf.Abs(t_velocity.z))
+                t_velocity.x - t_velocity.x * m_airResist.x * Mathf.Abs(t_velocity.x),
+                t_velocity.y - t_velocity.y * m_airResist.y * Mathf.Abs(t_velocity.y),
+                t_velocity.z - t_velocity.z * m_airResist.z * Mathf.Abs(t_velocity.z)
             )
 
             // 중력가속도
@@ -306,12 +305,8 @@ public abstract class C_AirPlaneStateBase : I_State<E_FlightStates>
         if (t_dynamicPos)
         {
             mp_HUDUpDown.localPosition = new Vector3(
-                t_degreeX,
-                t_degreeY,
-                0.0f
-            ) + mp_HUDUpDown.localRotation * new Vector3(
-                0.0f,
-                t_rotation.x * m_HUDUpDownMoveAmount,
+                t_rotation.x * t_sinZ * m_HUDUpDownMoveAmount + t_degreeX * t_cosZ,
+                t_rotation.x * t_cosZ * m_HUDUpDownMoveAmount + t_degreeY * Mathf.Abs(t_sinZ),
                 0.0f
             );
         }

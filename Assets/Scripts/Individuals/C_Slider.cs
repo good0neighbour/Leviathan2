@@ -9,9 +9,9 @@ public class C_Slider : MonoBehaviour
     private float m_range = 0.0f;
     private float m_initialMousePosition = 0.0f;
     private bool m_pressed = false;
-#if UNITY_EDITOR
-#elif PLATFORM_STANDALONE_WIN
+#if PLATFORM_STANDALONE_WIN
     private int m_currentwidth = 0;
+#elif UNITY_EDITOR
 #elif PLATFORM_ANDROID
     private byte m_currentMouse = 0;
 #endif
