@@ -49,6 +49,7 @@ public class C_EnemyBase : MonoBehaviour
         mp_flag.material = C_PlayManager.instance.GetPlayerFlagMaterial();
         mp_iconImage.sprite = C_PlayManager.instance.GetPlayerFlagSprite();
         C_PlayManager.instance.EnemyBaseConquested(m_enemyType);
+        m_attackEnemyTimer = C_Constants.ALLY_SPAWN_TIME;
         m_enemyType = E_ObjectPool.ALLYMINION;
     }
 

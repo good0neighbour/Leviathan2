@@ -416,7 +416,6 @@ public class C_Actor : MonoBehaviour, I_State<E_PlayStates>, I_Hitable
                     C_CanvasActorHUD.instance.ConquestButtonEnable(false);
                     m_currentState = E_ActorStates.STANDBY;
                     m_conquestingPhase = 0;
-                    C_CanvasAlwaysShow.instance.DisplayMessage("적 거점을 점령했습니다.", E_MessageAnnouncer.AIDE);
                     return;
                 }
                 C_CanvasActorHUD.instance.SetConquestBar(m_conquesting);

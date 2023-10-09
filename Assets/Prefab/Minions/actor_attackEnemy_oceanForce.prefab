@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2287086477393195749}
   m_Layer: 0
   m_Name: actor_attackEnemy_oceanForce
-  m_TagString: tag_landForce
+  m_TagString: tag_oceanForce
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -55,8 +55,8 @@ MonoBehaviour:
   mp_surprisedText: {fileID: 214289942345151175}
   mp_lineRenderer: {fileID: 3743298201541106290}
   mp_targetTags:
+  - tag_landForce
   - tag_player
-  - taglandForce
   m_attackColour: {r: 1, g: 1, b: 0, a: 1}
   m_enemyType: 1
 --- !u!195 &2126466028261376921

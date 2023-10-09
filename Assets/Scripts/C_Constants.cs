@@ -32,10 +32,9 @@ public static class C_Constants
     public const byte ENEMY_ATTACK = 2;
 
     // C_PlayerBase 전용, 메세지 상태
-    public const float MESSAGETIME = 5.0f;
-    public const byte PLAYER_HIT = 0B001;
-    public const byte PLAYER_HALFHITPOINT = 0B010;
-    public const byte PLAYER_LOWHITPOINT = 0B100;
+    public const float MESSAGE_TIME = 10.0f;
+    public const byte PLAYER_HALFHITPOINT = 0b01;
+    public const byte PLAYER_LOWHITPOINT = 0b10;
 
     // C_ObjectPool 전용, 개수 제한
     public const byte LANDFORCELIMIT = 16;
@@ -55,5 +54,6 @@ public static class C_Constants
     // 일반
     public const float DISTANCE_FADE = 500.0f;
     public const float CAMERA_ANGLE = 45.0f;
+    public const float ALLY_SPAWN_TIME = 25.0f;
     public const byte NUM_OF_ACTOR_LIMIT = 3;
 }

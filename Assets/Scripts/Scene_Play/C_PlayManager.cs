@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -83,6 +84,9 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
     /// </summary>
     public void EnemyBaseConquested(E_ObjectPool t_enemyForce)
     {
+        // 메세지 출력
+        C_CanvasAlwaysShow.instance.DisplayMessage("적 거점을 점령했습니다.", E_MessageAnnouncer.AIDE);
+
         // 적 기지 수 감소
         switch (t_enemyForce)
         {
@@ -90,8 +94,8 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
                 --m_numOfLandBase;
                 if (0 == m_numOfLandBase)
                 {
+                    C_CanvasAlwaysShow.instance.DisplayMessage("소국 주제에 대국에 대항하지 마라.", E_MessageAnnouncer.LANDFORCE);
                     C_CanvasAlwaysShow.instance.DisplayMessage("대륙세력의 모든 거점을 점령했습니다.", E_MessageAnnouncer.AIDE);
-                    //C_CanvasAlwaysShow.instance.DisplayMessage("대륙세력의 모든 거점을 점령했습니다.", E_MessageAnnouncer.LANDFORCE);
                 }
                 break;
 
@@ -99,8 +103,8 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
                 --m_numOfOceanBase;
                 if (0 == m_numOfOceanBase)
                 {
+                    C_CanvasAlwaysShow.instance.DisplayMessage("당신 같은 회색분자는 누구에게도 환영받지 못한다.", E_MessageAnnouncer.OCEANFORCE);
                     C_CanvasAlwaysShow.instance.DisplayMessage("해양세력의 모든 거점을 점령했습니다.", E_MessageAnnouncer.AIDE);
-                    //C_CanvasAlwaysShow.instance.DisplayMessage("해양세력의 모든 거점을 점령했습니다.", E_MessageAnnouncer.OCEANFORCE);
                 }
                 break;
         }
@@ -111,7 +115,7 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
         // 게임 종료 확인
         if (0 == m_numOfLandBase && 0 == m_numOfOceanBase)
         {
-            GameEnd(true);
+            StartCoroutine(WinSceneDelay(6.0f));
         }
     }
 
@@ -170,6 +174,7 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 
     public void GameEnd(bool m_win)
     {
+        StopAllCoroutines();
         C_GameManager.instance.gameWin = m_win;
         SceneManager.LoadScene("Scene_End");
     }    
@@ -177,6 +182,18 @@ public class C_PlayManager : MonoBehaviour, I_StateMachine<E_PlayStates>
 
 
     /* ========== Private Methods ========== */
+
+    private IEnumerator WinSceneDelay(float t_delayTime)
+    {
+        float t_time = 0.0f;
+        while (t_delayTime > t_time)
+        {
+            t_time += Time.deltaTime;
+            yield return null;
+        }
+        GameEnd(true);
+    }
+
 
     private void Awake()
     {

@@ -158,6 +158,10 @@ public abstract class C_Minion : MonoBehaviour, I_Hitable
                                     mp_target = t_tran;
                                     mp_actor = t_tran.GetComponent<I_Hitable>();
                                     m_targetDistance = t_dis;
+                                    if (m_attackRange > t_dis)
+                                    {
+                                        return E_NodeStatuss.RUNNING;
+                                    }
                                 }
                                 break;
                             }

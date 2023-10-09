@@ -55,8 +55,8 @@ MonoBehaviour:
   mp_surprisedText: {fileID: 214289942345151175}
   mp_lineRenderer: {fileID: 3743298201541106290}
   mp_targetTags:
-  - tag_player
   - tag_oceanForce
+  - tag_player
   m_attackColour: {r: 1, g: 0, b: 0, a: 1}
   m_enemyType: 0
 --- !u!195 &2126466028261376921
